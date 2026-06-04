@@ -4,12 +4,12 @@
     "totalAsset": 15000,
     "apiKey": "da5601ce51f74a18909eeb565fbbdc6c",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1780585866073,
-    "lastPriceRefreshText": "2026/6/4 23:11:06"
+    "lastPriceRefresh": 1780586017488,
+    "lastPriceRefreshText": "2026/6/4 23:13:37"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.16274,
+    "EUR": 1.16256,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
@@ -20,13 +20,13 @@
       "name": "美光科技",
       "source": "twelve",
       "currency": "USD",
-      "shares": 1,
+      "shares": 0,
       "avgCost": 890,
-      "price": 1003.64,
+      "price": 1002.92,
       "sector": "AI基建",
       "color": "#d4147f",
       "note": "",
-      "changePercent": -7.033351
+      "changePercent": -7.10004
     },
     {
       "symbol": "NVDA",
@@ -35,11 +35,11 @@
       "currency": "USD",
       "shares": 5,
       "avgCost": 215.2,
-      "price": 215.74,
+      "price": 215.63,
       "sector": "AI基建",
       "color": "#64d20f",
       "note": "",
-      "changePercent": 0.46100116
+      "changePercent": 0.40977881
     },
     {
       "symbol": "MRVL",
@@ -48,11 +48,11 @@
       "currency": "USD",
       "shares": 9,
       "avgCost": 325.04,
-      "price": 306.57,
+      "price": 307.845,
       "sector": "AI基建",
       "color": "#bb0f12",
       "note": "",
-      "changePercent": 1.63103
+      "changePercent": 2.053707
     },
     {
       "symbol": "AAOI",
@@ -61,11 +61,11 @@
       "currency": "USD",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 177.165,
+      "price": 175,
       "sector": "光通讯",
       "color": "#eeee00",
       "note": "",
-      "changePercent": -3.75129
+      "changePercent": -4.92748
     },
     {
       "symbol": "LITE",
@@ -74,31 +74,31 @@
       "currency": "USD",
       "shares": 1,
       "avgCost": 855,
-      "price": 898.61,
+      "price": 893.77,
       "sector": "光通讯",
       "color": "#ef850d",
       "note": "",
-      "changePercent": -4.19936
+      "changePercent": -4.71535
     },
     {
       "symbol": "SATS",
       "name": "回声星通信",
       "source": "twelve",
       "currency": "USD",
-      "shares": 8,
+      "shares": 0,
       "avgCost": 124,
-      "price": 125,
+      "price": 124.59,
       "sector": "太空",
       "color": "#25abc2",
       "note": "",
-      "changePercent": 3.37413
+      "changePercent": 3.035066
     },
     {
       "symbol": "SATG",
       "name": "回声星通信2倍做多",
       "source": "manual",
       "currency": "USD",
-      "shares": 57,
+      "shares": 0,
       "avgCost": 17.5,
       "price": 16.92,
       "sector": "太空",
