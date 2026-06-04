@@ -4,12 +4,12 @@
     "totalAsset": 15000,
     "apiKey": "da5601ce51f74a18909eeb565fbbdc6c",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 0,
-    "lastPriceRefreshText": ""
+    "lastPriceRefresh": 1780585199501,
+    "lastPriceRefreshText": "2026/6/4 22:59:59"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.16,
+    "EUR": 1.16311,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
@@ -22,10 +22,11 @@
       "currency": "USD",
       "shares": 1,
       "avgCost": 890,
-      "price": 1058.45,
+      "price": 996.03,
       "sector": "AI基建",
       "color": "#d4147f",
-      "note": ""
+      "note": "",
+      "changePercent": -7.73826
     },
     {
       "symbol": "NVDA",
@@ -34,10 +35,11 @@
       "currency": "USD",
       "shares": 5,
       "avgCost": 215.2,
-      "price": 217.34,
+      "price": 215.24,
       "sector": "AI基建",
       "color": "#64d20f",
-      "note": ""
+      "note": "",
+      "changePercent": 0.22817229
     },
     {
       "symbol": "MRVL",
@@ -46,10 +48,11 @@
       "currency": "USD",
       "shares": 9,
       "avgCost": 325.04,
-      "price": 303.63,
+      "price": 300.22,
       "sector": "AI基建",
       "color": "#bb0f12",
-      "note": ""
+      "note": "",
+      "changePercent": -0.47405733
     },
     {
       "symbol": "AAOI",
@@ -58,10 +61,11 @@
       "currency": "USD",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 189.68,
+      "price": 176,
       "sector": "光通讯",
       "color": "#eeee00",
-      "note": ""
+      "note": "",
+      "changePercent": -4.38421
     },
     {
       "symbol": "LITE",
@@ -70,10 +74,11 @@
       "currency": "USD",
       "shares": 1,
       "avgCost": 855,
-      "price": 966.12,
+      "price": 892.88,
       "sector": "光通讯",
       "color": "#ef850d",
-      "note": ""
+      "note": "",
+      "changePercent": -4.81023
     },
     {
       "symbol": "SATS",
@@ -82,10 +87,11 @@
       "currency": "USD",
       "shares": 8,
       "avgCost": 124,
-      "price": 123.04,
+      "price": 124.18,
       "sector": "太空",
       "color": "#25abc2",
-      "note": ""
+      "note": "",
+      "changePercent": 2.696
     },
     {
       "symbol": "SATG",
