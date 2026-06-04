@@ -1,0 +1,115 @@
+{
+  "settings": {
+    "title": "小宝贝梦想金库",
+    "totalAsset": 15000,
+    "apiKey": "",
+    "priceCacheMinutes": 30,
+    "lastPriceRefresh": 0,
+    "lastPriceRefreshText": ""
+  },
+  "fxRates": {
+    "USD": 1,
+    "EUR": 1.16,
+    "HKD": 0.128,
+    "JPY": 0.0067,
+    "GBP": 1.27
+  },
+  "data": [
+    {
+      "symbol": "MU",
+      "name": "美光科技",
+      "source": "twelve",
+      "currency": "USD",
+      "shares": 1,
+      "avgCost": 890,
+      "price": 1058.45,
+      "sector": "AI基建",
+      "color": "#d4147f",
+      "note": ""
+    },
+    {
+      "symbol": "NVDA",
+      "name": "英伟达",
+      "source": "twelve",
+      "currency": "USD",
+      "shares": 5,
+      "avgCost": 215.2,
+      "price": 217.34,
+      "sector": "AI基建",
+      "color": "#64d20f",
+      "note": ""
+    },
+    {
+      "symbol": "MRVL",
+      "name": "迈威尔",
+      "source": "twelve",
+      "currency": "USD",
+      "shares": 9,
+      "avgCost": 325.04,
+      "price": 303.63,
+      "sector": "AI基建",
+      "color": "#bb0f12",
+      "note": ""
+    },
+    {
+      "symbol": "AAOI",
+      "name": "应用光电",
+      "source": "twelve",
+      "currency": "USD",
+      "shares": 4,
+      "avgCost": 205.085,
+      "price": 189.68,
+      "sector": "光通讯",
+      "color": "#eeee00",
+      "note": ""
+    },
+    {
+      "symbol": "LITE",
+      "name": "Lumentum",
+      "source": "twelve",
+      "currency": "USD",
+      "shares": 1,
+      "avgCost": 855,
+      "price": 966.12,
+      "sector": "光通讯",
+      "color": "#ef850d",
+      "note": ""
+    },
+    {
+      "symbol": "SATS",
+      "name": "回声星通信",
+      "source": "twelve",
+      "currency": "USD",
+      "shares": 8,
+      "avgCost": 124,
+      "price": 123.04,
+      "sector": "太空",
+      "color": "#25abc2",
+      "note": ""
+    },
+    {
+      "symbol": "SATG",
+      "name": "回声星通信2倍做多",
+      "source": "manual",
+      "currency": "USD",
+      "shares": 57,
+      "avgCost": 17.5,
+      "price": 16.92,
+      "sector": "太空",
+      "color": "#1f82c4",
+      "note": "手动价"
+    },
+    {
+      "symbol": "XFAB",
+      "name": "硅片代工",
+      "source": "manual",
+      "currency": "EUR",
+      "shares": 44,
+      "avgCost": 11.685,
+      "price": 12.2,
+      "sector": "光通讯",
+      "color": "#8a20db",
+      "note": "手动价，EUR"
+    }
+  ]
+}
