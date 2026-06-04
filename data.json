@@ -33,7 +33,7 @@
       "name": "英伟达",
       "source": "twelve",
       "currency": "USD",
-      "shares": 5,
+      "shares": 10,
       "avgCost": 215.2,
       "price": 215.915,
       "sector": "AI基建",
