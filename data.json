@@ -4,12 +4,12 @@
     "totalAsset": 15000,
     "apiKey": "da5601ce51f74a18909eeb565fbbdc6c",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1780586879786,
-    "lastPriceRefreshText": "2026/6/4 23:27:59"
+    "lastPriceRefresh": 1780587245084,
+    "lastPriceRefreshText": "2026/6/4 23:34:05"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.16243,
+    "EUR": 1.16255,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
@@ -22,11 +22,11 @@
       "currency": "USD",
       "shares": 0,
       "avgCost": 890,
-      "price": 1005.42,
+      "price": 1004.99,
       "sector": "AI基建",
       "color": "#d4147f",
       "note": "",
-      "changePercent": -6.86847
+      "changePercent": -6.9083
     },
     {
       "symbol": "NVDA",
@@ -35,11 +35,11 @@
       "currency": "USD",
       "shares": 10,
       "avgCost": 215.2,
-      "price": 215.915,
+      "price": 216.01,
       "sector": "AI基建",
       "color": "#64d20f",
       "note": "",
-      "changePercent": 0.54249127
+      "changePercent": 0.58672875
     },
     {
       "symbol": "MRVL",
@@ -48,11 +48,11 @@
       "currency": "USD",
       "shares": 9,
       "avgCost": 325.04,
-      "price": 308.12,
+      "price": 307.48,
       "sector": "AI基建",
       "color": "#bb0f12",
       "note": "",
-      "changePercent": 2.14487
+      "changePercent": 1.93271
     },
     {
       "symbol": "AAOI",
@@ -61,11 +61,11 @@
       "currency": "USD",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 178.44,
+      "price": 178.87,
       "sector": "光通讯",
       "color": "#eeee00",
       "note": "",
-      "changePercent": -3.058623
+      "changePercent": -2.82502
     },
     {
       "symbol": "LITE",
@@ -74,11 +74,11 @@
       "currency": "USD",
       "shares": 1,
       "avgCost": 855,
-      "price": 900.38,
+      "price": 903.24,
       "sector": "光通讯",
       "color": "#ef850d",
       "note": "",
-      "changePercent": -4.010661
+      "changePercent": -3.70576
     },
     {
       "symbol": "SATS",
@@ -87,11 +87,11 @@
       "currency": "USD",
       "shares": 0,
       "avgCost": 124,
-      "price": 124.905,
+      "price": 125.58,
       "sector": "太空",
       "color": "#25abc2",
       "note": "",
-      "changePercent": 3.29557
+      "changePercent": 3.85379
     },
     {
       "symbol": "SATG",
@@ -124,11 +124,11 @@
       "currency": "USD",
       "shares": 5,
       "avgCost": 208.5,
-      "price": 208.57,
+      "price": 208.53,
       "sector": "AI基建",
       "color": "#15d1bb",
       "note": "",
-      "changePercent": -2.96362
+      "changePercent": -2.98223
     }
   ]
 }
