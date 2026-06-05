@@ -14,4 +14,4 @@ function renderAll(){renderKpis();renderTreemap();renderSectors();renderHoldingC
   const isAdmin=new URLSearchParams(location.search).get("admin")==="1";
   document.querySelectorAll(".admin-only").forEach(el=>el.classList.toggle("hidden",!isAdmin));
 }
-window.addEventListener("resize",renderTreemap);initAdminMode();fillAdmin();loadSharedData(true);
+window.addEventListener("resize", renderMap);initAdminMode();loadSharedData(true);
