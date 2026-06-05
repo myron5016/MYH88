@@ -129,6 +129,30 @@
       "color": "#15d1bb",
       "note": "",
       "changePercent": 0.21400924
+    },
+    {
+      "symbol": "RKLB",
+      "name": "火箭实验室",
+      "source": "twelve",
+      "currency": "USD",
+      "shares": 30,
+      "avgCost": 114.08,
+      "price": 0,
+      "sector": "太空",
+      "color": "#888888",
+      "note": ""
+    },
+    {
+      "symbol": "VRT",
+      "name": "维谛技术",
+      "source": "twelve",
+      "currency": "USD",
+      "shares": 5,
+      "avgCost": 310.07,
+      "price": 0,
+      "sector": "AI基建",
+      "color": "#888888",
+      "note": ""
     }
   ]
 }
