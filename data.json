@@ -1,15 +1,15 @@
 {
   "settings": {
-    "title": "小宝贝梦想金库",
+    "title": "孟一晗的梦想金库",
     "totalAsset": 15000,
     "apiKey": "da5601ce51f74a18909eeb565fbbdc6c",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 0,
-    "lastPriceRefreshText": ""
+    "lastPriceRefresh": 1780672870703,
+    "lastPriceRefreshText": "2026/6/5 23:21:10"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.16,
+    "EUR": 1.15454,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
@@ -22,10 +22,11 @@
       "currency": "USD",
       "shares": 10,
       "avgCost": 215.2,
-      "price": 211.82,
+      "price": 209.515,
       "sector": "AI基建",
       "color": "#64d20f",
-      "note": ""
+      "note": "",
+      "changePercent": -4.18229
     },
     {
       "symbol": "MRVL",
@@ -34,10 +35,11 @@
       "currency": "USD",
       "shares": 9,
       "avgCost": 325.04,
-      "price": 298.11,
+      "price": 289.705,
       "sector": "AI基建",
       "color": "#bb0f12",
-      "note": ""
+      "note": "",
+      "changePercent": -8.44578
     },
     {
       "symbol": "AAOI",
@@ -46,10 +48,11 @@
       "currency": "USD",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 199,
+      "price": 197.81,
       "sector": "光通讯",
       "color": "#eeee00",
-      "note": ""
+      "note": "",
+      "changePercent": -2.50382
     },
     {
       "symbol": "LITE",
@@ -58,10 +61,11 @@
       "currency": "USD",
       "shares": 1,
       "avgCost": 855,
-      "price": 934,
+      "price": 932.185,
       "sector": "光通讯",
       "color": "#ef850d",
-      "note": ""
+      "note": "",
+      "changePercent": -1.36444
     },
     {
       "symbol": "XFAB",
@@ -82,10 +86,11 @@
       "currency": "USD",
       "shares": 5,
       "avgCost": 208.5,
-      "price": 220.17,
+      "price": 213.59,
       "sector": "AI基建",
       "color": "#25abc2",
-      "note": ""
+      "note": "",
+      "changePercent": -0.84029431
     },
     {
       "symbol": "RKLB",
@@ -94,10 +99,11 @@
       "currency": "USD",
       "shares": 30,
       "avgCost": 114.08,
-      "price": 113.9,
+      "price": 113.2,
       "sector": "太空",
       "color": "#1f82c4",
-      "note": ""
+      "note": "",
+      "changePercent": -5.62734
     },
     {
       "symbol": "VRT",
@@ -106,10 +112,11 @@
       "currency": "USD",
       "shares": 5,
       "avgCost": 310.07,
-      "price": 312.71,
+      "price": 310.84,
       "sector": "AI基建",
       "color": "#ff4f9a",
-      "note": ""
+      "note": "",
+      "changePercent": -4.038038
     }
   ]
 }
