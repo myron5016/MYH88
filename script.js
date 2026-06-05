@@ -1,6 +1,6 @@
 // 梦想金库 V7
 // 只需要把下面这一行换成你的 Twelve Data Key
-const TWELVE_DATA_API_KEY = "PASTE_YOUR_TWELVE_DATA_KEY_HERE";
+const TWELVE_DATA_API_KEY = "da5601ce51f74a18909eeb565fbbdc6c";
 
 // 根据你最新截图录入，后面新增持仓只改这里
 const portfolio = [
