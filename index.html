@@ -1,10 +1,106 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>孟一晗的梦想金库</title><link rel="stylesheet" href="style.css"></head><body><main class="container">
-<header class="hero"><div class="hero-left"><img src="avatar.png" class="avatar" alt="小宝贝头像"><div><div class="hero-badge">♥ Family Dream Fund</div><h1 id="pageTitle">孟一晗的梦想金库</h1><p class="subtitle">爸爸妈妈为你种下的未来</p></div></div><div class="hero-actions"><button class="primary" onclick="refreshPrices(false)">刷新实时价格</button></div></header>
-<section id="adminPanel" class="card admin admin-only hidden"><details><summary>管理员保存设置</summary><div class="admin-grid"><label>GitHub 用户名<input id="ghOwner" placeholder="例如 myron5016"></label><label>仓库名<input id="ghRepo" placeholder="例如 MYH88"></label><label>分支<input id="ghBranch" value="main"></label><label>GitHub Token<input id="ghToken" type="password" placeholder="只保存在当前浏览器"></label></div><p class="note">Token 只需要你填写，家人不用填。需要仓库 Contents 的 Read and Write 权限。</p><div class="buttons"><button onclick="saveAdminSettings()">保存管理员设置</button><button onclick="saveToGithub()">保存当前数据到 GitHub</button></div></details></section>
-<section id="settingsPanel" class="card settings admin-only hidden"><label>看板标题<input id="titleInput" onchange="state.settings.title=this.value;renderAll()"></label><label>梦想基金 USD<input id="totalAssetInput" type="number" step="0.01" onchange="state.settings.totalAsset=parseFloat(this.value)||0;renderAll()"></label><label>Twelve Data Key<input id="apiKeyInput" type="password" onchange="state.settings.apiKey=this.value.trim();renderAll()"></label><label>行情缓存分钟<input id="cacheInput" type="number" min="5" onchange="state.settings.priceCacheMinutes=parseInt(this.value)||30;renderAll()"></label></section>
-<section class="kpis"><div class="kpi pink"><span>梦想基金</span><strong id="kpiTotal">$0</strong></div><div class="kpi"><span>股票/ETF市值</span><strong id="kpiInvested">$0</strong></div><div class="kpi"><span>现金</span><strong id="kpiCash">$0</strong></div><div class="kpi"><span>总盈亏 / 收益率</span><strong id="kpiPnl">$0 / 0%</strong></div></section>
-<section class="card"><div class="section-head"><h2>持仓地图</h2><span id="status">正在读取共享数据...</span></div><div id="treemap"></div></section>
-<section class="card"><div class="section-head"><h2>板块统计</h2></div><div id="sectorBar" class="sector-bar"></div><div id="sectorLegend" class="legend"></div></section>
-<section class="card holdings-view"><div class="section-head"><h2>持仓明细</h2><span class="muted">手机优先卡片视图</span></div><div id="holdingCards" class="holding-cards"></div></section>
-<section id="editorPanel" class="card admin-only hidden"><div class="section-head"><h2>持仓编辑区</h2><div class="buttons"><button onclick="addRow()">新增一行</button><button onclick="saveToGithub()">保存到 GitHub</button><button onclick="downloadJson()">导出备份</button><label class="file-btn">导入备份<input type="file" accept=".json" onchange="importJson(event)"></label></div></div><p class="note">Twelve 自动获取常见美股；Manual 用于 SATG、XFAB 等手动最新价。现金由“梦想基金本金 - 已投入成本”自动计算。</p><div class="table-wrap"><table><thead><tr><th>代码</th><th>名称</th><th>数据源</th><th>货币</th><th>数量</th><th>成本价</th><th>最新价</th><th>汇率USD</th><th>市值USD</th><th>总成本USD</th><th>盈亏USD</th><th>收益率</th><th>板块</th><th>颜色</th><th>备注</th><th>操作</th></tr></thead><tbody id="dataBody"></tbody></table></div></section>
-<footer class="footer">♥ 送给最爱的宝贝</footer></main><script src="script.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>孟一晗的梦想金库</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="container">
+  <header class="hero">
+    <div class="hero-left">
+      <img src="avatar.png" class="avatar" alt="小宝贝头像">
+      <div>
+        <div class="hero-badge">♥ Family Dream Fund · V8.0 盈亏结算版</div>
+        <h1 id="pageTitle">孟一晗的梦想金库</h1>
+        <p class="subtitle">爸爸妈妈为你种下的未来</p>
+      </div>
+    </div>
+    <div class="hero-actions">
+      <button class="primary" onclick="refreshPrices(false)">刷新实时价格</button>
+    </div>
+  </header>
+
+  <section id="adminPanel" class="card admin admin-only hidden">
+    <details>
+      <summary>管理员保存设置</summary>
+      <div class="admin-grid">
+        <label>GitHub 用户名<input id="ghOwner" placeholder="例如 myron5016"></label>
+        <label>仓库名<input id="ghRepo" placeholder="例如 MYH88"></label>
+        <label>分支<input id="ghBranch" value="main"></label>
+        <label>GitHub Token<input id="ghToken" type="password" placeholder="只保存在当前浏览器"></label>
+      </div>
+      <p class="note">Token 只需要你填写，家人不用填。需要仓库 Contents 的 Read and Write 权限。已卖出记录不会请求实时行情，可节省 Twelve Data 调用。</p>
+      <div class="buttons">
+        <button onclick="saveAdminSettings()">保存管理员设置</button>
+        <button onclick="saveToGithub()">保存当前数据到 GitHub</button>
+      </div>
+    </details>
+  </section>
+
+  <section id="settingsPanel" class="card settings admin-only hidden">
+    <label>看板标题<input id="titleInput" onchange="state.settings.title=this.value;renderAll()"></label>
+    <label>梦想基金本金 USD<input id="totalAssetInput" type="number" step="0.01" onchange="state.settings.totalAsset=parseFloat(this.value)||0;renderAll()"></label>
+    <label>Twelve Data Key<input id="apiKeyInput" type="password" onchange="state.settings.apiKey=this.value.trim();renderAll()"></label>
+    <label>行情缓存分钟<input id="cacheInput" type="number" min="5" onchange="state.settings.priceCacheMinutes=parseInt(this.value)||30;renderAll()"></label>
+  </section>
+
+  <section class="kpis">
+    <div class="kpi pink"><span>梦想基金本金</span><strong id="kpiTotal">$0</strong></div>
+    <div class="kpi"><span>当前持仓市值</span><strong id="kpiInvested">$0</strong></div>
+    <div class="kpi"><span>现金 / 种子</span><strong id="kpiCash">$0</strong></div>
+    <div class="kpi"><span>浮动盈亏</span><strong id="kpiFloating">$0 / 0%</strong></div>
+    <div class="kpi"><span>已实现盈亏</span><strong id="kpiRealized">$0</strong></div>
+    <div class="kpi"><span>累计总盈亏</span><strong id="kpiPnl">$0 / 0%</strong></div>
+  </section>
+
+  <section class="card">
+    <div class="section-head"><h2>持仓地图</h2><span id="status">正在读取共享数据...</span></div>
+    <div id="treemap"></div>
+  </section>
+
+  <section class="card">
+    <div class="section-head"><h2>板块统计</h2></div>
+    <div id="sectorBar" class="sector-bar"></div>
+    <div id="sectorLegend" class="legend"></div>
+  </section>
+
+  <section class="card holdings-view">
+    <div class="section-head"><h2>当前持仓明细</h2><span class="muted">只展示仍在持有的资产</span></div>
+    <div id="holdingCards" class="holding-cards"></div>
+  </section>
+
+  <section class="card holdings-view">
+    <div class="section-head"><h2>历史结算记录</h2><span class="muted">已卖出资产不再刷新行情</span></div>
+    <div id="soldCards" class="sold-cards"></div>
+  </section>
+
+  <section id="editorPanel" class="card admin-only hidden">
+    <div class="section-head">
+      <h2>持仓编辑区</h2>
+      <div class="buttons">
+        <button onclick="addRow()">新增一行</button>
+        <button onclick="saveToGithub()">保存到 GitHub</button>
+        <button onclick="downloadJson()">导出备份</button>
+        <label class="file-btn">导入备份<input type="file" accept=".json" onchange="importJson(event)"></label>
+      </div>
+    </div>
+    <p class="note">状态为“持有中”的 Twelve 资产才会请求实时价格；状态为“已卖出”的资产使用手动卖出价计算已实现盈亏，并计入累计总盈亏。</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>状态</th><th>代码</th><th>名称</th><th>数据源</th><th>货币</th><th>数量</th><th>成本价</th><th>最新价/卖出价</th><th>卖出日期</th><th>汇率USD</th><th>市值USD</th><th>总成本USD</th><th>盈亏USD</th><th>收益率</th><th>板块</th><th>颜色</th><th>备注</th><th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="dataBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="footer">♥ 送给最爱的宝贝</footer>
+</main>
+<script src="script.js"></script>
+</body>
+</html>

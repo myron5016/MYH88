@@ -5,7 +5,8 @@
     "apiKey": "da5601ce51f74a18909eeb565fbbdc6c",
     "priceCacheMinutes": 30,
     "lastPriceRefresh": 0,
-    "lastPriceRefreshText": ""
+    "lastPriceRefreshText": "",
+    "version": "V8.0 盈亏结算版"
   },
   "fxRates": {
     "USD": 1,
@@ -25,7 +26,11 @@
       "price": 211.82,
       "sector": "AI基建",
       "color": "#64d20f",
-      "note": ""
+      "note": "",
+      "status": "holding",
+      "sellPrice": "",
+      "sellDate": "",
+      "sellNote": ""
     },
     {
       "symbol": "MRVL",
@@ -37,7 +42,11 @@
       "price": 298.11,
       "sector": "AI基建",
       "color": "#bb0f12",
-      "note": ""
+      "note": "",
+      "status": "holding",
+      "sellPrice": "",
+      "sellDate": "",
+      "sellNote": ""
     },
     {
       "symbol": "AAOI",
@@ -49,7 +58,11 @@
       "price": 199,
       "sector": "光通讯",
       "color": "#eeee00",
-      "note": ""
+      "note": "",
+      "status": "holding",
+      "sellPrice": "",
+      "sellDate": "",
+      "sellNote": ""
     },
     {
       "symbol": "LITE",
@@ -61,7 +74,11 @@
       "price": 934,
       "sector": "光通讯",
       "color": "#ef850d",
-      "note": ""
+      "note": "",
+      "status": "holding",
+      "sellPrice": "",
+      "sellDate": "",
+      "sellNote": ""
     },
     {
       "symbol": "XFAB",
@@ -73,7 +90,11 @@
       "price": 10.71,
       "sector": "光通讯",
       "color": "#8a20db",
-      "note": "手动价，EUR"
+      "note": "手动价，EUR",
+      "status": "holding",
+      "sellPrice": "",
+      "sellDate": "",
+      "sellNote": ""
     },
     {
       "symbol": "CBRS",
@@ -85,7 +106,11 @@
       "price": 220.17,
       "sector": "AI基建",
       "color": "#25abc2",
-      "note": ""
+      "note": "",
+      "status": "holding",
+      "sellPrice": "",
+      "sellDate": "",
+      "sellNote": ""
     },
     {
       "symbol": "RKLB",
@@ -97,7 +122,11 @@
       "price": 113.9,
       "sector": "太空",
       "color": "#1f82c4",
-      "note": ""
+      "note": "",
+      "status": "holding",
+      "sellPrice": "",
+      "sellDate": "",
+      "sellNote": ""
     },
     {
       "symbol": "VRT",
@@ -109,7 +138,11 @@
       "price": 312.71,
       "sector": "AI基建",
       "color": "#ff4f9a",
-      "note": ""
+      "note": "",
+      "status": "holding",
+      "sellPrice": "",
+      "sellDate": "",
+      "sellNote": ""
     }
   ]
 }
