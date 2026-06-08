@@ -4,13 +4,13 @@
     "totalAsset": 15000,
     "apiKey": "da5601ce51f74a18909eeb565fbbdc6c",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 0,
-    "lastPriceRefreshText": "",
+    "lastPriceRefresh": 1780935357613,
+    "lastPriceRefreshText": "2026/6/9 00:15:57",
     "version": "V8.0 盈亏结算版"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.16,
+    "EUR": 1.15467,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
@@ -23,14 +23,15 @@
       "currency": "USD",
       "shares": 10,
       "avgCost": 215.2,
-      "price": 211.82,
+      "price": 208.875,
       "sector": "AI基建",
       "color": "#64d20f",
       "note": "",
       "status": "holding",
       "sellPrice": "",
       "sellDate": "",
-      "sellNote": ""
+      "sellNote": "",
+      "changePercent": 1.84056
     },
     {
       "symbol": "MRVL",
@@ -39,14 +40,15 @@
       "currency": "USD",
       "shares": 9,
       "avgCost": 325.04,
-      "price": 298.11,
+      "price": 299.71,
       "sector": "AI基建",
       "color": "#bb0f12",
       "note": "",
       "status": "holding",
       "sellPrice": "",
       "sellDate": "",
-      "sellNote": ""
+      "sellNote": "",
+      "changePercent": 13.75489
     },
     {
       "symbol": "AAOI",
@@ -55,14 +57,15 @@
       "currency": "USD",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 199,
+      "price": 195.4,
       "sector": "光通讯",
       "color": "#eeee00",
       "note": "",
       "status": "holding",
       "sellPrice": "",
       "sellDate": "",
-      "sellNote": ""
+      "sellNote": "",
+      "changePercent": 10.39548
     },
     {
       "symbol": "LITE",
@@ -71,14 +74,15 @@
       "currency": "USD",
       "shares": 1,
       "avgCost": 855,
-      "price": 934,
+      "price": 892.37,
       "sector": "光通讯",
       "color": "#ef850d",
       "note": "",
       "status": "holding",
       "sellPrice": "",
       "sellDate": "",
-      "sellNote": ""
+      "sellNote": "",
+      "changePercent": 3.32423
     },
     {
       "symbol": "XFAB",
@@ -87,7 +91,7 @@
       "currency": "EUR",
       "shares": 44,
       "avgCost": 11.685,
-      "price": 10.71,
+      "price": 10.82,
       "sector": "光通讯",
       "color": "#8a20db",
       "note": "手动价，EUR",
@@ -103,14 +107,15 @@
       "currency": "USD",
       "shares": 5,
       "avgCost": 208.5,
-      "price": 220.17,
+      "price": 234.295,
       "sector": "AI基建",
       "color": "#25abc2",
       "note": "",
-      "status": "holding",
-      "sellPrice": "",
-      "sellDate": "",
-      "sellNote": ""
+      "status": "sold",
+      "sellPrice": 225,
+      "sellDate": "2026-06-08",
+      "sellNote": "",
+      "changePercent": 16.55888
     },
     {
       "symbol": "RKLB",
@@ -119,14 +124,15 @@
       "currency": "USD",
       "shares": 30,
       "avgCost": 114.08,
-      "price": 113.9,
+      "price": 114.11,
       "sector": "太空",
       "color": "#1f82c4",
       "note": "",
       "status": "holding",
       "sellPrice": "",
       "sellDate": "",
-      "sellNote": ""
+      "sellNote": "",
+      "changePercent": 3.66097
     },
     {
       "symbol": "VRT",
@@ -135,14 +141,31 @@
       "currency": "USD",
       "shares": 5,
       "avgCost": 310.07,
-      "price": 312.71,
+      "price": 305.9,
       "sector": "AI基建",
       "color": "#ff4f9a",
       "note": "",
       "status": "holding",
       "sellPrice": "",
       "sellDate": "",
-      "sellNote": ""
+      "sellNote": "",
+      "changePercent": 1.79361
+    },
+    {
+      "symbol": "CRCL",
+      "name": "Circle货币",
+      "source": "twelve",
+      "currency": "USD",
+      "shares": 15,
+      "avgCost": 82.22,
+      "price": 82.8301,
+      "status": "holding",
+      "sellPrice": "",
+      "sellDate": "",
+      "sector": "加密货币",
+      "color": "#888888",
+      "note": "",
+      "changePercent": 3.17651
     }
   ]
 }
