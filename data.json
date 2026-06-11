@@ -4,13 +4,13 @@
     "totalAsset": 15000,
     "apiKey": "da5601ce51f74a18909eeb565fbbdc6c",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1781146245302,
-    "lastPriceRefreshText": "2026/6/11 10:50:45",
+    "lastPriceRefresh": 1781189224263,
+    "lastPriceRefreshText": "2026/6/11 22:47:04",
     "version": "V8.0 盈亏结算版"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.15538,
+    "EUR": 1.15202,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
@@ -23,7 +23,7 @@
       "currency": "USD",
       "shares": 10,
       "avgCost": 215.2,
-      "price": 200.42,
+      "price": 202.025,
       "sector": "AI基建",
       "color": "#64d20f",
       "note": "",
@@ -31,7 +31,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -3.73217
+      "changePercent": 0.8008192
     },
     {
       "symbol": "MRVL",
@@ -40,7 +40,7 @@
       "currency": "USD",
       "shares": 9,
       "avgCost": 325.04,
-      "price": 252.59,
+      "price": 262.86,
       "sector": "AI基建",
       "color": "#bb0f12",
       "note": "",
@@ -48,7 +48,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -5.35447
+      "changePercent": 4.065879
     },
     {
       "symbol": "AAOI",
@@ -57,7 +57,7 @@
       "currency": "USD",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 175.080002,
+      "price": 166,
       "sector": "光通讯",
       "color": "#eeee00",
       "note": "",
@@ -65,7 +65,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 7.49017
+      "changePercent": -5.21327
     },
     {
       "symbol": "LITE",
@@ -74,7 +74,7 @@
       "currency": "USD",
       "shares": 1,
       "avgCost": 855,
-      "price": 853.26001,
+      "price": 858.28,
       "sector": "光通讯",
       "color": "#ef850d",
       "note": "",
@@ -82,7 +82,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 3.83324
+      "changePercent": 0.58833066
     },
     {
       "symbol": "XFAB",
@@ -124,7 +124,7 @@
       "currency": "USD",
       "shares": 30,
       "avgCost": 114.08,
-      "price": 105.050003,
+      "price": 109.2,
       "sector": "太空",
       "color": "#1f82c4",
       "note": "",
@@ -132,7 +132,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -2.93819
+      "changePercent": 3.9505
     },
     {
       "symbol": "VRT",
@@ -141,7 +141,7 @@
       "currency": "USD",
       "shares": 5,
       "avgCost": 310.07,
-      "price": 280.98001,
+      "price": 290.34,
       "sector": "AI基建",
       "color": "#ff4f9a",
       "note": "",
@@ -149,7 +149,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -2.9497
+      "changePercent": 3.33119
     },
     {
       "symbol": "CRCL",
@@ -181,7 +181,8 @@
       "sellDate": "2026-06-04",
       "sector": "太空",
       "color": "#878787",
-      "note": ""
+      "note": "",
+      "sellNote": ""
     },
     {
       "symbol": "SATG",
@@ -196,7 +197,8 @@
       "sellDate": "2026-06-04",
       "sector": "太空",
       "color": "#888888",
-      "note": ""
+      "note": "",
+      "sellNote": ""
     },
     {
       "symbol": "MU",
@@ -210,6 +212,22 @@
       "sellPrice": 1000,
       "sellDate": "2026-06-04",
       "sector": "AI基建",
+      "color": "#888888",
+      "note": "",
+      "sellNote": ""
+    },
+    {
+      "symbol": "SATS",
+      "name": "回声星通信",
+      "source": "twelve",
+      "currency": "USD",
+      "shares": 20,
+      "avgCost": 117,
+      "price": 0,
+      "status": "sold",
+      "sellPrice": 120,
+      "sellDate": "2026-06-11",
+      "sector": "太空",
       "color": "#888888",
       "note": ""
     }
