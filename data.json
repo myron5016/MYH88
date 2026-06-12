@@ -4,8 +4,8 @@
     "totalAsset": 15000,
     "apiKey": "da5601ce51f74a18909eeb565fbbdc6c",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1781223723318,
-    "lastPriceRefreshText": "2026/6/12 08:22:03",
+    "lastPriceRefresh": 1781272129712,
+    "lastPriceRefreshText": "2026/6/12 21:48:49",
     "version": "V8.0 盈亏结算版"
   },
   "fxRates": {
@@ -23,7 +23,7 @@
       "currency": "USD",
       "shares": 10,
       "avgCost": 215.2,
-      "price": 204.87,
+      "price": 203.96,
       "sector": "AI基建",
       "color": "#64d20f",
       "note": "",
@@ -31,7 +31,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 2.22034
+      "changePercent": -0.44418174
     },
     {
       "symbol": "MRVL",
@@ -40,15 +40,15 @@
       "currency": "USD",
       "shares": 9,
       "avgCost": 325.04,
-      "price": 280.70999,
+      "price": 276.89,
       "sector": "AI基建",
-      "color": "#bb0f12",
+      "color": "#7e9023",
       "note": "",
       "status": "holding",
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 11.13266
+      "changePercent": -1.36083
     },
     {
       "symbol": "AAOI",
@@ -57,15 +57,15 @@
       "currency": "USD",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 172.78,
+      "price": 168.52,
       "sector": "光通讯",
-      "color": "#eeee00",
+      "color": "#ff6600",
       "note": "",
       "status": "holding",
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -1.34186
+      "changePercent": -2.46556
     },
     {
       "symbol": "LITE",
@@ -93,7 +93,7 @@
       "avgCost": 11.685,
       "price": 10.82,
       "sector": "光通讯",
-      "color": "#8a20db",
+      "color": "#8e3bce",
       "note": "手动价，EUR",
       "status": "holding",
       "sellPrice": "",
@@ -122,9 +122,9 @@
       "name": "火箭实验室",
       "source": "twelve",
       "currency": "USD",
-      "shares": 20,
-      "avgCost": 114.08,
-      "price": 114.78,
+      "shares": 30,
+      "avgCost": 111.4,
+      "price": 108.68,
       "sector": "太空",
       "color": "#1f82c4",
       "note": "",
@@ -132,7 +132,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 9.26225
+      "changePercent": -5.31451
     },
     {
       "symbol": "VRT",
@@ -141,7 +141,7 @@
       "currency": "USD",
       "shares": 5,
       "avgCost": 310.07,
-      "price": 297.88,
+      "price": 299.41,
       "sector": "AI基建",
       "color": "#ff4f9a",
       "note": "",
@@ -149,7 +149,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 6.014661
+      "changePercent": 0.513628
     },
     {
       "symbol": "CRCL",
@@ -248,6 +248,22 @@
       "sellDate": "2026-06-12",
       "sellNote": "",
       "changePercent": 9.26225
+    },
+    {
+      "symbol": "SPCX",
+      "name": "Space X",
+      "source": "twelve",
+      "currency": "USD",
+      "shares": 1,
+      "avgCost": 0,
+      "price": 0,
+      "status": "holding",
+      "sellPrice": "",
+      "sellDate": "",
+      "sector": "新板块",
+      "color": "#00eeff",
+      "note": "",
+      "changePercent": 0
     }
   ]
 }
