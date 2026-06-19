@@ -4,13 +4,13 @@
     "totalAsset": 15000,
     "apiKey": "da5601ce51f74a18909eeb565fbbdc6c",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1781574844154,
-    "lastPriceRefreshText": "2026/6/16 09:54:04",
+    "lastPriceRefresh": 1781856160678,
+    "lastPriceRefreshText": "2026/6/19 16:02:40",
     "version": "V8.0 盈亏结算版"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.16105,
+    "EUR": 1.14485,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
@@ -23,7 +23,7 @@
       "currency": "USD",
       "shares": 10,
       "avgCost": 215.2,
-      "price": 212.45,
+      "price": 210.69,
       "sector": "AI基建",
       "color": "#64d20f",
       "note": "",
@@ -31,16 +31,16 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 3.53818
+      "changePercent": 2.95138
     },
     {
       "symbol": "MRVL",
       "name": "迈威尔",
       "source": "twelve",
       "currency": "USD",
-      "shares": 9,
+      "shares": 5,
       "avgCost": 325.04,
-      "price": 308.88,
+      "price": 310.57999,
       "sector": "AI基建",
       "color": "#7e9023",
       "note": "",
@@ -48,7 +48,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 10.4326
+      "changePercent": 7.26669
     },
     {
       "symbol": "AAOI",
@@ -57,7 +57,7 @@
       "currency": "USD",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 191.55,
+      "price": 161.85001,
       "sector": "光通讯",
       "color": "#ff6600",
       "note": "",
@@ -65,7 +65,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 13.30967
+      "changePercent": -3.28074
     },
     {
       "symbol": "LITE",
@@ -91,7 +91,7 @@
       "currency": "EUR",
       "shares": 44,
       "avgCost": 11.685,
-      "price": 10.36,
+      "price": 9.47,
       "sector": "光通讯",
       "color": "#8e3bce",
       "note": "手动价，EUR",
@@ -124,7 +124,7 @@
       "currency": "USD",
       "shares": 30,
       "avgCost": 111.4,
-      "price": 109.25,
+      "price": 107.24,
       "sector": "太空",
       "color": "#1f82c4",
       "note": "",
@@ -132,16 +132,16 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 6.69987
+      "changePercent": -0.68531716
     },
     {
       "symbol": "VRT",
       "name": "维谛技术",
       "source": "twelve",
       "currency": "USD",
-      "shares": 5,
+      "shares": 3,
       "avgCost": 310.07,
-      "price": 311.92999,
+      "price": 333.049988,
       "sector": "AI基建",
       "color": "#ff4f9a",
       "note": "",
@@ -149,7 +149,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 2.99138
+      "changePercent": 4.87121
     },
     {
       "symbol": "CRCL",
@@ -256,14 +256,14 @@
       "currency": "USD",
       "shares": 10,
       "avgCost": 150,
-      "price": 192.5,
+      "price": 185,
       "status": "holding",
       "sellPrice": "",
       "sellDate": "",
       "sector": "太空",
       "color": "#00eeff",
       "note": "",
-      "changePercent": 19.60236,
+      "changePercent": -3.55542,
       "sellNote": ""
     },
     {
@@ -282,6 +282,40 @@
       "note": " 部分卖出",
       "changePercent": 19.60236,
       "sellNote": ""
+    },
+    {
+      "symbol": "MRVL",
+      "name": "迈威尔",
+      "source": "twelve",
+      "currency": "USD",
+      "shares": 4,
+      "avgCost": 325.04,
+      "price": 310.57999,
+      "sector": "AI基建",
+      "color": "#7e9023",
+      "note": " 部分卖出",
+      "status": "sold",
+      "sellPrice": 315,
+      "sellDate": "2026-06-19",
+      "sellNote": "",
+      "changePercent": 7.26669
+    },
+    {
+      "symbol": "VRT",
+      "name": "维谛技术",
+      "source": "twelve",
+      "currency": "USD",
+      "shares": 2,
+      "avgCost": 310.07,
+      "price": 333.049988,
+      "sector": "AI基建",
+      "color": "#ff4f9a",
+      "note": " 部分卖出",
+      "status": "sold",
+      "sellPrice": 330,
+      "sellDate": "2026-06-19",
+      "sellNote": "",
+      "changePercent": 4.87121
     }
   ]
 }
