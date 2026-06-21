@@ -1,19 +1,40 @@
 {
   "settings": {
     "title": "孟一晗的梦想金库",
-    "totalAsset": 15000,
-    "apiKey": "",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1782032366310,
-    "lastPriceRefreshText": "2026/6/21 16:59:26",
-    "version": "V8.0 盈亏结算版"
+    "lastPriceRefresh": 0,
+    "lastPriceRefreshText": "",
+    "version": "V9.0 成长账本版",
+    "apiKey": "",
+    "migratedFrom": "V8.0",
+    "migratedAt": "2026-06-21T09:11:05.489Z"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.14763,
+    "EUR": 1.16,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
   },
-  "data": []
+  "positions": [],
+  "transactions": [],
+  "cashFlows": [
+    {
+      "id": "cash_mqnkh5ht_olvdag",
+      "date": "2026-06-21",
+      "type": "deposit",
+      "amountUSD": 15000,
+      "note": "V8 迁移：原始梦想基金本金",
+      "migration": true
+    }
+  ],
+  "snapshots": [
+    {
+      "date": "2026-06-21",
+      "capital": 15000,
+      "netAsset": 15000,
+      "market": 0,
+      "cash": 15000
+    }
+  ]
 }
