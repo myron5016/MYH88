@@ -14,7 +14,7 @@
     <div class="hero-left">
       <img src="avatar.png" class="avatar" alt="小宝贝头像">
       <div>
-        <div class="hero-badge">♥ Family Dream Fund · V9.0 成长账本版</div>
+        <div class="hero-badge">♥ Family Dream Fund · V9.1 安心同步版</div>
         <h1 id="pageTitle">孟一晗的梦想金库</h1>
         <p class="subtitle">爸爸妈妈为你种下的未来</p>
       </div>
@@ -23,6 +23,12 @@
       <button class="primary" id="refreshButton" onclick="refreshPrices(false)">刷新实时价格</button>
     </div>
   </header>
+
+  <section id="syncStrip" class="sync-strip">
+    <span id="syncDot" class="sync-dot checking"></span>
+    <div><strong id="syncLabel">正在核对云端数据</strong><small id="syncDetail">请稍候…</small></div>
+    <button class="admin-only hidden" onclick="checkCloudStatus(true)">重新核对</button>
+  </section>
 
   <section id="adminPanel" class="card admin admin-only hidden">
     <details>
@@ -36,7 +42,7 @@
       <p class="note">V9 不再把 GitHub Token 写入长期缓存。关闭标签页后 Token 自动清除。保存前会自动创建本地恢复点。</p>
       <div class="buttons">
         <button onclick="saveAdminSettings()">保存本次会话设置</button>
-        <button class="primary" onclick="saveToGithub()">保存当前数据到 GitHub</button>
+        <button id="githubSaveButton" class="primary" onclick="saveToGithub()">安全保存到 GitHub</button>
       </div>
     </details>
   </section>
@@ -112,7 +118,7 @@
         <input id="transactionSearch" placeholder="搜索代码" oninput="transactionPage=1;renderTransactionTable()">
         <select id="transactionTypeFilter" onchange="transactionPage=1;renderTransactionTable()"><option value="all">全部类型</option><option value="buy">仅买入</option><option value="sell">仅卖出</option><option value="opening">V8 迁移记录</option></select>
       </div>
-      <div class="table-wrap"><table class="compact-table"><thead><tr><th>日期</th><th>类型</th><th>代码</th><th>数量</th><th>成交价</th><th>手续费</th><th>成交汇率</th><th>已实现盈亏 USD</th><th>备注</th></tr></thead><tbody id="transactionBody"></tbody></table></div>
+      <div class="table-wrap"><table class="compact-table"><thead><tr><th>日期</th><th>类型</th><th>代码</th><th>数量</th><th>成交价</th><th>手续费</th><th>成交汇率</th><th>已实现盈亏 USD</th><th>备注</th><th>纠错</th></tr></thead><tbody id="transactionBody"></tbody></table></div>
       <div id="transactionPager" class="pager"></div>
     </div>
 
@@ -122,8 +128,9 @@
 
     <div id="backupPane" class="tab-pane hidden">
       <div class="backup-grid">
-        <div><h3>导出与导入</h3><p class="note">导出完整 V9 数据；导入前会自动创建恢复点。</p><div class="buttons"><button onclick="downloadJson()">导出 data.json</button><label class="file-btn">导入 data.json<input type="file" accept=".json" onchange="importJson(event)"></label></div></div>
+        <div><h3>导出与导入</h3><p class="note">导出完整 V9.1 数据；导入前会自动创建恢复点。</p><div class="buttons"><button onclick="downloadJson()">导出 data.json</button><label class="file-btn">导入 data.json<input type="file" accept=".json" onchange="importJson(event)"></label></div></div>
         <div><h3>本地恢复点</h3><p class="note">最多保留最近10份，只保存在当前浏览器。</p><div id="backupList"></div></div>
+        <div><h3>GitHub 云端备份</h3><p class="note">每次安全保存前，V9.1 会先把旧的云端 data.json 复制到 backups 文件夹；备份失败时不会覆盖主账本。</p><div id="cloudBackupStatus" class="cloud-backup-status">尚未执行本次会话的云端备份</div></div>
       </div>
     </div>
   </section>
