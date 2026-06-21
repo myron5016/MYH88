@@ -4,13 +4,13 @@
     "totalAsset": 15000,
     "apiKey": "",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 0,
-    "lastPriceRefreshText": "",
+    "lastPriceRefresh": 1782032366310,
+    "lastPriceRefreshText": "2026/6/21 16:59:26",
     "version": "V8.0 盈亏结算版"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.16,
+    "EUR": 1.14763,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
