@@ -2,15 +2,16 @@
   "settings": {
     "title": "孟一晗的梦想金库",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1781856351558,
-    "lastPriceRefreshText": "2026/6/19 16:05:51",
+    "lastPriceRefresh": 1782109783280,
+    "lastPriceRefreshText": "2026/6/22 14:29:43",
     "version": "V10.0 PWA家庭版",
     "migratedFrom": "V8.0",
-    "migratedAt": "2026-06-21T08:38:50.908Z"
+    "migratedAt": "2026-06-21T08:38:50.908Z",
+    "lastCloudSaveAt": "2026-06-22T06:36:26.772Z"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.14485,
+    "EUR": 1.14771,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
@@ -89,7 +90,8 @@
       "sellDate": "",
       "sellNote": "",
       "id": "pos_mqnjborg_q3swfw",
-      "costBasisUSD": 588.613179
+      "costBasisUSD": 588.613179,
+      "changePercent": 0
     },
     {
       "symbol": "RKLB",
@@ -491,6 +493,13 @@
       "capital": 15000,
       "netAsset": 15374.84,
       "market": 10850.59,
+      "cash": 4524.26
+    },
+    {
+      "date": "2026-06-22",
+      "capital": 15000,
+      "netAsset": 15376.03,
+      "market": 10851.78,
       "cash": 4524.26
     }
   ]
