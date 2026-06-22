@@ -2,16 +2,17 @@
   "settings": {
     "title": "孟一晗的梦想金库",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1782109783280,
-    "lastPriceRefreshText": "2026/6/22 14:29:43",
+    "lastPriceRefresh": 1782138083870,
+    "lastPriceRefreshText": "2026/6/22 22:21:23",
     "version": "V10.0 PWA家庭版",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-06-22T06:36:26.772Z"
+    "lastCloudSaveAt": "2026-06-22T14:28:11.345Z",
+    "localUpdatedAt": "2026-06-22T14:25:04.811Z"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.14771,
+    "EUR": 1.14354,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
@@ -24,7 +25,7 @@
       "currency": "USD",
       "shares": 10,
       "avgCost": 215.2,
-      "price": 210.69,
+      "price": 212.4,
       "sector": "AI基建",
       "color": "#64d20f",
       "note": "",
@@ -32,7 +33,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 2.95138,
+      "changePercent": 0.8116178,
       "id": "pos_mqnjborg_4xhe58",
       "costBasisUSD": 2152
     },
@@ -43,7 +44,7 @@
       "currency": "USD",
       "shares": 5,
       "avgCost": 325.04,
-      "price": 310.57999,
+      "price": 310.5,
       "sector": "AI基建",
       "color": "#7e9023",
       "note": "",
@@ -51,7 +52,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 7.26669,
+      "changePercent": -0.025753936,
       "id": "pos_mqnjborg_zeux56",
       "costBasisUSD": 1625.2
     },
@@ -62,7 +63,7 @@
       "currency": "USD",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 161.85001,
+      "price": 159.31,
       "sector": "光通讯",
       "color": "#ff6600",
       "note": "",
@@ -70,7 +71,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -3.28074,
+      "changePercent": -1.56936,
       "id": "pos_mqnjborg_p8abix",
       "costBasisUSD": 820.34
     },
@@ -100,7 +101,7 @@
       "currency": "USD",
       "shares": 30,
       "avgCost": 111.4,
-      "price": 107.24,
+      "price": 97.4,
       "sector": "太空",
       "color": "#1f82c4",
       "note": "",
@@ -108,7 +109,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -0.68531716,
+      "changePercent": -9.17568,
       "id": "pos_mqnjborg_0c6vpc",
       "costBasisUSD": 3342
     },
@@ -119,7 +120,7 @@
       "currency": "USD",
       "shares": 3,
       "avgCost": 310.07,
-      "price": 333.049988,
+      "price": 347.25,
       "sector": "AI基建",
       "color": "#ff4f9a",
       "note": "",
@@ -127,7 +128,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 4.87121,
+      "changePercent": 4.26363,
       "id": "pos_mqnjborg_n3b8py",
       "costBasisUSD": 930.21
     },
@@ -138,17 +139,45 @@
       "currency": "USD",
       "shares": 10,
       "avgCost": 150,
-      "price": 185,
+      "price": 168.58,
       "status": "holding",
       "sellPrice": "",
       "sellDate": "",
       "sector": "太空",
       "color": "#00eeff",
       "note": "",
-      "changePercent": -3.55542,
+      "changePercent": -8.87568,
       "sellNote": "",
       "id": "pos_mqnjborg_pzifro",
       "costBasisUSD": 1500
+    },
+    {
+      "id": "pos_mqpb20pj_q02ooh",
+      "symbol": "GOOGL",
+      "name": "谷歌",
+      "currency": "USD",
+      "source": "twelve",
+      "shares": 1,
+      "avgCost": 350.35,
+      "price": 350,
+      "sector": "科技",
+      "color": "#dd4646",
+      "note": "",
+      "costBasisUSD": 350.35
+    },
+    {
+      "id": "pos_mqpb3vqg_vlx0kn",
+      "symbol": "CRDO",
+      "name": "默升科技",
+      "currency": "USD",
+      "source": "twelve",
+      "shares": 10,
+      "avgCost": 303.034,
+      "price": 303,
+      "sector": "AI基建",
+      "color": "#9dc2d2",
+      "note": "",
+      "costBasisUSD": 3030.34
     }
   ],
   "transactions": [
@@ -475,6 +504,44 @@
       "realizedPnlUSD": 39.860000000000014,
       "note": " 部分卖出",
       "migration": true
+    },
+    {
+      "id": "tx_mqpb20pj_4jkp7j",
+      "date": "2026-06-22",
+      "type": "buy",
+      "symbol": "GOOGL",
+      "name": "",
+      "shares": 1,
+      "price": 350,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.35,
+      "feeUSD": 0.35,
+      "costBasisUSD": 350.35,
+      "grossUSD": 350,
+      "realizedPnlUSD": 0,
+      "note": "",
+      "positionBefore": null,
+      "schemaVersion": "10"
+    },
+    {
+      "id": "tx_mqpb3vqg_npglti",
+      "date": "2026-06-22",
+      "type": "buy",
+      "symbol": "CRDO",
+      "name": "默升科技",
+      "shares": 10,
+      "price": 303,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.34,
+      "feeUSD": 0.34,
+      "costBasisUSD": 3030.34,
+      "grossUSD": 3030,
+      "realizedPnlUSD": 0,
+      "note": "",
+      "positionBefore": null,
+      "schemaVersion": "10"
     }
   ],
   "cashFlows": [
@@ -498,9 +565,9 @@
     {
       "date": "2026-06-22",
       "capital": 15000,
-      "netAsset": 15376.03,
-      "market": 10851.78,
-      "cash": 4524.26
+      "netAsset": 14963.35,
+      "market": 13819.78,
+      "cash": 1143.57
     }
   ]
 }
