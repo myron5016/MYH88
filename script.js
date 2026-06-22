@@ -1,4 +1,4 @@
-const VERSION="V9.1 安心同步版";
+const VERSION="V10.0 PWA家庭版";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
 const PRICE_CACHE_KEY="v9_price_cache";
@@ -16,6 +16,9 @@ let dirty=false;
 let cloudState=null;
 let cloudSha=null;
 let lastMutationReason="";
+let deferredInstallPrompt=null;
+let swRegistration=null;
+let updateReloading=false;
 
 function $(id){return document.getElementById(id)}
 function readJson(text,fallback){try{return JSON.parse(text)||fallback}catch{return fallback}}
@@ -29,6 +32,30 @@ function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;",
 function validColor(v){return /^#[0-9a-f]{6}$/i.test(v||"")?v:"#888888"}
 function fx(currency){return num(state.fxRates?.[String(currency||"USD").toUpperCase()])||1}
 function marketKey(){return localStorage.getItem(MARKET_KEY)||""}
+function isStandalone(){return window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true}
+function isIos(){return /iphone|ipad|ipod/i.test(navigator.userAgent)}
+function updateNetworkStatus(){
+  const online=navigator.onLine,badge=$("networkBadge");if(badge){badge.textContent=online?"在线":"离线";badge.className=`network-badge ${online?"online":"offline"}`}
+  const refresh=$("refreshButton"),save=$("githubSaveButton");if(refresh)refresh.disabled=!online;if(save)save.disabled=!online;
+  if(!online){$("status").textContent="当前离线：正在显示设备中最近缓存的数据"}
+}
+function updateInstallButton(){const button=$("installAppButton");if(!button)return;button.classList.toggle("hidden",isStandalone())}
+function installApp(){
+  if(isStandalone()){alert("梦想金库已经安装在这台设备上");return}
+  $("nativeInstallHelp").classList.toggle("hidden",!deferredInstallPrompt);$("iosInstallHelp").classList.toggle("hidden",!isIos()||!!deferredInstallPrompt);$("genericInstallHelp").classList.toggle("hidden",isIos()||!!deferredInstallPrompt);$("installDialog").showModal();
+}
+async function triggerNativeInstall(){if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;$("installDialog").close();updateInstallButton()}
+function showUpdateBanner(){$("updateBanner")?.classList.remove("hidden")}
+function applyAppUpdate(){if(swRegistration?.waiting)swRegistration.waiting.postMessage({type:"SKIP_WAITING"});else location.reload()}
+async function registerPwa(){
+  if(!("serviceWorker" in navigator)||!window.isSecureContext)return;
+  try{
+    swRegistration=await navigator.serviceWorker.register("./service-worker.js");
+    if(swRegistration.waiting)showUpdateBanner();
+    swRegistration.addEventListener("updatefound",()=>{const worker=swRegistration.installing;if(!worker)return;worker.addEventListener("statechange",()=>{if(worker.state==="installed"&&navigator.serviceWorker.controller)showUpdateBanner()})});
+    navigator.serviceWorker.addEventListener("controllerchange",()=>{if(updateReloading)return;updateReloading=true;location.reload()});
+  }catch(error){console.warn("PWA 注册失败",error)}
+}
 
 function normalizePosition(p){
   p.id=p.id||uid("pos");p.symbol=String(p.symbol||"").trim().toUpperCase();p.name=String(p.name||"");p.currency=String(p.currency||"USD").toUpperCase();p.source=p.source==="manual"?"manual":"twelve";p.shares=num(p.shares);p.avgCost=num(p.avgCost);p.price=num(p.price);p.sector=String(p.sector||"未分类");p.color=validColor(p.color);p.note=String(p.note||"");
@@ -77,8 +104,8 @@ async function loadSharedData(autoRefresh=false){
     const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),8000);
     const response=await fetch("data.json?ts="+Date.now(),{cache:"no-store",signal:controller.signal});clearTimeout(timer);
     if(!response.ok)throw new Error("找不到 data.json");
-    const shared=await response.json(),versionChanged=shared?.settings?.version!==VERSION;normalizeState(shared);applyPriceCache();cloudState=structuredClone(state);const snapshotChanged=captureSnapshot(false);dirty=versionChanged||snapshotChanged;lastMutationReason=versionChanged?"账本已升级到 V9.1，等待首次安全保存":snapshotChanged?"今日资产快照":"";saveLocal();renderAll();renderSyncStatus();
-    status.textContent=`已读取共享数据：${new Date().toLocaleString("zh-CN")}`;
+    const shared=await response.json(),versionChanged=shared?.settings?.version!==VERSION;normalizeState(shared);applyPriceCache();cloudState=structuredClone(state);const snapshotChanged=captureSnapshot(false);dirty=versionChanged||snapshotChanged;lastMutationReason=versionChanged?"账本已升级到 V10，等待首次安全保存":snapshotChanged?"今日资产快照":"";saveLocal();renderAll();renderSyncStatus();
+    status.textContent=navigator.onLine?`已读取共享数据：${new Date().toLocaleString("zh-CN")}`:"离线模式：已读取设备中最近缓存的数据";
     if(admin.owner&&admin.repo&&admin.token)checkCloudStatus(false);if(autoRefresh&&marketKey())refreshPrices(true);
   }catch(error){
     console.warn("共享数据读取失败",error);
@@ -144,6 +171,7 @@ async function refreshFx(force=false){
 }
 async function refreshPrices(useCache=true){
   const status=$("status"),button=$("refreshButton");
+  if(!navigator.onLine){status.textContent="当前离线，无法刷新行情；正在显示最近缓存价格";return}
   if(useCache&&priceCacheValid()){applyPriceCache();renderAll();status.textContent="已使用缓存行情："+(state.settings.lastPriceRefreshText||"");return}
   if(!marketKey()){status.textContent="展示 GitHub 已保存行情；管理员可在设置中填写行情 Key";return}
   status.textContent="正在刷新实时价格...";button.disabled=true;
@@ -168,9 +196,10 @@ async function checkCloudStatus(manual=false){
   try{const remote=await getRemoteData();cloudState=remote.data;cloudSha=remote.sha;renderSyncStatus();if(manual){const l=summaryOf(state),r=summaryOf(cloudState),danger=dangerBetween(state,cloudState);alert(danger.length?`发现危险差异，保存已被锁定：\n${danger.join("\n")}`:`核对完成。\n本地：${l.positions} 个持仓 / ${l.transactions} 条交易\n云端：${r.positions} 个持仓 / ${r.transactions} 条交易`)}return remote}catch(error){cloudState=null;renderSyncStatus();if(manual)alert("云端核对失败："+error.message);return null}
 }
 async function createCloudBackup(remote){
-  if(!remote?.sha)return null;const stamp=new Date().toISOString().replace(/[-:TZ.]/g,"").slice(0,17),path=`backups/data-${stamp}.json`;const result=await putGithubFile(path,remote.raw,`Backup data.json before V9.1 save (${stamp})`);const box=$("cloudBackupStatus");if(box)box.textContent=`已备份旧云端账本：${path}`;return{path,result}
+  if(!remote?.sha)return null;const stamp=new Date().toISOString().replace(/[-:TZ.]/g,"").slice(0,17),path=`backups/data-${stamp}.json`;const result=await putGithubFile(path,remote.raw,`Backup data.json before V10 save (${stamp})`);const box=$("cloudBackupStatus");if(box)box.textContent=`已备份旧云端账本：${path}`;return{path,result}
 }
 async function saveToGithub(){
+  if(!navigator.onLine){alert("当前离线，不能保存到 GitHub。联网后再试，所有本地修改仍保留在本机。");return}
   saveAdminSettings(false);if(!admin.owner||!admin.repo||!admin.token){alert("请先填写 GitHub 用户名、仓库名和 Token");return}
   const button=$("githubSaveButton");button.disabled=true;renderSyncStatus("checking");$("status").textContent="正在进行保存前安全核对...";
   try{
@@ -179,9 +208,9 @@ async function saveToGithub(){
     const l=summaryOf(state),r=summaryOf(remote.data);
     if(!confirm(`即将安全保存到 GitHub：\n\n本地：${l.positions} 个持仓 / ${l.transactions} 条交易 / ${l.cashFlows} 条资金流水\n云端：${r.positions} 个持仓 / ${r.transactions} 条交易 / ${r.cashFlows} 条资金流水\n\n系统会先备份旧云端账本，再执行保存。是否继续？`)){renderSyncStatus();return}
     createBackup("安全保存 GitHub 前");$("status").textContent="正在备份旧的云端账本...";await createCloudBackup(remote);
-    state.settings.version=VERSION;state.settings.lastCloudSaveAt=new Date().toISOString();const raw=JSON.stringify(state,null,2);$("status").textContent="云端备份完成，正在保存新账本...";const result=await putGithubFile("data.json",raw,"Update baby dream fund data V9.1",remote.sha);
-    cloudSha=result.content?.sha||null;cloudState=structuredClone(state);dirty=false;lastMutationReason="";saveLocal();renderSyncStatus();$("status").textContent="安全保存完成：旧账本已备份，新账本已同步。";alert("V9.1 安全保存完成。旧的云端账本已经自动备份。")
-  }catch(error){renderSyncStatus();$("status").textContent="保存失败："+error.message;alert($("status").textContent)}finally{button.disabled=false}
+    state.settings.version=VERSION;state.settings.lastCloudSaveAt=new Date().toISOString();const raw=JSON.stringify(state,null,2);$("status").textContent="云端备份完成，正在保存新账本...";const result=await putGithubFile("data.json",raw,"Update baby dream fund data V10",remote.sha);
+    cloudSha=result.content?.sha||null;cloudState=structuredClone(state);dirty=false;lastMutationReason="";saveLocal();renderSyncStatus();$("status").textContent="安全保存完成：旧账本已备份，新账本已同步。";alert("V10 安全保存完成。旧的云端账本已经自动备份。")
+  }catch(error){renderSyncStatus();$("status").textContent="保存失败："+error.message;alert($("status").textContent)}finally{button.disabled=!navigator.onLine}
 }
 function saveSettings(){state.settings.title=$("titleInput").value.trim()||defaultState.settings.title;state.settings.priceCacheMinutes=Math.max(5,num($("cacheInput").value)||30);const key=$("apiKeyInput").value.trim();if(key)localStorage.setItem(MARKET_KEY,key);else localStorage.removeItem(MARKET_KEY);markDirty("看板设置已修改");renderAll();alert("设置已应用，尚未保存到 GitHub")}
 
@@ -216,22 +245,22 @@ function submitTrade(event){
     const nativeCost=shares*price+fee,usdCost=nativeCost*rate;
     if(!p){p=normalizePosition({id:uid("pos"),symbol,name:$("tradeName").value.trim(),currency,source:$("tradeSource").value,shares,avgCost:nativeCost/shares,price,sector:$("tradeSector").value.trim()||"未分类",color:$("tradeColor").value,note:"",costBasisUSD:usdCost});state.positions.push(p)}
     else{const oldNative=p.avgCost*p.shares;p.avgCost=(oldNative+nativeCost)/(p.shares+shares);p.shares+=shares;p.costBasisUSD+=usdCost;p.price=price}
-    state.transactions.push({id:uid("tx"),date,type,symbol,name:p.name,shares,price,currency,fxRate:rate,fee,feeUSD:fee*rate,costBasisUSD:usdCost,grossUSD:shares*price*rate,realizedPnlUSD:0,note,positionBefore,schemaVersion:"9.1"});
+    state.transactions.push({id:uid("tx"),date,type,symbol,name:p.name,shares,price,currency,fxRate:rate,fee,feeUSD:fee*rate,costBasisUSD:usdCost,grossUSD:shares*price*rate,realizedPnlUSD:0,note,positionBefore,schemaVersion:"10"});
   }else{
     const basisPerShare=p.costBasisUSD/p.shares,basis=basisPerShare*shares,gross=shares*price*rate,feeUSD=fee*rate,realized=gross-feeUSD-basis;
-    state.transactions.push({id:uid("tx"),date,type,symbol,name:p.name,shares,price,currency:p.currency,fxRate:rate,fee,feeUSD,costBasisUSD:basis,grossUSD:gross,realizedPnlUSD:realized,note,positionBefore,schemaVersion:"9.1"});p.shares=round(p.shares-shares,8);p.costBasisUSD=Math.max(0,p.costBasisUSD-basis);p.price=price;if(p.shares<=1e-8)state.positions=state.positions.filter(x=>x.id!==p.id);
+    state.transactions.push({id:uid("tx"),date,type,symbol,name:p.name,shares,price,currency:p.currency,fxRate:rate,fee,feeUSD,costBasisUSD:basis,grossUSD:gross,realizedPnlUSD:realized,note,positionBefore,schemaVersion:"10"});p.shares=round(p.shares-shares,8);p.costBasisUSD=Math.max(0,p.costBasisUSD-basis);p.price=price;if(p.shares<=1e-8)state.positions=state.positions.filter(x=>x.id!==p.id);
   }
   captureSnapshot(false);markDirty(`${symbol} ${type==="buy"?"买入":"卖出"}交易已记录`);$("tradeDialog").close();renderAll();switchLedgerTab(type==="sell"?"transactions":"positions");
 }
 function restorePositionBefore(transaction){state.positions=state.positions.filter(p=>p.symbol!==transaction.symbol);if(transaction.positionBefore)state.positions.push(normalizePosition(structuredClone(transaction.positionBefore)));transaction.voided=true;transaction.voidedAt=new Date().toISOString()}
-function undoLastTransaction(id){const t=latestCorrectableTransaction();if(!t||t.id!==id){alert("只能撤销最新一笔尚未撤销的 V9.1 交易");return}if(!confirm(`确认撤销最新交易？\n${transactionLabel(t)} ${t.symbol} ${t.shares} 股 @ ${t.price} ${t.currency}\n\n原记录会标记为“已撤销”，不会从流水中删除。`))return;createBackup(`${t.symbol} 交易撤销前`);restorePositionBefore(t);captureSnapshot(false);markDirty(`${t.symbol} 最新交易已撤销`);renderAll();switchLedgerTab("transactions")}
-function correctLastTransaction(id){const t=latestCorrectableTransaction();if(!t||t.id!==id){alert("只能更正最新一笔尚未撤销的 V9.1 交易");return}if(!confirm(`更正 ${t.symbol} 最新交易？\n系统会先撤销原记录，再打开交易窗口重新填写。`))return;const old=structuredClone(t);createBackup(`${t.symbol} 交易更正前`);restorePositionBefore(t);captureSnapshot(false);markDirty(`${t.symbol} 原交易已撤销，等待重新录入`);renderAll();const restored=state.positions.find(p=>p.symbol===old.symbol);openTrade(old.type,restored?.id||"");$("tradeSymbol").value=old.symbol;$("tradeDate").value=old.date;$("tradeShares").value=old.shares;$("tradePrice").value=old.price;$("tradeCurrency").value=old.currency;$("tradeFx").value=old.fxRate;$("tradeFee").value=old.fee||0;$("tradeName").value=old.name||"";$("tradeNote").value=(old.note?old.note+"；":"")+"更正重录";updateTradePreview()}
+function undoLastTransaction(id){const t=latestCorrectableTransaction();if(!t||t.id!==id){alert("只能撤销最新一笔尚未撤销的 V9.1 及以后交易");return}if(!confirm(`确认撤销最新交易？\n${transactionLabel(t)} ${t.symbol} ${t.shares} 股 @ ${t.price} ${t.currency}\n\n原记录会标记为“已撤销”，不会从流水中删除。`))return;createBackup(`${t.symbol} 交易撤销前`);restorePositionBefore(t);captureSnapshot(false);markDirty(`${t.symbol} 最新交易已撤销`);renderAll();switchLedgerTab("transactions")}
+function correctLastTransaction(id){const t=latestCorrectableTransaction();if(!t||t.id!==id){alert("只能更正最新一笔尚未撤销的 V9.1 及以后交易");return}if(!confirm(`更正 ${t.symbol} 最新交易？\n系统会先撤销原记录，再打开交易窗口重新填写。`))return;const old=structuredClone(t);createBackup(`${t.symbol} 交易更正前`);restorePositionBefore(t);captureSnapshot(false);markDirty(`${t.symbol} 原交易已撤销，等待重新录入`);renderAll();const restored=state.positions.find(p=>p.symbol===old.symbol);openTrade(old.type,restored?.id||"");$("tradeSymbol").value=old.symbol;$("tradeDate").value=old.date;$("tradeShares").value=old.shares;$("tradePrice").value=old.price;$("tradeCurrency").value=old.currency;$("tradeFx").value=old.fxRate;$("tradeFee").value=old.fee||0;$("tradeName").value=old.name||"";$("tradeNote").value=(old.note?old.note+"；":"")+"更正重录";updateTradePreview()}
 function editPosition(id){const p=state.positions.find(x=>x.id===id);if(!p)return;const name=prompt("资产名称",p.name);if(name===null)return;const sector=prompt("所属板块",p.sector);if(sector===null)return;const source=prompt("数据源：twelve 或 manual",p.source);if(source===null)return;if(!["twelve","manual"].includes(source)){alert("数据源只能是 twelve 或 manual");return}createBackup(`${p.symbol} 资料编辑前`);p.name=name.trim();p.sector=sector.trim()||"未分类";p.source=source;if(source==="manual"){const price=prompt(`手动最新价（${p.currency}）`,p.price);if(price!==null&&num(price)>=0)p.price=num(price)}markDirty(`${p.symbol} 资产资料已编辑`);renderAll()}
 function openCashFlow(){$("cashDate").value=today();$("cashAmount").value="";$("cashNote").value="";$("cashDialog").showModal()}
 function submitCashFlow(event){event.preventDefault();const type=$("cashType").value,date=$("cashDate").value,amountUSD=num($("cashAmount").value),note=$("cashNote").value.trim();if(!date||amountUSD<=0){alert("请填写正确金额");return}createBackup("本金变动前");state.cashFlows.push({id:uid("cash"),date,type,amountUSD,note});captureSnapshot(false);markDirty("本金变动已记录");$("cashDialog").close();renderAll();switchLedgerTab("cashflows")}
 function deleteCashFlow(id){const item=state.cashFlows.find(x=>x.id===id);if(!item||item.voided)return;if(!confirm("确认作废这条本金变动记录？原记录会保留在流水中。"))return;createBackup("作废资金流水前");item.voided=true;item.voidedAt=new Date().toISOString();captureSnapshot(false);markDirty("一条资金流水已作废");renderAll()}
 
-function downloadJson(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download="data-v9.1.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function downloadJson(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download="data-v10.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 function importJson(event){const file=event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const incoming=JSON.parse(reader.result);createBackup("导入数据前");normalizeState(incoming);captureSnapshot(false);markDirty("已导入外部数据，等待安全核对");renderAll();alert("导入成功。保存前系统会与 GitHub 云端数据进行安全核对。") }catch(error){alert("JSON 格式或数据结构不正确："+error.message)}finally{event.target.value=""}};reader.readAsText(file)}
 
 function renderAll(){renderKpis();renderTreemap();renderSectors();renderChart();renderHoldingCards();renderPositionTable();renderTransactionTable();renderCashFlowTable();renderBackupList();$("positionCount").textContent=state.positions.length;$("transactionCount").textContent=state.transactions.length;$("cashFlowCount").textContent=state.cashFlows.length;$("pageTitle").textContent=state.settings.title;document.title=state.settings.title;$("titleInput").value=state.settings.title;$("cacheInput").value=state.settings.priceCacheMinutes;$("apiKeyInput").value=marketKey();renderSyncStatus()}
@@ -239,8 +268,12 @@ function initAdminMode(){const isAdmin=new URLSearchParams(location.search).get(
 
 window.addEventListener("resize",renderTreemap);
 window.addEventListener("beforeunload",event=>{if(dirty){event.preventDefault();event.returnValue=""}});
+window.addEventListener("online",updateNetworkStatus);
+window.addEventListener("offline",updateNetworkStatus);
+window.addEventListener("beforeinstallprompt",event=>{event.preventDefault();deferredInstallPrompt=event;updateInstallButton()});
+window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;$("installDialog")?.close();updateInstallButton()});
 document.addEventListener("DOMContentLoaded",()=>{
-  initAdminMode();fillAdmin();normalizeState(defaultState);renderAll();
+  initAdminMode();fillAdmin();normalizeState(defaultState);renderAll();updateNetworkStatus();updateInstallButton();registerPwa();
   ["tradeShares","tradePrice","tradeFx","tradeFee"].forEach(id=>$(id).addEventListener("input",updateTradePreview));$("tradeSymbol").addEventListener("change",syncTradeSymbol);$("tradeCurrency").addEventListener("change",()=>{$("tradeFx").value=fx($("tradeCurrency").value);updateTradePreview()});
   loadSharedData(true);
 });

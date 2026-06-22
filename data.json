@@ -2,17 +2,15 @@
   "settings": {
     "title": "孟一晗的梦想金库",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1782034560557,
-    "lastPriceRefreshText": "2026/6/21 17:36:00",
-    "version": "V9.1 安心同步版",
+    "lastPriceRefresh": 1781856351558,
+    "lastPriceRefreshText": "2026/6/19 16:05:51",
+    "version": "V10.0 PWA家庭版",
     "migratedFrom": "V8.0",
-    "migratedAt": "2026-06-21T08:38:50.908Z",
-    "localUpdatedAt": "2026-06-21T09:36:22.114Z",
-    "lastCloudSaveAt": "2026-06-21T09:36:46.913Z"
+    "migratedAt": "2026-06-21T08:38:50.908Z"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.14771,
+    "EUR": 1.14485,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
@@ -82,7 +80,7 @@
       "currency": "EUR",
       "shares": 44,
       "avgCost": 11.685,
-      "price": 9.19,
+      "price": 9.47,
       "sector": "光通讯",
       "color": "#8e3bce",
       "note": "手动价，EUR",
@@ -91,8 +89,7 @@
       "sellDate": "",
       "sellNote": "",
       "id": "pos_mqnjborg_q3swfw",
-      "costBasisUSD": 588.613179,
-      "changePercent": 0
+      "costBasisUSD": 588.613179
     },
     {
       "symbol": "RKLB",
@@ -492,8 +489,8 @@
     {
       "date": "2026-06-21",
       "capital": 15000,
-      "netAsset": 15376.03,
-      "market": 10851.78,
+      "netAsset": 15374.84,
+      "market": 10850.59,
       "cash": 4524.26
     }
   ]

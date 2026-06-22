@@ -4,8 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#111827">
+  <meta name="application-name" content="梦想金库">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="梦想金库">
   <title>孟一晗的梦想金库</title>
-  <link rel="icon" href="data:,">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="app-icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -14,20 +21,27 @@
     <div class="hero-left">
       <img src="avatar.png" class="avatar" alt="小宝贝头像">
       <div>
-        <div class="hero-badge">♥ Family Dream Fund · V9.1 安心同步版</div>
+        <div class="hero-badge">♥ Family Dream Fund · V10 PWA家庭版</div>
         <h1 id="pageTitle">孟一晗的梦想金库</h1>
         <p class="subtitle">爸爸妈妈为你种下的未来</p>
       </div>
     </div>
     <div class="hero-actions">
       <button class="primary" id="refreshButton" onclick="refreshPrices(false)">刷新实时价格</button>
+      <button id="installAppButton" class="install-button" onclick="installApp()">安装到手机</button>
     </div>
   </header>
 
   <section id="syncStrip" class="sync-strip">
     <span id="syncDot" class="sync-dot checking"></span>
     <div><strong id="syncLabel">正在核对云端数据</strong><small id="syncDetail">请稍候…</small></div>
+    <span id="networkBadge" class="network-badge online">在线</span>
     <button class="admin-only hidden" onclick="checkCloudStatus(true)">重新核对</button>
+  </section>
+
+  <section id="updateBanner" class="update-banner hidden">
+    <div><strong>梦想金库有新版本</strong><small>更新不会影响账本数据</small></div>
+    <button onclick="applyAppUpdate()">立即更新</button>
   </section>
 
   <section id="adminPanel" class="card admin admin-only hidden">
@@ -39,7 +53,7 @@
         <label>分支<input id="ghBranch" value="main"></label>
         <label>GitHub Token<input id="ghToken" type="password" autocomplete="off" placeholder="仅保存在当前浏览器会话"></label>
       </div>
-      <p class="note">V9 不再把 GitHub Token 写入长期缓存。关闭标签页后 Token 自动清除。保存前会自动创建本地恢复点。</p>
+      <p class="note">V10 不把 GitHub Token 写入长期缓存。关闭应用后 Token 自动清除；离线时只能查看最近数据，不能刷新行情或保存 GitHub。</p>
       <div class="buttons">
         <button onclick="saveAdminSettings()">保存本次会话设置</button>
         <button id="githubSaveButton" class="primary" onclick="saveToGithub()">安全保存到 GitHub</button>
@@ -128,7 +142,7 @@
 
     <div id="backupPane" class="tab-pane hidden">
       <div class="backup-grid">
-        <div><h3>导出与导入</h3><p class="note">导出完整 V9.1 数据；导入前会自动创建恢复点。</p><div class="buttons"><button onclick="downloadJson()">导出 data.json</button><label class="file-btn">导入 data.json<input type="file" accept=".json" onchange="importJson(event)"></label></div></div>
+        <div><h3>导出与导入</h3><p class="note">导出完整 V10 数据；导入前会自动创建恢复点。</p><div class="buttons"><button onclick="downloadJson()">导出 data.json</button><label class="file-btn">导入 data.json<input type="file" accept=".json" onchange="importJson(event)"></label></div></div>
         <div><h3>本地恢复点</h3><p class="note">最多保留最近10份，只保存在当前浏览器。</p><div id="backupList"></div></div>
         <div><h3>GitHub 云端备份</h3><p class="note">每次安全保存前，V9.1 会先把旧的云端 data.json 复制到 backups 文件夹；备份失败时不会覆盖主账本。</p><div id="cloudBackupStatus" class="cloud-backup-status">尚未执行本次会话的云端备份</div></div>
       </div>
@@ -172,6 +186,26 @@
     </div>
     <div class="modal-actions"><button type="button" onclick="cashDialog.close()">取消</button><button class="primary" type="submit">确认记账</button></div>
   </form>
+</dialog>
+
+<dialog id="installDialog" class="modal small-modal install-dialog">
+  <div class="install-content">
+    <div class="modal-head"><h2>安装梦想金库</h2><button type="button" class="icon-btn" onclick="installDialog.close()">×</button></div>
+    <div id="nativeInstallHelp" class="install-help">
+      <div class="install-icon">梦</div>
+      <p>安装后会出现在手机桌面，可全屏打开并离线查看最近一次数据。</p>
+      <button class="primary" onclick="triggerNativeInstall()">确认安装</button>
+    </div>
+    <div id="iosInstallHelp" class="install-help hidden">
+      <div class="install-icon">梦</div>
+      <p>请使用 Safari 打开本页，然后：</p>
+      <ol><li>点击底部的“分享”按钮</li><li>向下找到“添加到主屏幕”</li><li>点击右上角“添加”</li></ol>
+    </div>
+    <div id="genericInstallHelp" class="install-help hidden">
+      <div class="install-icon">梦</div>
+      <p>打开浏览器菜单，选择“安装应用”或“添加到主屏幕”。如果没有该选项，请稍后刷新再试。</p>
+    </div>
+  </div>
 </dialog>
 
 <script src="script.js"></script>
