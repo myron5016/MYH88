@@ -2,17 +2,17 @@
   "settings": {
     "title": "孟一晗的梦想金库",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1782151563964,
-    "lastPriceRefreshText": "2026/6/23 02:06:03",
+    "lastPriceRefresh": 1782264842103,
+    "lastPriceRefreshText": "2026/6/24 09:34:02",
     "version": "V10.0 PWA家庭版",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-06-23T02:57:20.381Z",
-    "localUpdatedAt": "2026-06-22T18:06:29.003Z"
+    "lastCloudSaveAt": "2026-06-24T01:34:09.769Z",
+    "localUpdatedAt": "2026-06-24T01:34:02.104Z"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.14354,
+    "EUR": 1.13731,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
@@ -25,7 +25,7 @@
       "currency": "USD",
       "shares": 10,
       "avgCost": 215.2,
-      "price": 208.75,
+      "price": 200.039993,
       "sector": "AI基建",
       "color": "#64d20f",
       "note": "",
@@ -33,7 +33,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -0.92078524,
+      "changePercent": -4.12653,
       "id": "pos_mqnjborg_4xhe58",
       "costBasisUSD": 2152
     },
@@ -44,7 +44,7 @@
       "currency": "USD",
       "shares": 5,
       "avgCost": 325.04,
-      "price": 306.74,
+      "price": 279.040009,
       "sector": "AI基建",
       "color": "#7e9023",
       "note": "",
@@ -52,7 +52,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -1.23639,
+      "changePercent": -9.36139,
       "id": "pos_mqnjborg_zeux56",
       "costBasisUSD": 1625.2
     },
@@ -63,7 +63,7 @@
       "currency": "USD",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 173.695,
+      "price": 147.44,
       "sector": "光通讯",
       "color": "#ff6600",
       "note": "",
@@ -71,7 +71,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 7.3185,
+      "changePercent": -13.89359,
       "id": "pos_mqnjborg_p8abix",
       "costBasisUSD": 820.34
     },
@@ -101,7 +101,7 @@
       "currency": "USD",
       "shares": 30,
       "avgCost": 111.4,
-      "price": 99.73,
+      "price": 95.12,
       "sector": "太空",
       "color": "#1f82c4",
       "note": "",
@@ -109,7 +109,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -7.0029821,
+      "changePercent": -5.15505,
       "id": "pos_mqnjborg_0c6vpc",
       "costBasisUSD": 3342
     },
@@ -120,7 +120,7 @@
       "currency": "USD",
       "shares": 3,
       "avgCost": 310.07,
-      "price": 353.2,
+      "price": 318.32001,
       "sector": "AI基建",
       "color": "#ff4f9a",
       "note": "",
@@ -128,7 +128,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 6.050147,
+      "changePercent": -11.073859,
       "id": "pos_mqnjborg_n3b8py",
       "costBasisUSD": 930.21
     },
@@ -139,14 +139,14 @@
       "currency": "USD",
       "shares": 10,
       "avgCost": 150,
-      "price": 165.37,
+      "price": 156.11,
       "status": "holding",
       "sellPrice": "",
       "sellDate": "",
       "sector": "太空",
       "color": "#00eeff",
       "note": "",
-      "changePercent": -10.61081,
+      "changePercent": 0.97671051,
       "sellNote": "",
       "id": "pos_mqnjborg_pzifro",
       "costBasisUSD": 1500
@@ -159,12 +159,12 @@
       "source": "twelve",
       "shares": 1,
       "avgCost": 350.35,
-      "price": 347.42,
+      "price": 346.13,
       "sector": "科技",
       "color": "#dd4646",
       "note": "",
       "costBasisUSD": 350.35,
-      "changePercent": -5.60009
+      "changePercent": -1.01521
     },
     {
       "id": "pos_mqpb3vqg_vlx0kn",
@@ -174,12 +174,12 @@
       "source": "twelve",
       "shares": 7,
       "avgCost": 303.034,
-      "price": 304,
+      "price": 272.0050049,
       "sector": "AI基建",
       "color": "#9dc2d2",
       "note": "",
       "costBasisUSD": 2121.2380000000003,
-      "changePercent": 11.59917
+      "changePercent": -10.086932
     }
   ],
   "transactions": [
@@ -602,6 +602,13 @@
       "capital": 15000,
       "netAsset": 15028.29,
       "market": 12973.09,
+      "cash": 2055.2
+    },
+    {
+      "date": "2026-06-24",
+      "capital": 15000,
+      "netAsset": 14134.28,
+      "market": 12079.08,
       "cash": 2055.2
     }
   ]
