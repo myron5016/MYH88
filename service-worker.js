@@ -1,6 +1,6 @@
-const CACHE_VERSION="dream-fund-v10-1";
-const DATA_CACHE="dream-fund-data-v10-1";
-const APP_SHELL=["./","./index.html","./style.css","./script.js","./manifest.webmanifest","./avatar.png","./app-icon.svg","./icon-192.png","./icon-512.png"];
+const CACHE_VERSION="dream-fund-v10-2";
+const DATA_CACHE="dream-fund-data-v10-2";
+const APP_SHELL=["./","./index.html","./style.css?v=10.2","./script.js?v=10.2","./manifest.webmanifest","./avatar.png","./app-icon.svg","./icon-192.png","./icon-512.png"];
 
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE_VERSION).then(cache=>cache.addAll(APP_SHELL)));
@@ -43,6 +43,11 @@ self.addEventListener("fetch",event=>{
 
   if(request.mode==="navigate"){
     event.respondWith(networkFirst(request,new Request(new URL("./index.html",self.registration.scope).href)));
+    return;
+  }
+
+  if(url.pathname.endsWith("/script.js")||url.pathname.endsWith("/style.css")){
+    event.respondWith(networkFirst(request));
     return;
   }
 
