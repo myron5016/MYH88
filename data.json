@@ -2,13 +2,13 @@
   "settings": {
     "title": "孟一晗的梦想金库",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1782360380936,
-    "lastPriceRefreshText": "2026/6/25 12:06:20",
+    "lastPriceRefresh": 1782361419435,
+    "lastPriceRefreshText": "2026/6/25 12:23:39",
     "version": "V10.0 PWA家庭版",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-06-25T04:17:11.417Z",
-    "localUpdatedAt": "2026-06-25T04:16:45.896Z",
+    "lastCloudSaveAt": "2026-06-25T04:24:42.625Z",
+    "localUpdatedAt": "2026-06-25T04:24:25.161Z",
     "priceProxyUrl": "https://myh88-price-proxy.myh88.workers.dev",
     "publicMarketKey": "da5601ce51f74a18909eeb565fbbdc6c"
   },
