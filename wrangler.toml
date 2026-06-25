@@ -1,0 +1,6 @@
+name = "myh88-price-proxy"
+main = "cloudflare-worker.js"
+compatibility_date = "2026-06-25"
+
+# After deployment, configure the secret:
+# wrangler secret put TWELVE_DATA_KEY

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
@@ -64,7 +64,8 @@
   <section id="settingsPanel" class="card settings admin-only hidden">
     <label>看板标题<input id="titleInput"></label>
     <label>行情缓存分钟<input id="cacheInput" type="number" min="5"></label>
-    <label>Twelve Data Key<input id="apiKeyInput" type="password" autocomplete="off" placeholder="建议改用行情代理"></label>
+    <label>行情代理地址<input id="proxyInput" autocomplete="off" placeholder="https://myh88-price-proxy.xxx.workers.dev"></label>
+    <label>Twelve Data Key<input id="apiKeyInput" type="password" autocomplete="off" placeholder="保存到 GitHub 后家人共用"></label>
     <button onclick="saveSettings()">应用设置</button>
   </section>
 
@@ -73,6 +74,7 @@
     <div class="kpi gold"><span>当前总资产</span><strong id="kpiNetAsset">$0</strong></div>
     <div class="kpi"><span>当前持仓市值</span><strong id="kpiMarket">$0</strong></div>
     <div class="kpi"><span>可用现金</span><strong id="kpiCash">$0</strong></div>
+    <div class="kpi"><span>已实现盈亏</span><strong id="kpiRealized">$0</strong></div>
     <div class="kpi"><span>浮动盈亏</span><strong id="kpiFloating">$0 / 0%</strong></div>
     <div class="kpi"><span>累计总盈亏</span><strong id="kpiPnl">$0 / 0%</strong></div>
   </section>
@@ -102,13 +104,13 @@
     <div id="holdingCards" class="holding-cards"></div>
   </section>
 
-  <section id="ledgerPanel" class="card admin-only hidden">
+  <section id="ledgerPanel" class="card">
     <div class="section-head ledger-head">
       <div>
         <h2>梦想金库账本</h2>
         <p class="section-note">持仓负责汇总，流水负责记住每一次变化</p>
       </div>
-      <div class="buttons">
+      <div class="buttons admin-only hidden">
         <button class="buy-btn" onclick="openTrade('buy')">＋ 买入</button>
         <button class="sell-btn" onclick="openTrade('sell')">－ 卖出</button>
         <button onclick="openCashFlow()">本金变动</button>
@@ -118,8 +120,8 @@
     <div class="tabs" role="tablist">
       <button class="tab active" data-tab="positions" onclick="switchLedgerTab('positions')">当前持仓 <b id="positionCount">0</b></button>
       <button class="tab" data-tab="transactions" onclick="switchLedgerTab('transactions')">交易流水 <b id="transactionCount">0</b></button>
-      <button class="tab" data-tab="cashflows" onclick="switchLedgerTab('cashflows')">资金流水 <b id="cashFlowCount">0</b></button>
-      <button class="tab" data-tab="backup" onclick="switchLedgerTab('backup')">备份与恢复</button>
+      <button class="tab admin-only hidden" data-tab="cashflows" onclick="switchLedgerTab('cashflows')">资金流水 <b id="cashFlowCount">0</b></button>
+      <button class="tab admin-only hidden" data-tab="backup" onclick="switchLedgerTab('backup')">备份与恢复</button>
     </div>
 
     <div id="positionsPane" class="tab-pane">
@@ -211,3 +213,4 @@
 <script src="script.js"></script>
 </body>
 </html>
+
