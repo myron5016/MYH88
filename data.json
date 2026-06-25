@@ -2,19 +2,19 @@
   "settings": {
     "title": "孟一晗的梦想金库",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1782361419435,
-    "lastPriceRefreshText": "2026/6/25 12:23:39",
+    "lastPriceRefresh": 1782361970039,
+    "lastPriceRefreshText": "2026/6/25 12:32:50",
     "version": "V10.0 PWA家庭版",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-06-25T04:24:42.625Z",
+    "lastCloudSaveAt": "2026-06-25T04:45:00.834Z",
     "localUpdatedAt": "2026-06-25T04:24:25.161Z",
     "priceProxyUrl": "https://myh88-price-proxy.myh88.workers.dev",
     "publicMarketKey": "da5601ce51f74a18909eeb565fbbdc6c"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.13622,
+    "EUR": 1.137,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
@@ -704,8 +704,8 @@
     {
       "date": "2026-06-25",
       "capital": 15000,
-      "netAsset": 13850.5,
-      "market": 10580.39,
+      "netAsset": 13850.83,
+      "market": 10580.72,
       "cash": 3270.11
     }
   ]
