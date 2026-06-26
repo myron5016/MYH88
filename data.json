@@ -2,19 +2,19 @@
   "settings": {
     "title": "孟一晗的梦想金库",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1782362721124,
-    "lastPriceRefreshText": "2026/6/25 12:45:21",
-    "version": "V10.0 PWA家庭版",
+    "lastPriceRefresh": 1782498046156,
+    "lastPriceRefreshText": "2026/6/27 02:20:46",
+    "version": "V10.4 PWA家庭版",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-06-25T04:46:02.949Z",
-    "localUpdatedAt": "2026-06-25T04:45:21.125Z",
+    "lastCloudSaveAt": "2026-06-26T18:36:43.597Z",
+    "localUpdatedAt": "2026-06-26T18:36:01.624Z",
     "priceProxyUrl": "https://myh88-price-proxy.myh88.workers.dev",
     "publicMarketKey": "da5601ce51f74a18909eeb565fbbdc6c"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.137,
+    "EUR": 1.14127,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
@@ -27,7 +27,7 @@
       "currency": "USD",
       "shares": 12,
       "avgCost": 212.86233858333333,
-      "price": 199,
+      "price": 194.29,
       "sector": "AI基建",
       "color": "#64d20f",
       "note": "",
@@ -35,7 +35,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -0.51989268,
+      "changePercent": -0.74078137,
       "id": "pos_mqnjborg_4xhe58",
       "costBasisUSD": 2554.348063
     },
@@ -46,7 +46,7 @@
       "currency": "USD",
       "shares": 5,
       "avgCost": 325.04,
-      "price": 276.70001,
+      "price": 264.815,
       "sector": "AI基建",
       "color": "#7e9023",
       "note": "",
@@ -54,7 +54,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -0.83858811,
+      "changePercent": -5.84691,
       "id": "pos_mqnjborg_zeux56",
       "costBasisUSD": 1625.2
     },
@@ -65,7 +65,7 @@
       "currency": "USD",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 146.97,
+      "price": 138.215,
       "sector": "光通讯",
       "color": "#ff6600",
       "note": "",
@@ -73,7 +73,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -0.31877456,
+      "changePercent": -0.23458445,
       "id": "pos_mqnjborg_p8abix",
       "costBasisUSD": 820.34
     },
@@ -103,7 +103,7 @@
       "currency": "USD",
       "shares": 30,
       "avgCost": 111.4,
-      "price": 85.41,
+      "price": 85.445,
       "sector": "太空",
       "color": "#1f82c4",
       "note": "",
@@ -111,7 +111,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -10.20816,
+      "changePercent": 5.89292,
       "id": "pos_mqnjborg_0c6vpc",
       "costBasisUSD": 3342
     },
@@ -120,9 +120,9 @@
       "name": "维谛技术",
       "source": "twelve",
       "currency": "USD",
-      "shares": 3,
-      "avgCost": 310.07,
-      "price": 316.42999,
+      "shares": 3.0007,
+      "avgCost": 310.070583197254,
+      "price": 304.36,
       "sector": "AI基建",
       "color": "#ff4f9a",
       "note": "",
@@ -130,9 +130,9 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -0.59374673,
+      "changePercent": -6.51473,
       "id": "pos_mqnjborg_n3b8py",
-      "costBasisUSD": 930.21
+      "costBasisUSD": 930.428799
     },
     {
       "symbol": "SPCX",
@@ -141,14 +141,14 @@
       "currency": "USD",
       "shares": 10,
       "avgCost": 150,
-      "price": 154.53999,
+      "price": 153.945,
       "status": "holding",
       "sellPrice": "",
       "sellDate": "",
       "sector": "太空",
       "color": "#00eeff",
       "note": "",
-      "changePercent": -1.0057058,
+      "changePercent": 0.61764706,
       "sellNote": "",
       "id": "pos_mqnjborg_pzifro",
       "costBasisUSD": 1500
@@ -161,12 +161,26 @@
       "source": "twelve",
       "shares": 2,
       "avgCost": 346.34993,
-      "price": 345.29001,
+      "price": 341.275,
       "sector": "科技",
       "color": "#dd4646",
       "note": "",
       "costBasisUSD": 692.69986,
-      "changePercent": -0.24268232
+      "changePercent": -0.70844361
+    },
+    {
+      "id": "pos_mqv9tzrw_6n81s8",
+      "symbol": "LITE",
+      "name": "朗美通",
+      "currency": "USD",
+      "source": "twelve",
+      "shares": 2,
+      "avgCost": 810.175,
+      "price": 810,
+      "sector": "光通信",
+      "color": "#38bdf8",
+      "note": "",
+      "costBasisUSD": 1620.35
     }
   ],
   "transactions": [
@@ -667,6 +681,62 @@
         "costBasisUSD": 2152
       },
       "schemaVersion": "10"
+    },
+    {
+      "id": "tx_mqv9tzrw_3o68hy",
+      "date": "2026-06-26",
+      "type": "buy",
+      "symbol": "LITE",
+      "name": "朗美通",
+      "shares": 2,
+      "price": 810,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.35,
+      "feeUSD": 0.35,
+      "costBasisUSD": 1620.35,
+      "grossUSD": 1620,
+      "realizedPnlUSD": 0,
+      "note": "",
+      "positionBefore": null,
+      "schemaVersion": "10"
+    },
+    {
+      "id": "tx_mqv9ux94_se7c1h",
+      "date": "2026-06-26",
+      "type": "buy",
+      "symbol": "VRT",
+      "name": "维谛技术",
+      "shares": 0.0007,
+      "price": 312.57,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0,
+      "feeUSD": 0,
+      "costBasisUSD": 0.218799,
+      "grossUSD": 0.218799,
+      "realizedPnlUSD": 0,
+      "note": "股息买入",
+      "positionBefore": {
+        "symbol": "VRT",
+        "name": "维谛技术",
+        "source": "twelve",
+        "currency": "USD",
+        "shares": 3,
+        "avgCost": 310.07,
+        "price": 304.36,
+        "sector": "AI基建",
+        "color": "#ff4f9a",
+        "note": "",
+        "status": "holding",
+        "sellPrice": "",
+        "sellDate": "",
+        "sellNote": "",
+        "changePercent": -6.51473,
+        "id": "pos_mqnjborg_n3b8py",
+        "costBasisUSD": 930.21
+      },
+      "schemaVersion": "10"
     }
   ],
   "cashFlows": [
@@ -707,6 +777,13 @@
       "netAsset": 13850.83,
       "market": 10580.72,
       "cash": 3270.11
+    },
+    {
+      "date": "2026-06-26",
+      "capital": 15000,
+      "netAsset": 13676.78,
+      "market": 12027.24,
+      "cash": 1649.55
     }
   ]
 }
