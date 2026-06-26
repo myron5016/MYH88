@@ -1,10 +1,13 @@
-﻿const VERSION="V10.0 PWA家庭版";
+﻿const VERSION="V10.1 PWA家庭版";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
 const PRICE_CACHE_KEY="v9_price_cache";
 const FX_CACHE_KEY="v9_fx_cache";
 const MARKET_KEY="v9_market_key";
 const PAGE_SIZE=20;
+const FETCH_TIMEOUT_MS=12000;
+const AUTO_REFRESH_CHECK_MS=5*60000;
+const RESUME_REFRESH_GAP_MS=20000;
 
 const defaultState={settings:{title:"孟一晗的梦想金库",priceCacheMinutes:30,lastPriceRefresh:0,lastPriceRefreshText:"",version:VERSION},fxRates:{USD:1,EUR:1.16,HKD:.128,JPY:.0067,GBP:1.27},positions:[],transactions:[],cashFlows:[],snapshots:[]};
 let state=structuredClone(defaultState);
@@ -20,6 +23,9 @@ let deferredInstallPrompt=null;
 let swRegistration=null;
 let updateReloading=false;
 let isAdminMode=false;
+let priceRefreshPromise=null;
+let autoRefreshTimer=null;
+let lastAutoRefreshKick=0;
 
 function $(id){return document.getElementById(id)}
 function readJson(text,fallback){try{return JSON.parse(text)||fallback}catch{return fallback}}
@@ -106,7 +112,7 @@ async function loadSharedData(autoRefresh=false){
     const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),8000);
     const response=await fetch("data.json?ts="+Date.now(),{cache:"no-store",signal:controller.signal});clearTimeout(timer);
     if(!response.ok)throw new Error("找不到 data.json");
-    const shared=await response.json(),versionChanged=shared?.settings?.version!==VERSION;normalizeState(shared);applyPriceCache();cloudState=structuredClone(state);const snapshotChanged=captureSnapshot(false);dirty=versionChanged||snapshotChanged;lastMutationReason=versionChanged?"账本已升级到 V10，等待首次安全保存":snapshotChanged?"今日资产快照":"";saveLocal();renderAll();renderSyncStatus();
+    const shared=await response.json(),versionChanged=shared?.settings?.version!==VERSION;normalizeState(shared);applyPriceCache();cloudState=structuredClone(state);const snapshotChanged=isAdminMode?captureSnapshot(false):false;dirty=isAdminMode&&(versionChanged||snapshotChanged);lastMutationReason=isAdminMode?(versionChanged?"账本已升级到 V10，等待首次安全保存":snapshotChanged?"今日资产快照":""):"";saveLocal();renderAll();renderSyncStatus();
     status.textContent=navigator.onLine?`已读取共享数据：${new Date().toLocaleString("zh-CN")}`:"离线模式：已读取设备中最近缓存的数据";
     if(admin.owner&&admin.repo&&admin.token)checkCloudStatus(false);if(autoRefresh)refreshPrices(true);
   }catch(error){
@@ -164,7 +170,23 @@ function getFxCache(){return readJson(localStorage.getItem(FX_CACHE_KEY),null)}
 function applyPriceCache(){const pc=getPriceCache();const fc=getFxCache();if(fc?.fxRates)state.fxRates={...state.fxRates,...fc.fxRates,USD:1};if(pc?.prices)state.positions.forEach(p=>{const q=pc.prices[p.symbol];if(q&&num(q.price)>0){p.price=num(q.price);p.changePercent=num(q.changePercent)}});if(pc?.lastPriceRefresh){state.settings.lastPriceRefresh=pc.lastPriceRefresh;state.settings.lastPriceRefreshText=pc.lastPriceRefreshText||""}}
 function priceCacheValid(){const last=num(getPriceCache()?.lastPriceRefresh),mins=num(state.settings.priceCacheMinutes)||30;return last&&Date.now()-last<mins*60000}
 function savePriceCache(){const prices={};state.positions.forEach(p=>prices[p.symbol]={price:p.price,changePercent:p.changePercent||0});localStorage.setItem(PRICE_CACHE_KEY,JSON.stringify({lastPriceRefresh:state.settings.lastPriceRefresh,lastPriceRefreshText:state.settings.lastPriceRefreshText,prices}))}
-async function fetchJson(url){const r=await fetch(url);if(!r.ok)throw new Error("网络错误 "+r.status);return r.json()}
+function friendlyFetchError(error){
+  if(error?.name==="AbortError")return"请求超时，请检查手机网络后会自动重试";
+  if(error instanceof TypeError)return"网络请求失败，可能是手机网络或微信浏览器临时拦截";
+  return error?.message||"网络请求失败";
+}
+async function fetchJson(url,options={}){
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),options.timeout||FETCH_TIMEOUT_MS);
+  try{
+    const r=await fetch(url,{cache:"no-store",credentials:"omit",...options,signal:controller.signal});
+    if(!r.ok)throw new Error("网络错误 "+r.status);
+    return r.json();
+  }catch(error){
+    throw new Error(friendlyFetchError(error));
+  }finally{
+    clearTimeout(timer);
+  }
+}
 async function refreshFx(force=false){
   const proxy=priceProxyUrl(),key=marketKey();if(!proxy&&!key)return;const cached=getFxCache();if(!force&&cached?.time&&Date.now()-cached.time<24*3600000){state.fxRates={...state.fxRates,...cached.fxRates,USD:1};return}
   const currencies=[...new Set(state.positions.map(p=>p.currency).filter(c=>c!=="USD"))];
@@ -188,11 +210,16 @@ async function fetchQuoteBatch(symbols,key){
   throw lastError;
 }
 async function refreshPrices(useCache=true){
+  if(priceRefreshPromise)return priceRefreshPromise;
+  priceRefreshPromise=doRefreshPrices(useCache).finally(()=>{priceRefreshPromise=null});
+  return priceRefreshPromise;
+}
+async function doRefreshPrices(useCache=true){
   const status=$("status"),button=$("refreshButton"),key=marketKey(),proxy=priceProxyUrl();
   if(!navigator.onLine){status.textContent="当前离线，无法刷新行情；正在显示最近缓存价格";return}
   if(useCache&&priceCacheValid()){applyPriceCache();renderAll();status.textContent="已使用缓存行情："+(state.settings.lastPriceRefreshText||"");return}
   if(!proxy&&!key){status.textContent="刷新失败：管理员需要先填写 Cloudflare Worker 行情代理地址，或 Twelve Data Key";if(!useCache)alert(status.textContent);return}
-  status.textContent=proxy?"正在通过行情代理刷新实时价格...":"正在通过 Twelve Data 刷新实时价格...";button.disabled=true;
+  status.textContent=proxy?"正在通过行情代理刷新实时价格...":"正在通过 Twelve Data 刷新实时价格...";if(button)button.disabled=true;
   try{
     await refreshFx(false);const items=state.positions.filter(p=>p.source==="twelve"&&p.symbol),symbols=[...new Set(items.map(p=>p.symbol))];
     if(symbols.length){
@@ -202,7 +229,7 @@ async function refreshPrices(useCache=true){
     state.settings.lastPriceRefresh=Date.now();state.settings.lastPriceRefreshText=new Date().toLocaleString("zh-CN");savePriceCache();
     if(isAdminMode){captureSnapshot(false);markDirty("实时行情与今日快照已更新")}else saveLocal();
     renderAll();status.textContent=isAdminMode?"已刷新："+state.settings.lastPriceRefreshText+"。保存到 GitHub 后家人可见":"已刷新："+state.settings.lastPriceRefreshText+"。本次价格已缓存在本设备";
-  }catch(error){applyPriceCache();renderAll();status.textContent="行情刷新失败，已保留最近行情："+error.message;if(!useCache)alert(status.textContent)}finally{button.disabled=false}
+  }catch(error){applyPriceCache();renderAll();status.textContent="行情刷新失败，已保留最近行情："+friendlyFetchError(error);if(!useCache)alert(status.textContent)}finally{if(button)button.disabled=false}
 }
 function saveAdminSettings(showAlert=true){admin={owner:$("ghOwner").value.trim(),repo:$("ghRepo").value.trim(),branch:$("ghBranch").value.trim()||"main",token:$("ghToken").value.trim()};sessionStorage.setItem("v9_admin",JSON.stringify(admin));if(showAlert){alert("管理员设置已保存到当前浏览器会话");if(admin.owner&&admin.repo&&admin.token)checkCloudStatus(false)}}
 function fillAdmin(){$("ghOwner").value=admin.owner||"";$("ghRepo").value=admin.repo||"";$("ghBranch").value=admin.branch||"main";$("ghToken").value=admin.token||""}
@@ -281,14 +308,31 @@ function importJson(event){const file=event.target.files[0];if(!file)return;cons
 
 function renderAll(){renderKpis();renderTreemap();renderSectors();renderChart();renderHoldingCards();renderPositionTable();renderTransactionTable();renderCashFlowTable();renderBackupList();$("positionCount").textContent=state.positions.length;$("transactionCount").textContent=state.transactions.length;$("cashFlowCount").textContent=state.cashFlows.length;$("pageTitle").textContent=state.settings.title;document.title=state.settings.title;$("titleInput").value=state.settings.title;$("cacheInput").value=state.settings.priceCacheMinutes;if($("proxyInput"))$("proxyInput").value=priceProxyUrl();$("apiKeyInput").value=marketKey();renderSyncStatus()}
 function initAdminMode(){isAdminMode=new URLSearchParams(location.search).get("admin")==="1";document.querySelectorAll(".admin-only").forEach(el=>el.classList.toggle("hidden",!isAdminMode));document.body.classList.toggle("viewer-mode",!isAdminMode)}
+function canAutoRefreshPrices(){return navigator.onLine&&document.visibilityState!=="hidden"&&(priceProxyUrl()||marketKey())}
+function kickAutoRefresh(force=false){
+  if(!canAutoRefreshPrices())return;
+  const now=Date.now();
+  if(!force&&now-lastAutoRefreshKick<RESUME_REFRESH_GAP_MS)return;
+  if(!force&&priceCacheValid()){applyPriceCache();renderAll();return}
+  lastAutoRefreshKick=now;
+  refreshPrices(true);
+}
+function initAutoRefreshHooks(){
+  if(autoRefreshTimer)clearInterval(autoRefreshTimer);
+  autoRefreshTimer=setInterval(()=>kickAutoRefresh(false),AUTO_REFRESH_CHECK_MS);
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")kickAutoRefresh(false)});
+  window.addEventListener("focus",()=>kickAutoRefresh(false));
+  window.addEventListener("pageshow",event=>kickAutoRefresh(!!event.persisted));
+}
 window.addEventListener("resize",renderTreemap);
 window.addEventListener("beforeunload",event=>{if(dirty){event.preventDefault();event.returnValue=""}});
-window.addEventListener("online",updateNetworkStatus);
+window.addEventListener("online",()=>{updateNetworkStatus();kickAutoRefresh(true)});
 window.addEventListener("offline",updateNetworkStatus);
 window.addEventListener("beforeinstallprompt",event=>{event.preventDefault();deferredInstallPrompt=event;updateInstallButton()});
 window.addEventListener("appinstalled",()=>{deferredInstallPrompt=null;$("installDialog")?.close();updateInstallButton()});
 document.addEventListener("DOMContentLoaded",()=>{
   initAdminMode();fillAdmin();normalizeState(defaultState);renderAll();updateNetworkStatus();updateInstallButton();registerPwa();
+  initAutoRefreshHooks();
   ["tradeShares","tradePrice","tradeFx","tradeFee"].forEach(id=>$(id).addEventListener("input",updateTradePreview));$("tradeSymbol").addEventListener("change",syncTradeSymbol);$("tradeCurrency").addEventListener("change",()=>{$("tradeFx").value=fx($("tradeCurrency").value);updateTradePreview()});
   loadSharedData(true);
 });
