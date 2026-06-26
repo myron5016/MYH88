@@ -1,4 +1,4 @@
-﻿const VERSION="V10.1 PWA家庭版";
+﻿const VERSION="V10.2 PWA家庭版";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
 const PRICE_CACHE_KEY="v9_price_cache";
@@ -6,6 +6,7 @@ const FX_CACHE_KEY="v9_fx_cache";
 const MARKET_KEY="v9_market_key";
 const PAGE_SIZE=20;
 const FETCH_TIMEOUT_MS=12000;
+const PROXY_TIMEOUT_MS=8000;
 const AUTO_REFRESH_CHECK_MS=5*60000;
 const RESUME_REFRESH_GAP_MS=20000;
 
@@ -59,8 +60,8 @@ async function registerPwa(){
   if(!("serviceWorker" in navigator)||!window.isSecureContext)return;
   try{
     swRegistration=await navigator.serviceWorker.register("./service-worker.js");
-    if(swRegistration.waiting)showUpdateBanner();
-    swRegistration.addEventListener("updatefound",()=>{const worker=swRegistration.installing;if(!worker)return;worker.addEventListener("statechange",()=>{if(worker.state==="installed"&&navigator.serviceWorker.controller)showUpdateBanner()})});
+    if(swRegistration.waiting){showUpdateBanner();if(!isAdminMode&&!dirty)applyAppUpdate()}
+    swRegistration.addEventListener("updatefound",()=>{const worker=swRegistration.installing;if(!worker)return;worker.addEventListener("statechange",()=>{if(worker.state==="installed"&&navigator.serviceWorker.controller){showUpdateBanner();if(!isAdminMode&&!dirty)applyAppUpdate()}})});
     navigator.serviceWorker.addEventListener("controllerchange",()=>{if(updateReloading)return;updateReloading=true;location.reload()});
   }catch(error){console.warn("PWA 注册失败",error)}
 }
@@ -190,20 +191,41 @@ async function fetchJson(url,options={}){
 async function refreshFx(force=false){
   const proxy=priceProxyUrl(),key=marketKey();if(!proxy&&!key)return;const cached=getFxCache();if(!force&&cached?.time&&Date.now()-cached.time<24*3600000){state.fxRates={...state.fxRates,...cached.fxRates,USD:1};return}
   const currencies=[...new Set(state.positions.map(p=>p.currency).filter(c=>c!=="USD"))];
-  if(proxy&&currencies.length){const res=await fetchJson(`${proxy}/fx?currencies=${encodeURIComponent(currencies.join(","))}`);state.fxRates={...state.fxRates,...(res.rates||{}),USD:1}}
+  if(proxy&&currencies.length){
+    try{
+      const res=await fetchJson(`${proxy}/fx?currencies=${encodeURIComponent(currencies.join(","))}`,{timeout:PROXY_TIMEOUT_MS});state.fxRates={...state.fxRates,...(res.rates||{}),USD:1}
+    }catch(error){
+      if(!key)throw error;
+      console.warn("行情代理汇率失败，改用 Twelve Data 直连",error);
+      for(const c of currencies){const res=await fetchJson(`https://api.twelvedata.com/exchange_rate?symbol=${c}/USD&apikey=${encodeURIComponent(key)}`);if(res.rate)state.fxRates[c]=num(res.rate)}
+    }
+  }
   else for(const c of currencies){const res=await fetchJson(`https://api.twelvedata.com/exchange_rate?symbol=${c}/USD&apikey=${encodeURIComponent(key)}`);if(res.rate)state.fxRates[c]=num(res.rate)}
   state.fxRates.USD=1;localStorage.setItem(FX_CACHE_KEY,JSON.stringify({time:Date.now(),fxRates:state.fxRates}));
+}
+async function fetchQuoteDirect(symbols,key){
+  if(!key)throw new Error("缺少 Twelve Data Key，无法启用备用行情线路");
+  return fetchJson(`https://api.twelvedata.com/quote?symbol=${encodeURIComponent(symbols.join(","))}&apikey=${encodeURIComponent(key)}`);
 }
 async function fetchQuoteBatch(symbols,key){
   let lastError=null;
   for(let attempt=1;attempt<=3;attempt++){
     try{
       const proxy=priceProxyUrl();
-      const res=proxy?await fetchJson(`${proxy}/quotes?symbols=${encodeURIComponent(symbols.join(","))}`):await fetchJson(`https://api.twelvedata.com/quote?symbol=${encodeURIComponent(symbols.join(","))}&apikey=${encodeURIComponent(key)}`);
+      const res=proxy?await fetchJson(`${proxy}/quotes?symbols=${encodeURIComponent(symbols.join(","))}`,{timeout:PROXY_TIMEOUT_MS}):await fetchQuoteDirect(symbols,key);
       if(res.code||res.status==="error")throw new Error(res.message||"Twelve Data 错误");
       return res;
     }catch(error){
       lastError=error;
+      if(priceProxyUrl()&&key){
+        try{
+          const res=await fetchQuoteDirect(symbols,key);
+          if(res.code||res.status==="error")throw new Error(res.message||"Twelve Data 错误");
+          return res;
+        }catch(fallbackError){
+          lastError=fallbackError;
+        }
+      }
       await new Promise(resolve=>setTimeout(resolve, attempt*900));
     }
   }
@@ -219,7 +241,7 @@ async function doRefreshPrices(useCache=true){
   if(!navigator.onLine){status.textContent="当前离线，无法刷新行情；正在显示最近缓存价格";return}
   if(useCache&&priceCacheValid()){applyPriceCache();renderAll();status.textContent="已使用缓存行情："+(state.settings.lastPriceRefreshText||"");return}
   if(!proxy&&!key){status.textContent="刷新失败：管理员需要先填写 Cloudflare Worker 行情代理地址，或 Twelve Data Key";if(!useCache)alert(status.textContent);return}
-  status.textContent=proxy?"正在通过行情代理刷新实时价格...":"正在通过 Twelve Data 刷新实时价格...";if(button)button.disabled=true;
+  status.textContent=proxy&&key?"正在刷新实时价格：代理优先，失败自动切换备用线路...":proxy?"正在通过行情代理刷新实时价格...":"正在通过 Twelve Data 刷新实时价格...";if(button)button.disabled=true;
   try{
     await refreshFx(false);const items=state.positions.filter(p=>p.source==="twelve"&&p.symbol),symbols=[...new Set(items.map(p=>p.symbol))];
     if(symbols.length){
