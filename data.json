@@ -2,19 +2,19 @@
   "settings": {
     "title": "孟一晗的梦想金库",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1782362721124,
-    "lastPriceRefreshText": "2026/6/25 12:45:21",
-    "version": "V10.0 PWA家庭版",
+    "lastPriceRefresh": 1782488613225,
+    "lastPriceRefreshText": "2026/6/26 23:43:33",
+    "version": "V10.2 PWA家庭版",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-06-25T04:46:02.949Z",
-    "localUpdatedAt": "2026-06-25T04:45:21.125Z",
+    "lastCloudSaveAt": "2026-06-26T15:48:59.186Z",
+    "localUpdatedAt": "2026-06-26T15:47:26.110Z",
     "priceProxyUrl": "https://myh88-price-proxy.myh88.workers.dev",
     "publicMarketKey": "da5601ce51f74a18909eeb565fbbdc6c"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.137,
+    "EUR": 1.14127,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
@@ -27,7 +27,7 @@
       "currency": "USD",
       "shares": 12,
       "avgCost": 212.86233858333333,
-      "price": 199,
+      "price": 195.06,
       "sector": "AI基建",
       "color": "#64d20f",
       "note": "",
@@ -35,7 +35,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -0.51989268,
+      "changePercent": -0.34740241,
       "id": "pos_mqnjborg_4xhe58",
       "costBasisUSD": 2554.348063
     },
@@ -46,7 +46,7 @@
       "currency": "USD",
       "shares": 5,
       "avgCost": 325.04,
-      "price": 276.70001,
+      "price": 268.09,
       "sector": "AI基建",
       "color": "#7e9023",
       "note": "",
@@ -54,7 +54,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -0.83858811,
+      "changePercent": -4.6825,
       "id": "pos_mqnjborg_zeux56",
       "costBasisUSD": 1625.2
     },
@@ -65,15 +65,15 @@
       "currency": "USD",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 146.97,
-      "sector": "光通讯",
+      "price": 131.44,
+      "sector": "光通信",
       "color": "#ff6600",
       "note": "",
       "status": "holding",
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -0.31877456,
+      "changePercent": -5.12487,
       "id": "pos_mqnjborg_p8abix",
       "costBasisUSD": 820.34
     },
@@ -85,7 +85,7 @@
       "shares": 44,
       "avgCost": 11.685,
       "price": 9.47,
-      "sector": "光通讯",
+      "sector": "光通信",
       "color": "#8e3bce",
       "note": "手动价，EUR",
       "status": "holding",
@@ -103,7 +103,7 @@
       "currency": "USD",
       "shares": 30,
       "avgCost": 111.4,
-      "price": 85.41,
+      "price": 85.925,
       "sector": "太空",
       "color": "#1f82c4",
       "note": "",
@@ -111,7 +111,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -10.20816,
+      "changePercent": 6.48779,
       "id": "pos_mqnjborg_0c6vpc",
       "costBasisUSD": 3342
     },
@@ -122,7 +122,7 @@
       "currency": "USD",
       "shares": 3,
       "avgCost": 310.07,
-      "price": 316.42999,
+      "price": 306.715,
       "sector": "AI基建",
       "color": "#ff4f9a",
       "note": "",
@@ -130,7 +130,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -0.59374673,
+      "changePercent": -5.79138,
       "id": "pos_mqnjborg_n3b8py",
       "costBasisUSD": 930.21
     },
@@ -141,14 +141,14 @@
       "currency": "USD",
       "shares": 10,
       "avgCost": 150,
-      "price": 154.53999,
+      "price": 156.1,
       "status": "holding",
       "sellPrice": "",
       "sellDate": "",
       "sector": "太空",
       "color": "#00eeff",
       "note": "",
-      "changePercent": -1.0057058,
+      "changePercent": 2.026144,
       "sellNote": "",
       "id": "pos_mqnjborg_pzifro",
       "costBasisUSD": 1500
@@ -161,12 +161,26 @@
       "source": "twelve",
       "shares": 2,
       "avgCost": 346.34993,
-      "price": 345.29001,
+      "price": 343.53,
       "sector": "科技",
       "color": "#dd4646",
       "note": "",
       "costBasisUSD": 692.69986,
-      "changePercent": -0.24268232
+      "changePercent": -0.052367246
+    },
+    {
+      "id": "pos_mqv3ssra_6nurpk",
+      "symbol": "LITE",
+      "name": "朗美通",
+      "currency": "USD",
+      "source": "twelve",
+      "shares": 2,
+      "avgCost": 810.175,
+      "price": 810,
+      "sector": "光通信",
+      "color": "#38bdf8",
+      "note": "",
+      "costBasisUSD": 1620.35
     }
   ],
   "transactions": [
@@ -667,6 +681,25 @@
         "costBasisUSD": 2152
       },
       "schemaVersion": "10"
+    },
+    {
+      "id": "tx_mqv3ssra_893d11",
+      "date": "2026-06-26",
+      "type": "buy",
+      "symbol": "LITE",
+      "name": "朗美通",
+      "shares": 2,
+      "price": 810,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.35,
+      "feeUSD": 0.35,
+      "costBasisUSD": 1620.35,
+      "grossUSD": 1620,
+      "realizedPnlUSD": 0,
+      "note": "",
+      "positionBefore": null,
+      "schemaVersion": "10"
     }
   ],
   "cashFlows": [
@@ -707,6 +740,13 @@
       "netAsset": 13850.83,
       "market": 10580.72,
       "cash": 3270.11
+    },
+    {
+      "date": "2026-06-26",
+      "capital": 15000,
+      "netAsset": 13698.19,
+      "market": 12048.43,
+      "cash": 1649.76
     }
   ]
 }
