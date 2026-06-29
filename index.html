@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=10.6">
+  <link rel="stylesheet" href="style.css?v=10.7">
 </head>
 <body>
 <main class="container">
@@ -140,7 +140,7 @@
         <input id="transactionSearch" placeholder="搜索代码" oninput="transactionPage=1;renderTransactionTable()">
         <select id="transactionTypeFilter" onchange="transactionPage=1;renderTransactionTable()"><option value="all">全部类型</option><option value="buy">仅买入</option><option value="sell">仅卖出</option><option value="opening">V8 迁移记录</option></select>
       </div>
-      <div class="table-wrap"><table class="compact-table"><thead><tr><th>日期</th><th>类型</th><th>代码</th><th>数量</th><th>成交价</th><th>手续费</th><th>成交汇率</th><th>已实现盈亏 USD</th><th>备注</th><th>纠错</th></tr></thead><tbody id="transactionBody"></tbody></table></div>
+      <div class="table-wrap"><table class="compact-table"><thead><tr><th>日期</th><th>类型</th><th>代码</th><th>数量</th><th>成交价</th><th>手续费</th><th>成交汇率</th><th>已实现盈亏 USD</th><th>备注</th><th>操作</th></tr></thead><tbody id="transactionBody"></tbody></table></div>
       <div id="transactionPager" class="pager"></div>
     </div>
 
@@ -164,6 +164,7 @@
   <form method="dialog" onsubmit="submitTrade(event)">
     <div class="modal-head"><h2 id="tradeTitle">记录交易</h2><button type="button" class="icon-btn" onclick="tradeDialog.close()">×</button></div>
     <input id="tradeType" type="hidden">
+    <input id="tradeEditId" type="hidden">
     <div class="form-grid">
       <label>资产代码<input id="tradeSymbol" required placeholder="例如 NVDA"></label>
       <label>交易日期<input id="tradeDate" type="date" required></label>
@@ -216,6 +217,6 @@
   </div>
 </dialog>
 
-<script src="script.js?v=10.6"></script>
+<script src="script.js?v=10.7"></script>
 </body>
 </html>
