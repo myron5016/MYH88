@@ -4,11 +4,11 @@
     "priceCacheMinutes": 30,
     "lastPriceRefresh": 1782701462200,
     "lastPriceRefreshText": "2026/6/29 10:51:02",
-    "version": "V10.4 PWA家庭版",
+    "version": "V10.7 PWA家庭版",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-06-29T20:52:25.876Z",
-    "localUpdatedAt": "2026-06-29T20:51:09.105Z",
+    "lastCloudSaveAt": "2026-06-29T21:28:25.719Z",
+    "localUpdatedAt": "2026-06-29T21:28:11.804Z",
     "priceProxyUrl": "https://myh88-price-proxy.myh88.workers.dev",
     "publicMarketKey": "da5601ce51f74a18909eeb565fbbdc6c"
   },
@@ -29,7 +29,7 @@
       "avgCost": 209.76343307142858,
       "price": 192.53,
       "sector": "AI基建",
-      "color": "#64d20f",
+      "color": "#51ac0c",
       "note": "",
       "status": "holding",
       "sellPrice": "",
@@ -105,7 +105,7 @@
       "avgCost": 111.4,
       "price": 84.54,
       "sector": "太空",
-      "color": "#1f82c4",
+      "color": "#c01b34",
       "note": "",
       "status": "holding",
       "sellPrice": "",
@@ -178,7 +178,7 @@
       "avgCost": 810.175,
       "price": 816.97998,
       "sector": "光通信",
-      "color": "#38bdf8",
+      "color": "#b9d00b",
       "note": "",
       "costBasisUSD": 810.175,
       "changePercent": -5.21944
@@ -193,7 +193,7 @@
       "avgCost": 1110.35,
       "price": 1110,
       "sector": "AI基建",
-      "color": "#00ffff",
+      "color": "#0062ff",
       "note": "",
       "costBasisUSD": 1110.35
     }
@@ -215,7 +215,10 @@
       "grossUSD": 2152,
       "realizedPnlUSD": 0,
       "note": "V8 迁移：期初持仓",
-      "migration": true
+      "migration": true,
+      "sector": "AI基建",
+      "source": "twelve",
+      "color": "#51ac0c"
     },
     {
       "id": "tx_mqnjborg_yfihv6",
@@ -258,7 +261,7 @@
       "date": "2026-06-11",
       "type": "sell",
       "symbol": "LITE",
-      "name": "Lumentum",
+      "name": "朗美通",
       "shares": 1,
       "price": 880,
       "currency": "USD",
@@ -269,7 +272,10 @@
       "grossUSD": 880,
       "realizedPnlUSD": 25,
       "note": "V8 已结算记录",
-      "migration": true
+      "migration": true,
+      "sector": "光通信",
+      "source": "twelve",
+      "color": "#b9d00b"
     },
     {
       "id": "tx_mqnjborg_dndtbg",
@@ -323,7 +329,10 @@
       "grossUSD": 3342,
       "realizedPnlUSD": 0,
       "note": "V8 迁移：期初持仓",
-      "migration": true
+      "migration": true,
+      "sector": "太空",
+      "source": "twelve",
+      "color": "#c01b34"
     },
     {
       "id": "tx_mqnjborg_ju1ddv",
@@ -413,7 +422,10 @@
       "grossUSD": 1000,
       "realizedPnlUSD": 110,
       "note": "V8 已结算记录",
-      "migration": true
+      "migration": true,
+      "sector": "AI基建",
+      "source": "twelve",
+      "color": "#0062ff"
     },
     {
       "id": "tx_mqnjborg_gfs9bn",
@@ -449,7 +461,10 @@
       "grossUSD": 1250,
       "realizedPnlUSD": 109.20000000000005,
       "note": " 部分卖出",
-      "migration": true
+      "migration": true,
+      "sector": "太空",
+      "source": "twelve",
+      "color": "#c01b34"
     },
     {
       "id": "tx_mqnjborg_1jspyf",
@@ -695,7 +710,10 @@
         "id": "pos_mqnjborg_4xhe58",
         "costBasisUSD": 2152
       },
-      "schemaVersion": "10"
+      "schemaVersion": "10",
+      "sector": "AI基建",
+      "source": "twelve",
+      "color": "#51ac0c"
     },
     {
       "id": "tx_mqv9tzrw_3o68hy",
@@ -714,7 +732,10 @@
       "realizedPnlUSD": 0,
       "note": "",
       "positionBefore": null,
-      "schemaVersion": "10"
+      "schemaVersion": "10",
+      "sector": "光通信",
+      "source": "twelve",
+      "color": "#b9d00b"
     },
     {
       "id": "tx_mqv9ux94_se7c1h",
@@ -770,7 +791,10 @@
       "realizedPnlUSD": 0,
       "note": "",
       "positionBefore": null,
-      "schemaVersion": "10"
+      "schemaVersion": "10",
+      "sector": "AI基建",
+      "source": "twelve",
+      "color": "#0062ff"
     },
     {
       "id": "tx_mqzowpji_t0yuji",
@@ -807,7 +831,10 @@
         "id": "pos_mqnjborg_4xhe58",
         "costBasisUSD": 2554.348063
       },
-      "schemaVersion": "10"
+      "schemaVersion": "10",
+      "sector": "AI基建",
+      "source": "twelve",
+      "color": "#51ac0c"
     },
     {
       "id": "tx_mqzox7zr_hkqh8d",
@@ -840,7 +867,10 @@
         "costBasisUSD": 1620.35,
         "changePercent": -5.21944
       },
-      "schemaVersion": "10"
+      "schemaVersion": "10",
+      "sector": "光通信",
+      "source": "twelve",
+      "color": "#b9d00b"
     }
   ],
   "cashFlows": [
@@ -892,8 +922,8 @@
     {
       "date": "2026-06-29",
       "capital": 15000,
-      "netAsset": 13638.44,
-      "market": 12636.96,
+      "netAsset": 13631.84,
+      "market": 12630.36,
       "cash": 1001.49
     }
   ]
