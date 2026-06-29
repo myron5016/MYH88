@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=10.7">
+  <link rel="stylesheet" href="style.css?v=10.8">
 </head>
 <body>
 <main class="container">
@@ -197,6 +197,31 @@
   </form>
 </dialog>
 
+<dialog id="positionDialog" class="modal small-modal">
+  <form method="dialog" onsubmit="submitPositionEdit(event)">
+    <div class="modal-head"><h2 id="positionEditTitle">编辑资产</h2><button type="button" class="icon-btn" onclick="positionDialog.close()">×</button></div>
+    <input id="positionEditId" type="hidden">
+    <div class="form-grid one-col">
+      <label>资产名称<input id="positionEditName"></label>
+      <label>板块<input id="positionEditSector"></label>
+      <label>数据源<select id="positionEditSource"><option value="twelve">Twelve</option><option value="manual">Manual</option></select></label>
+      <label id="positionEditPriceLabel">手动最新价<input id="positionEditPrice" type="number" min="0" step="any"></label>
+      <label>看板颜色<input id="positionEditColor" type="color" value="#38bdf8"></label>
+      <div class="color-swatches" aria-label="常用颜色">
+        <button type="button" style="--swatch:#64d20f" onclick="setPositionEditColor('#64d20f')" title="绿色"></button>
+        <button type="button" style="--swatch:#1f82c4" onclick="setPositionEditColor('#1f82c4')" title="蓝色"></button>
+        <button type="button" style="--swatch:#ffd84d" onclick="setPositionEditColor('#ffd84d')" title="黄色"></button>
+        <button type="button" style="--swatch:#ff4f9a" onclick="setPositionEditColor('#ff4f9a')" title="粉色"></button>
+        <button type="button" style="--swatch:#ff6600" onclick="setPositionEditColor('#ff6600')" title="橙色"></button>
+        <button type="button" style="--swatch:#8e3bce" onclick="setPositionEditColor('#8e3bce')" title="紫色"></button>
+        <button type="button" style="--swatch:#00eeff" onclick="setPositionEditColor('#00eeff')" title="青色"></button>
+        <button type="button" style="--swatch:#dd4646" onclick="setPositionEditColor('#dd4646')" title="红色"></button>
+      </div>
+    </div>
+    <div class="modal-actions"><button type="button" onclick="positionDialog.close()">取消</button><button class="primary" type="submit">保存资产</button></div>
+  </form>
+</dialog>
+
 <dialog id="installDialog" class="modal small-modal install-dialog">
   <div class="install-content">
     <div class="modal-head"><h2>安装梦想金库</h2><button type="button" class="icon-btn" onclick="installDialog.close()">×</button></div>
@@ -217,6 +242,6 @@
   </div>
 </dialog>
 
-<script src="script.js?v=10.7"></script>
+<script src="script.js?v=10.8"></script>
 </body>
 </html>
