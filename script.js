@@ -1,4 +1,4 @@
-﻿const VERSION="V10.6 PWA家庭版";
+﻿const VERSION="V10.7 PWA家庭版";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
 const PRICE_CACHE_KEY="v9_price_cache";
@@ -160,7 +160,7 @@ async function checkSharedDataUpdate(force=false){
 function saveLocal(){localStorage.setItem(STATE_KEY,JSON.stringify(state))}
 function markDirty(reason="本地数据已修改"){dirty=true;lastMutationReason=reason;state.settings.localUpdatedAt=new Date().toISOString();saveLocal();renderSyncStatus()}
 function summaryOf(s){return{positions:Array.isArray(s?.positions)?s.positions.length:0,transactions:Array.isArray(s?.transactions)?s.transactions.length:0,cashFlows:Array.isArray(s?.cashFlows)?s.cashFlows.length:0,snapshots:Array.isArray(s?.snapshots)?s.snapshots.length:0}}
-function dangerBetween(local,remote){const l=summaryOf(local),r=summaryOf(remote),reasons=[];if(l.transactions<r.transactions)reasons.push(`交易流水从 ${r.transactions} 条减少到 ${l.transactions} 条`);if(l.cashFlows<r.cashFlows)reasons.push(`资金流水从 ${r.cashFlows} 条减少到 ${l.cashFlows} 条`);if(!l.positions&&r.positions&&l.transactions<=r.transactions)reasons.push(`当前持仓从 ${r.positions} 个变成 0 个`);return reasons}
+function dangerBetween(local,remote){const l=summaryOf(local),r=summaryOf(remote),reasons=[],intentionalTransactionDelete=dirty&&/交易已删除/.test(lastMutationReason);if(l.transactions<r.transactions&&!intentionalTransactionDelete)reasons.push(`交易流水从 ${r.transactions} 条减少到 ${l.transactions} 条`);if(l.cashFlows<r.cashFlows)reasons.push(`资金流水从 ${r.cashFlows} 条减少到 ${l.cashFlows} 条`);if(!l.positions&&r.positions&&l.transactions<=r.transactions)reasons.push(`当前持仓从 ${r.positions} 个变成 0 个`);return reasons}
 function renderSyncStatus(mode=""){
   const dot=$("syncDot"),label=$("syncLabel"),detail=$("syncDetail");if(!dot||!label||!detail)return;
   dot.className="sync-dot";
