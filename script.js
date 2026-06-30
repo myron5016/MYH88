@@ -7,6 +7,8 @@ const MARKET_KEY="v9_market_key";
 const PAGE_SIZE=20;
 const FETCH_TIMEOUT_MS=20000;
 const PROXY_TIMEOUT_MS=25000;
+const DEFAULT_PRICE_PROXY_URLS=["https://quote.myh88.com"];
+const STATIC_QUOTES_URL="./kv-quotes-all-current.json";
 const AUTO_REFRESH_CHECK_MS=5*60000;
 const RESUME_REFRESH_GAP_MS=20000;
 const SHARED_DATA_CHECK_MS=60000;
@@ -44,7 +46,14 @@ function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;",
 function validColor(v){return /^#[0-9a-f]{6}$/i.test(v||"")?v:"#888888"}
 function fx(currency){return num(state.fxRates?.[String(currency||"USD").toUpperCase()])||1}
 function marketKey(){return isAdminMode?localStorage.getItem(MARKET_KEY)||state.settings?.publicMarketKey||state.settings?.apiKey||"":""}
-function priceProxyUrl(){return String(state.settings?.priceProxyUrl||localStorage.getItem("v10_price_proxy")||"").trim().replace(/\/+$/,"")}
+function normalizeProxyUrl(value){return String(value||"").trim().replace(/\/+$/,"")}
+function parseProxyUrls(value){return String(value||"").split(/[\n,，\s]+/).map(normalizeProxyUrl).filter(Boolean)}
+function priceProxyUrls(){
+  const configured=[...(Array.isArray(state.settings?.priceProxyUrls)?state.settings.priceProxyUrls:[]),state.settings?.priceProxyUrl,localStorage.getItem("v10_price_proxy")];
+  const urls=[...configured.flatMap(parseProxyUrls),...DEFAULT_PRICE_PROXY_URLS];
+  return [...new Set(urls)];
+}
+function priceProxyUrl(){return priceProxyUrls()[0]||""}
 function isStandalone(){return window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true}
 function isIos(){return /iphone|ipad|ipod/i.test(navigator.userAgent)}
 function updateNetworkStatus(){
@@ -241,11 +250,25 @@ async function fetchJson(url,options={}){
     clearTimeout(timer);
   }
 }
+async function fetchStaticQuoteCache(symbols){
+  const data=await fetchJson(STATIC_QUOTES_URL,{timeout:FETCH_TIMEOUT_MS});
+  const quotes=typeof data.body==="string"?JSON.parse(data.body):data;
+  const picked={};
+  symbols.forEach(symbol=>{if(quotes?.[symbol])picked[symbol]=quotes[symbol]});
+  if(Object.keys(picked).length)return symbols.length===1?picked[symbols[0]]:picked;
+  throw new Error("Static quote cache missing requested symbols");
+}
 async function refreshFx(force=false){
-  const proxy=priceProxyUrl();if(!proxy)return;const cached=getFxCache();if(!force&&cached?.time&&Date.now()-cached.time<24*3600000){state.fxRates={...state.fxRates,...cached.fxRates,USD:1};return}
+  const proxies=priceProxyUrls();if(!proxies.length)return;const cached=getFxCache();if(!force&&cached?.time&&Date.now()-cached.time<24*3600000){state.fxRates={...state.fxRates,...cached.fxRates,USD:1};return}
   const currencies=[...new Set(state.positions.map(p=>p.currency).filter(c=>c!=="USD"))];
-  if(proxy&&currencies.length){
-    const res=await fetchJson(`${proxy}/fx?currencies=${encodeURIComponent(currencies.join(","))}`,{timeout:PROXY_TIMEOUT_MS});state.fxRates={...state.fxRates,...(res.rates||{}),USD:1}
+  if(currencies.length){
+    let lastError=null;
+    for(const proxy of proxies){
+      try{
+        const res=await fetchJson(`${proxy}/fx?currencies=${encodeURIComponent(currencies.join(","))}`,{timeout:PROXY_TIMEOUT_MS});state.fxRates={...state.fxRates,...(res.rates||{}),USD:1};lastError=null;break
+      }catch(error){lastError=error}
+    }
+    if(lastError)throw lastError;
   }
   state.fxRates.USD=1;localStorage.setItem(FX_CACHE_KEY,JSON.stringify({time:Date.now(),fxRates:state.fxRates}));
 }
@@ -266,6 +289,32 @@ async function fetchQuoteBatch(symbols){
   }
   throw lastError;
 }
+async function fetchQuoteBatchResilient(symbols){
+  let lastError=null;
+  const proxies=priceProxyUrls();
+  if(!proxies.length)throw new Error("Missing Cloudflare Worker price proxy URL");
+  for(let attempt=1;attempt<=3;attempt++){
+    for(const proxy of proxies){
+      try{
+        const res=await fetchJson(`${proxy}/quotes?symbols=${encodeURIComponent(symbols.join(","))}`,{timeout:PROXY_TIMEOUT_MS});
+        if(res.code||res.status==="error")throw new Error(res.message||"Quote proxy error");
+        lastMarketRoute=proxy===proxies[0]?"proxy":"fallback";
+        return res;
+      }catch(error){
+        lastError=error;
+      }
+    }
+    await new Promise(resolve=>setTimeout(resolve, attempt*900));
+  }
+  try{
+    const cached=await fetchStaticQuoteCache(symbols);
+    lastMarketRoute="static";
+    return cached;
+  }catch(error){
+    lastError=lastError||error;
+  }
+  throw lastError;
+}
 async function refreshPrices(useCache=true){
   if(priceRefreshPromise)return priceRefreshPromise;
   priceRefreshPromise=doRefreshPrices(useCache).finally(()=>{priceRefreshPromise=null});
@@ -280,7 +329,7 @@ async function doRefreshPrices(useCache=true){
   try{
     await refreshFx(false);const items=state.positions.filter(p=>p.source==="twelve"&&p.symbol),symbols=[...new Set(items.map(p=>p.symbol))];
     if(symbols.length){
-      const res=await fetchQuoteBatch(symbols);
+      const res=await fetchQuoteBatchResilient(symbols);
       items.forEach(p=>{const q=symbols.length===1?res:res[p.symbol];const price=num(q?.close||q?.price);if(price>0)p.price=price;p.changePercent=num(q?.percent_change)});
     }
     state.settings.lastPriceRefresh=Date.now();state.settings.lastPriceRefreshText=new Date().toLocaleString("zh-CN");savePriceCache();

@@ -9,7 +9,10 @@
     "migratedAt": "2026-06-21T08:38:50.908Z",
     "lastCloudSaveAt": "2026-06-30T14:20:09.329Z",
     "localUpdatedAt": "2026-06-30T14:19:58.994Z",
-    "priceProxyUrl": "https://myh88-price-proxy.myh88.workers.dev"
+    "priceProxyUrl": "https://quote.myh88.com",
+    "priceProxyUrls": [
+      "https://quote.myh88.com"
+    ]
   },
   "fxRates": {
     "USD": 1,

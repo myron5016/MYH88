@@ -1,9 +1,15 @@
 name = "myh88-price-proxy"
 main = "cloudflare-worker.js"
 compatibility_date = "2026-06-25"
+workers_dev = false
+
+[[routes]]
+pattern = "quote.myh88.com"
+custom_domain = true
 
 # After deployment, configure the secret:
 # wrangler secret put TWELVE_DATA_KEY
+# wrangler secret put FINNHUB_API_KEY
 
 # Create a KV namespace, then replace the id below:
 # wrangler kv namespace create MYH88_CACHE
