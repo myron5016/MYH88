@@ -1,11 +1,12 @@
-const CACHE_SECONDS = 60;
+const CACHE_SECONDS = 30 * 60;
+const STALE_SECONDS = 6 * 60 * 60;
 const TWELVE_BASE = "https://api.twelvedata.com";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
-  "Cache-Control": `public, max-age=${CACHE_SECONDS}`,
+  "Cache-Control": `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=${STALE_SECONDS}`,
 };
 
 function json(data, status = 200) {
@@ -23,16 +24,65 @@ function normalizeSymbols(value) {
     .slice(0, 50);
 }
 
-async function fetchWithCache(request, url) {
-  const cache = caches.default;
-  const cacheKey = new Request(url.toString(), request);
-  const cached = await cache.match(cacheKey);
-  if (cached) return cached;
-
-  const upstream = await fetch(url.toString(), {
-    headers: { Accept: "application/json" },
-    cf: { cacheTtl: CACHE_SECONDS, cacheEverything: true },
+function responseFromCached(record, cacheLabel) {
+  return new Response(record.body, {
+    status: 200,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": record.contentType || "application/json; charset=utf-8",
+      "X-MYH88-Cache": cacheLabel,
+      "X-MYH88-Cached-At": String(record.cachedAt || ""),
+    },
   });
+}
+
+async function readSharedCache(env, key) {
+  if (!env.MYH88_CACHE) return null;
+  return env.MYH88_CACHE.get(key, { type: "json" }).catch(() => null);
+}
+
+async function writeSharedCache(env, key, response) {
+  if (!env.MYH88_CACHE || !response.ok) return;
+  const body = await response.clone().text();
+  await env.MYH88_CACHE.put(
+    key,
+    JSON.stringify({
+      cachedAt: Date.now(),
+      contentType: response.headers.get("Content-Type") || "application/json; charset=utf-8",
+      body,
+    }),
+    { expirationTtl: CACHE_SECONDS + STALE_SECONDS }
+  ).catch(() => {});
+}
+
+async function fetchWithCache(request, env, cacheName, url) {
+  const shared = await readSharedCache(env, cacheName);
+  if (shared?.body && Date.now() - Number(shared.cachedAt || 0) < CACHE_SECONDS * 1000) {
+    return responseFromCached(shared, "HIT-KV");
+  }
+
+  const cache = caches.default;
+  const cacheKey = new Request(new URL(`/cache/${cacheName}`, request.url).toString(), request);
+  const cached = await cache.match(cacheKey);
+  if (cached) {
+    return new Response(cached.body, {
+      status: cached.status,
+      headers: { ...Object.fromEntries(cached.headers), "X-MYH88-Cache": "HIT" },
+    });
+  }
+
+  let upstream;
+  try {
+    upstream = await fetch(url.toString(), {
+      headers: { Accept: "application/json" },
+      cf: { cacheTtl: CACHE_SECONDS, cacheEverything: true },
+    });
+  } catch (error) {
+    if (shared?.body) return responseFromCached(shared, "STALE-KV");
+    return json({ error: error.message || "Twelve Data request failed" }, 502);
+  }
+
+  if (!upstream.ok && shared?.body) return responseFromCached(shared, "STALE-KV");
 
   const response = new Response(upstream.body, {
     status: upstream.status,
@@ -43,7 +93,11 @@ async function fetchWithCache(request, url) {
     },
   });
 
-  if (upstream.ok) await cache.put(cacheKey, response.clone());
+  if (upstream.ok) {
+    response.headers.set("Cache-Control", `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=${STALE_SECONDS}`);
+    await writeSharedCache(env, cacheName, response.clone());
+    await cache.put(cacheKey, response.clone());
+  }
   return response;
 }
 
@@ -57,10 +111,19 @@ export default {
 
     try {
       if (pathname === "" || pathname === "/") {
-        return json({ ok: true, service: "MYH88 price proxy", cacheSeconds: CACHE_SECONDS });
+        const apiKey = String(env.TWELVE_DATA_KEY || "").trim();
+        return json({
+          ok: true,
+          service: "MYH88 price proxy",
+          cacheSeconds: CACHE_SECONDS,
+          staleSeconds: STALE_SECONDS,
+          sharedCache: Boolean(env.MYH88_CACHE),
+          secretConfigured: Boolean(apiKey),
+          secretLength: apiKey.length,
+        });
       }
 
-      const apiKey = env.TWELVE_DATA_KEY;
+      const apiKey = String(env.TWELVE_DATA_KEY || "").trim();
       if (!apiKey) return json({ error: "TWELVE_DATA_KEY is not configured" }, 500);
 
       if (pathname === "/quotes") {
@@ -69,7 +132,7 @@ export default {
         const url = new URL(`${TWELVE_BASE}/quote`);
         url.searchParams.set("symbol", symbols.join(","));
         url.searchParams.set("apikey", apiKey);
-        return fetchWithCache(request, url);
+        return fetchWithCache(request, env, `quotes:${symbols.join(",")}`, url);
       }
 
       if (pathname === "/fx") {
@@ -82,7 +145,7 @@ export default {
             const url = new URL(`${TWELVE_BASE}/exchange_rate`);
             url.searchParams.set("symbol", `${currency}/USD`);
             url.searchParams.set("apikey", apiKey);
-            const response = await fetchWithCache(request, url);
+            const response = await fetchWithCache(request, env, `fx:${currency}`, url);
             const data = await response.clone().json().catch(() => ({}));
             if (Number(data.rate) > 0) rates[currency] = Number(data.rate);
           })

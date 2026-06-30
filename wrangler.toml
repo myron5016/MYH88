@@ -4,3 +4,9 @@ compatibility_date = "2026-06-25"
 
 # After deployment, configure the secret:
 # wrangler secret put TWELVE_DATA_KEY
+
+# Create a KV namespace, then replace the id below:
+# wrangler kv namespace create MYH88_CACHE
+[[kv_namespaces]]
+binding = "MYH88_CACHE"
+id = "3b85491151004c1d98005b442912666e"
