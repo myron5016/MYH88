@@ -1,4 +1,4 @@
-const VERSION="V10.14 PWA家庭版";
+const VERSION="V10.15 PWA家庭版";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
 const PRICE_CACHE_KEY="v9_price_cache";
@@ -12,6 +12,7 @@ const STATIC_QUOTES_URL="./kv-quotes-all-current.json";
 const AUTO_REFRESH_CHECK_MS=5*60000;
 const RESUME_REFRESH_GAP_MS=20000;
 const SHARED_DATA_CHECK_MS=60000;
+const TAXONOMY_VERSION="sector-color-v1";
 
 const defaultState={settings:{title:"孟一晗的梦想金库",priceCacheMinutes:30,lastPriceRefresh:0,lastPriceRefreshText:"",version:VERSION},fxRates:{USD:1,EUR:1.16,HKD:.128,JPY:.0067,GBP:1.27},positions:[],transactions:[],cashFlows:[],snapshots:[]};
 let state=structuredClone(defaultState);
@@ -33,6 +34,19 @@ let sharedDataTimer=null;
 let lastAutoRefreshKick=0;
 let lastSharedRaw="";
 let lastMarketRoute="pending";
+let lastMarketProvider="";
+
+const SECTOR_RULES=[
+  {label:"AI基建",color:"#22c55e",symbols:["NVDA","VRT"],keywords:["英伟达","维谛","ai基建","ai基础设施","算力","数据中心","电力"]},
+  {label:"AI存储",color:"#2563eb",symbols:["MU"],keywords:["美光","存储","内存","dram","hbm"]},
+  {label:"光通信",color:"#06b6d4",symbols:["MRVL","AAOI","LITE"],keywords:["光通信","光通讯","光模块","光电","光芯片","迈威尔","应用光电","lumentum","鲁门特姆","朗美通"]},
+  {label:"太空",color:"#e11d48",symbols:["RKLB","SPCX"],keywords:["太空","航天","火箭","rocket","space","spacex"]},
+  {label:"科技平台",color:"#ef4444",symbols:["GOOGL","GOOG","META","MSFT","AMZN","AAPL"],keywords:["谷歌","平台","云","搜索","广告","软件"]},
+  {label:"医疗",color:"#a855f7",symbols:["UNH","LLY","NVO","MRK","PFE","JNJ","TMO","ISRG"],keywords:["医疗","医药","制药","生物","器械"]},
+  {label:"现金",color:"#ffd84d",symbols:["CASH"],keywords:["现金","cash"]},
+  {label:"未分类",color:"#64748b",symbols:[],keywords:["未分类"]}
+];
+const SECTOR_ALIAS={"光通讯":"光通信","通信光":"光通信","AI":"AI基建","人工智能":"AI基建","算力":"AI基建","航天":"太空","宇宙":"太空","现金":"现金","CASH":"现金"};
 
 function $(id){return document.getElementById(id)}
 function readJson(text,fallback){try{return JSON.parse(text)||fallback}catch{return fallback}}
@@ -44,6 +58,43 @@ function money(v){const n=num(v),sign=n<0?"-":"";return sign+"$"+new Intl.Number
 function cls(v){return num(v)>0?"green":num(v)<0?"red":"muted"}
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 function validColor(v){return /^#[0-9a-f]{6}$/i.test(v||"")?v:"#888888"}
+function hexToRgb(hex){const v=validColor(hex).slice(1);return{r:parseInt(v.slice(0,2),16),g:parseInt(v.slice(2,4),16),b:parseInt(v.slice(4,6),16)}}
+function rgbToHex({r,g,b}){return"#"+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,"0")).join("")}
+function mixColor(a,b,weight=.5){const x=hexToRgb(a),y=hexToRgb(b);return rgbToHex({r:x.r+(y.r-x.r)*weight,g:x.g+(y.g-x.g)*weight,b:x.b+(y.b-x.b)*weight})}
+function sectorRule(label){const key=String(label||"未分类").trim();return SECTOR_RULES.find(r=>r.label===key)||SECTOR_RULES.at(-1)}
+function sectorBaseColor(label){return sectorRule(label).color}
+function normalizeSectorName(value){
+  const raw=String(value||"").trim();
+  if(!raw)return"未分类";
+  const direct=SECTOR_ALIAS[raw]||SECTOR_ALIAS[raw.toUpperCase()];
+  if(direct)return direct;
+  const lower=raw.toLowerCase();
+  const rule=SECTOR_RULES.find(r=>r.label===raw||r.keywords.some(k=>lower.includes(String(k).toLowerCase())));
+  return rule?.label||raw;
+}
+function inferSector(symbol,name="",sector=""){
+  const normalized=normalizeSectorName(sector);
+  if(normalized&&normalized!=="未分类")return normalized;
+  const ticker=String(symbol||"").trim().toUpperCase();
+  const text=`${ticker} ${name}`.toLowerCase();
+  const rule=SECTOR_RULES.find(r=>r.symbols.includes(ticker)||r.keywords.some(k=>text.includes(String(k).toLowerCase())));
+  return rule?.label||"未分类";
+}
+function sectorPeerIndex(symbol,sector){
+  const ticker=String(symbol||"").trim().toUpperCase();
+  const peers=state.positions.filter(p=>inferSector(p.symbol,p.name,p.sector)===sector).map(p=>p.symbol).filter(Boolean).sort();
+  return Math.max(0,peers.indexOf(ticker));
+}
+function colorForSectorMember(sector,index=0){
+  const base=sectorBaseColor(sector);
+  const variants=[base,mixColor(base,"#ffffff",.18),mixColor(base,"#000000",.18),mixColor(base,"#ffffff",.32),mixColor(base,"#000000",.32),mixColor(base,"#ffffff",.46)];
+  return variants[index%variants.length];
+}
+function autoColorForPosition(p){return colorForSectorMember(p.sector,sectorPeerIndex(p.symbol,p.sector))}
+function applyAutoTaxonomy(force=false){
+  state.positions.forEach(p=>{p.sector=inferSector(p.symbol,p.name,p.sector)});
+  state.positions.forEach(p=>{if(force||!p.color||p.color==="#888888")p.color=autoColorForPosition(p)});
+}
 function fx(currency){return num(state.fxRates?.[String(currency||"USD").toUpperCase()])||1}
 function marketKey(){return isAdminMode?localStorage.getItem(MARKET_KEY)||state.settings?.publicMarketKey||state.settings?.apiKey||"":""}
 function normalizeProxyUrl(value){return String(value||"").trim().replace(/\/+$/,"")}
@@ -80,7 +131,7 @@ async function registerPwa(){
 }
 
 function normalizePosition(p){
-  p.id=p.id||uid("pos");p.symbol=String(p.symbol||"").trim().toUpperCase();p.name=String(p.name||"");p.currency=String(p.currency||"USD").toUpperCase();p.source=p.source==="manual"?"manual":"twelve";p.shares=num(p.shares);p.avgCost=num(p.avgCost);p.price=num(p.price);p.sector=String(p.sector||"未分类");p.color=validColor(p.color);p.note=String(p.note||"");
+  p.id=p.id||uid("pos");p.symbol=String(p.symbol||"").trim().toUpperCase();p.name=String(p.name||"");p.currency=String(p.currency||"USD").toUpperCase();p.source=p.source==="manual"?"manual":"twelve";p.shares=num(p.shares);p.avgCost=num(p.avgCost);p.price=num(p.price);p.sector=inferSector(p.symbol,p.name,p.sector);p.color=validColor(p.color||autoColorForPosition(p));p.note=String(p.note||"");
   if(!Number.isFinite(Number(p.costBasisUSD)))p.costBasisUSD=p.shares*p.avgCost*fx(p.currency);else p.costBasisUSD=num(p.costBasisUSD);
   return p;
 }
@@ -108,11 +159,14 @@ function migrateV8(raw){
 
 function normalizeState(raw){
   if(Array.isArray(raw?.data)&&!Array.isArray(raw?.positions))raw=migrateV8(raw);
+  const incomingTaxonomy=raw?.settings?.taxonomyVersion||"";
   state={...structuredClone(defaultState),...(raw||{})};
   state.settings={...defaultState.settings,...(state.settings||{}),version:VERSION};
   if(state.settings.apiKey&&!state.settings.publicMarketKey)state.settings.publicMarketKey=String(state.settings.apiKey);
   state.fxRates={...defaultState.fxRates,...(state.fxRates||{}),USD:1};
   state.positions=(Array.isArray(state.positions)?state.positions:[]).map(normalizePosition).filter(p=>p.symbol&&p.shares>0);
+  applyAutoTaxonomy(incomingTaxonomy!==TAXONOMY_VERSION);
+  state.settings.taxonomyVersion=TAXONOMY_VERSION;
   state.transactions=Array.isArray(state.transactions)?state.transactions:[];
   state.cashFlows=Array.isArray(state.cashFlows)?state.cashFlows:[];
   state.snapshots=Array.isArray(state.snapshots)?state.snapshots:[];
@@ -186,11 +240,20 @@ function renderSyncStatus(mode=""){
   }
   renderDiagnostics();
 }
+function marketProviderLabel(){
+  if(lastMarketProvider==="twelve")return"TWE";
+  if(lastMarketProvider==="finnhub")return"FIN";
+  if(lastMarketProvider==="mixed")return"TWE/FIN";
+  if(lastMarketProvider==="static")return"静态缓存";
+  return"";
+}
 function marketRouteLabel(){
-  if(lastMarketRoute==="proxy")return"行情：代理线路";
-  if(lastMarketRoute==="fallback")return"行情：备用线路";
+  const provider=marketProviderLabel();
+  if(lastMarketRoute==="proxy")return provider?`行情：${provider} 代理`:"行情：代理线路";
+  if(lastMarketRoute==="fallback")return provider?`行情：${provider} 备用`:"行情：备用线路";
   if(lastMarketRoute==="direct")return"行情：直连线路";
   if(lastMarketRoute==="cache")return"行情：本机缓存";
+  if(lastMarketRoute==="static")return"行情：静态缓存";
   if(lastMarketRoute==="failed")return"行情：刷新失败";
   return"行情：等待刷新";
 }
@@ -309,6 +372,7 @@ async function fetchQuoteBatchResilient(symbols){
   try{
     const cached=await fetchStaticQuoteCache(symbols);
     lastMarketRoute="static";
+    lastMarketProvider="static";
     return cached;
   }catch(error){
     lastError=lastError||error;
@@ -330,8 +394,9 @@ async function doRefreshPrices(useCache=true){
     try{await refreshFx(false)}catch(error){console.warn("FX refresh failed; keep cached rates",error);state.fxRates={...state.fxRates,...(getFxCache()?.fxRates||{}),USD:1}}
     const items=state.positions.filter(p=>p.source==="twelve"&&p.symbol),symbols=[...new Set(items.map(p=>p.symbol))];
     if(symbols.length){
-      const res=await fetchQuoteBatchResilient(symbols);
-      items.forEach(p=>{const q=symbols.length===1?res:res[p.symbol];const price=num(q?.close||q?.price);if(price>0)p.price=price;p.changePercent=num(q?.percent_change)});
+      const res=await fetchQuoteBatchResilient(symbols),providers=new Set();
+      items.forEach(p=>{const q=symbols.length===1?res:res[p.symbol];const provider=String(q?.source||"twelve").toLowerCase();if(provider)providers.add(provider);const price=num(q?.close||q?.price);if(price>0)p.price=price;p.changePercent=num(q?.percent_change)});
+      if(providers.size===1)lastMarketProvider=[...providers][0];else if(providers.size>1)lastMarketProvider="mixed";
     }
     state.settings.lastPriceRefresh=Date.now();state.settings.lastPriceRefreshText=new Date().toLocaleString("zh-CN");savePriceCache();
     if(isAdminMode){captureSnapshot(false);markDirty("实时行情与今日快照已更新")}else saveLocal();
@@ -373,7 +438,7 @@ function saveSettings(){state.settings.title=$("titleInput").value.trim()||defau
 function treemapItems(){const arr=state.positions.map(p=>({label:p.symbol,value:num(p.costBasisUSD),color:p.color})).filter(x=>x.value>0),cash=cashBalance();if(cash>0)arr.push({label:"CASH",value:cash,color:"#ffd84d"});return arr.sort((a,b)=>b.value-a.value)}
 function layout(items,x,y,w,h){if(!items.length)return[];if(items.length===1)return[{...items[0],x,y,w,h}];const total=items.reduce((s,i)=>s+i.value,0);let acc=0,split=0;for(let i=0;i<items.length;i++){if(acc<total/2){acc+=items[i].value;split=i+1}}split=Math.max(1,Math.min(items.length-1,split));const a=items.slice(0,split),b=items.slice(split),at=a.reduce((s,i)=>s+i.value,0);if(w>=h){const aw=w*at/total;return[...layout(a,x,y,aw,h),...layout(b,x+aw,y,w-aw,h)]}const ah=h*at/total;return[...layout(a,x,y,w,ah),...layout(b,x,y+ah,w,h-ah)]}
 function renderTreemap(){const box=$("treemap");box.innerHTML="";const rect=box.getBoundingClientRect(),items=treemapItems(),denom=Math.max(contributedCapital()+realizedPnl(),1);layout(items,0,0,rect.width,rect.height).forEach(t=>{const d=document.createElement("div"),area=t.w*t.h,share=round(t.value/denom*100);d.className="tile"+(area<13000?" tiny":"")+(area<6200?" micro":"");Object.assign(d.style,{left:t.x+"px",top:t.y+"px",width:t.w+"px",height:t.h+"px",background:t.color,color:["#ffd84d","#eeee00","#f1a2ef"].includes(t.color)?"#07101a":"white"});d.title=`${t.label} ${money(t.value)} | ${share}%`;d.innerHTML=area<6200?`<div>${escapeHtml(t.label)}</div>`:`<div>${escapeHtml(t.label)}<small>${money(t.value)} | ${share}%</small></div>`;box.appendChild(d)})}
-function sectorItems(){const map={};state.positions.forEach(p=>{const key=p.sector||"未分类";if(!map[key])map[key]={label:key,total:0,pnl:0,color:p.color};map[key].total+=num(p.costBasisUSD);map[key].pnl+=floatingPnlUSD(p)});const cash=cashBalance();if(cash>0)map["现金"]={label:"现金",total:cash,pnl:0,color:"#ffd84d"};return Object.values(map).sort((a,b)=>b.total-a.total)}
+function sectorItems(){const map={};state.positions.forEach(p=>{const key=inferSector(p.symbol,p.name,p.sector);if(!map[key])map[key]={label:key,total:0,pnl:0,color:sectorBaseColor(key)};map[key].total+=num(p.costBasisUSD);map[key].pnl+=floatingPnlUSD(p)});const cash=cashBalance();if(cash>0)map["现金"]={label:"现金",total:cash,pnl:0,color:sectorBaseColor("现金")};return Object.values(map).sort((a,b)=>b.total-a.total)}
 function renderSectors(){const bar=$("sectorBar"),legend=$("sectorLegend"),total=Math.max(contributedCapital()+realizedPnl(),1);bar.innerHTML="";legend.innerHTML="";sectorItems().forEach(s=>{const seg=document.createElement("div");seg.className="segment";seg.style.width=Math.max(3,s.total/total*100)+"%";seg.style.background=s.color;seg.textContent=`${s.label} ${round(s.total/total*100)}%`;bar.appendChild(seg);legend.insertAdjacentHTML("beforeend",`<span><i class="dot" style="background:${validColor(s.color)}"></i>${escapeHtml(s.label)} ${money(s.total)} <b class="${cls(s.pnl)}">${money(s.pnl)}</b></span>`)})}
 function renderKpis(){$("kpiCapital").textContent=money(contributedCapital());$("kpiNetAsset").textContent=money(netAsset());$("kpiMarket").textContent=money(marketTotal());$("kpiCash").textContent=money(cashBalance());$("kpiCash").className=cls(cashBalance());if($("kpiRealized")){$("kpiRealized").textContent=money(realizedPnl());$("kpiRealized").className=cls(realizedPnl())}$("kpiFloating").textContent=`${money(floatingPnl())} / ${round(floatingReturn())}%`;$("kpiFloating").className=cls(floatingPnl());$("kpiPnl").textContent=`${money(totalPnl())} / ${round(totalReturn())}%`;$("kpiPnl").className=cls(totalPnl())}function renderHoldingCards(){const box=$("holdingCards");if(!state.positions.length){box.innerHTML='<div class="empty">暂无当前持仓</div>';return}box.innerHTML=state.positions.slice().sort((a,b)=>num(b.costBasisUSD)-num(a.costBasisUSD)).map(p=>`<div class="holding-card"><div class="top"><div><div class="symbol">${escapeHtml(p.symbol)}</div><div class="name">${escapeHtml(p.name)}</div></div><div class="sector-pill">${escapeHtml(p.sector)}</div></div><div class="grid"><div><div class="label">数量</div><div class="value">${round(p.shares,4)}</div></div><div><div class="label">最新价</div><div class="value">${round(p.price,4)} ${escapeHtml(p.currency)}</div></div><div><div class="label">单股成本</div><div class="value">${round(p.avgCost,4)} ${escapeHtml(p.currency)}</div></div><div><div class="label">投入成本</div><div class="value">${money(p.costBasisUSD)}</div></div><div><div class="label">市值</div><div class="value">${money(marketUSD(p))}</div></div><div><div class="label">成本仓位</div><div class="value">${round(p.costBasisUSD/Math.max(contributedCapital()+realizedPnl(),1)*100)}%</div></div><div><div class="label">浮动盈亏</div><div class="value ${cls(floatingPnlUSD(p))}">${money(floatingPnlUSD(p))} / ${round(p.costBasisUSD?floatingPnlUSD(p)/p.costBasisUSD*100:0)}%</div></div></div></div>`).join("")}function captureSnapshot(manual=false){const date=today(),snap={date,capital:round(contributedCapital()),netAsset:round(netAsset()),market:round(marketTotal()),cash:round(cashBalance())},i=state.snapshots.findIndex(x=>x.date===date),before=i>=0?JSON.stringify(state.snapshots[i]):"",changed=before!==JSON.stringify(snap);if(i>=0)state.snapshots[i]=snap;else state.snapshots.push(snap);state.snapshots.sort((a,b)=>a.date.localeCompare(b.date));saveLocal();if(manual){markDirty("今日资产快照已记录");renderChart();alert("今日资产快照已记录，尚未保存到 GitHub")}return changed}
 function renderChart(){const svg=$("assetChart"),data=state.snapshots.slice(-120);if(data.length<2){svg.classList.add("hidden");$("chartEmpty").classList.remove("hidden");return}svg.classList.remove("hidden");$("chartEmpty").classList.add("hidden");const W=1200,H=250,pad={l:62,r:20,t:20,b:30},values=data.flatMap(x=>[num(x.netAsset),num(x.capital)]),min=Math.min(...values),max=Math.max(...values),range=Math.max(max-min,1),x=i=>pad.l+i*(W-pad.l-pad.r)/Math.max(data.length-1,1),y=v=>pad.t+(max-v)*(H-pad.t-pad.b)/range,path=key=>data.map((d,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(num(d[key])).toFixed(1)).join(" "),area=`${path("netAsset")} L ${x(data.length-1)} ${H-pad.b} L ${x(0)} ${H-pad.b} Z`;let grid="";for(let i=0;i<4;i++){const val=max-range*i/3,yy=y(val);grid+=`<line class="chart-grid" x1="${pad.l}" y1="${yy}" x2="${W-pad.r}" y2="${yy}"/><text class="chart-label" x="4" y="${yy+4}">${money(val)}</text>`}svg.setAttribute("viewBox",`0 0 ${W} ${H}`);svg.innerHTML=`<defs><linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4f9a" stop-opacity=".25"/><stop offset="1" stop-color="#ff4f9a" stop-opacity="0"/></linearGradient></defs>${grid}<path class="chart-area" d="${area}"/><path class="chart-capital" d="${path("capital")}"/><path class="chart-asset" d="${path("netAsset")}"/><circle class="chart-dot" cx="${x(data.length-1)}" cy="${y(data.at(-1).netAsset)}" r="5"/><text class="chart-label" x="${pad.l}" y="${H-5}">${escapeHtml(data[0].date)}</text><text class="chart-label" text-anchor="end" x="${W-pad.r}" y="${H-5}">${escapeHtml(data.at(-1).date)}</text>`}
@@ -384,7 +449,7 @@ function renderTransactionTable(){const q=$("transactionSearch")?.value.trim().t
 function switchLedgerTab(tab){if(!isAdminMode&&["cashflows","backup"].includes(tab))tab="transactions";activeLedgerTab=tab;document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));["positions","transactions","cashflows","backup"].forEach(x=>$(x+"Pane").classList.toggle("hidden",x!==tab));if(tab==="backup")renderBackupList()}
 function fillTradeFromPosition(p){if(!p)return;$("tradeSymbol").value=p.symbol;$("tradeName").value=p.name;$("tradeCurrency").value=p.currency;$("tradeFx").value=fx(p.currency);$("tradePrice").value=p.price||p.avgCost;$("tradeSource").value=p.source;$("tradeSector").value=p.sector;$("tradeColor").value=p.color;updateTradePreview()}
 function openTrade(type,positionId=""){$("tradeType").value=type;$("tradeTitle").textContent=type==="buy"?"记录买入":"记录卖出";$("tradeDate").value=today();$("tradeSymbol").value="";$("tradeShares").value="";$("tradePrice").value="";$("tradeFee").value="0";$("tradeCurrency").value="USD";$("tradeFx").value="1";$("tradeName").value="";$("tradeSector").value="未分类";$("tradeColor").value="#38bdf8";$("tradeSource").value="twelve";$("tradeNote").value="";const existing=state.positions.find(p=>p.id===positionId);if(existing)fillTradeFromPosition(existing);["sourceLabel","nameLabel","sectorLabel","colorLabel"].forEach(id=>$(id).classList.toggle("hidden",type==="sell"));updateTradePreview();$("tradeDialog").showModal();setTimeout(()=>$("tradeSymbol").focus(),30)}
-function syncTradeSymbol(){const symbol=$("tradeSymbol").value.trim().toUpperCase(),p=state.positions.find(x=>x.symbol===symbol);if(p)fillTradeFromPosition(p);else{$("tradeFx").value=fx($("tradeCurrency").value)}updateTradePreview()}
+function syncTradeSymbol(){const symbol=$("tradeSymbol").value.trim().toUpperCase(),p=state.positions.find(x=>x.symbol===symbol);if(p)fillTradeFromPosition(p);else{const sector=inferSector(symbol,$("tradeName").value,$("tradeSector").value);$("tradeSector").value=sector;$("tradeColor").value=colorForSectorMember(sector,state.positions.filter(x=>x.sector===sector).length);$("tradeFx").value=fx($("tradeCurrency").value)}updateTradePreview()}
 function updateTradePreview(){const type=$("tradeType").value,qty=num($("tradeShares").value),price=num($("tradePrice").value),rate=num($("tradeFx").value),fee=num($("tradeFee").value),value=(qty*price+fee)*rate,symbol=$("tradeSymbol").value.trim().toUpperCase(),p=state.positions.find(x=>x.symbol===symbol);let text=`预计${type==="buy"?"占用":"收入"} ${money(type==="buy"?value:Math.max(0,(qty*price-fee)*rate))}`;if(type==="sell"&&p&&qty>0){const basis=num(p.costBasisUSD)/p.shares*qty,realized=(qty*price-fee)*rate-basis;text+=`，预计已实现盈亏 ${money(realized)}`}$("tradePreview").textContent=text}
 function submitTrade(event){
   event.preventDefault();const type=$("tradeType").value,symbol=$("tradeSymbol").value.trim().toUpperCase(),date=$("tradeDate").value,shares=num($("tradeShares").value),price=num($("tradePrice").value),currency=$("tradeCurrency").value,rate=num($("tradeFx").value),fee=num($("tradeFee").value),note=$("tradeNote").value.trim();if(!symbol||!date||shares<=0||price<0||rate<=0||fee<0){alert("请检查交易信息");return}
@@ -416,7 +481,7 @@ function importJson(event){const file=event.target.files[0];if(!file)return;cons
 function transactionMetaMap(transactions=state.transactions){
   const map={};
   state.positions.forEach(p=>{map[p.symbol]={id:p.id,name:p.name,sector:p.sector,color:p.color,source:p.source,currency:p.currency,price:p.price,changePercent:p.changePercent,note:p.note}});
-  transactions.forEach(t=>{const symbol=String(t.symbol||"").toUpperCase();if(!symbol)return;map[symbol]={...(map[symbol]||{}),name:t.name||map[symbol]?.name||"",sector:t.sector||map[symbol]?.sector||"未分类",color:validColor(t.color||map[symbol]?.color),source:t.source==="manual"?"manual":map[symbol]?.source||"twelve",currency:String(t.currency||map[symbol]?.currency||"USD").toUpperCase()}});
+  transactions.forEach(t=>{const symbol=String(t.symbol||"").toUpperCase();if(!symbol)return;const sector=inferSector(symbol,t.name,t.sector||map[symbol]?.sector);map[symbol]={...(map[symbol]||{}),name:t.name||map[symbol]?.name||"",sector,color:validColor(t.color||map[symbol]?.color||sectorBaseColor(sector)),source:t.source==="manual"?"manual":map[symbol]?.source||"twelve",currency:String(t.currency||map[symbol]?.currency||"USD").toUpperCase()}});
   return map;
 }
 function rebuildCurrentPositionsFromTransactions(transactions=state.transactions){
@@ -450,12 +515,13 @@ function rebuildCurrentPositionsFromTransactions(transactions=state.transactions
     if(p.shares<=1e-8){delete bySymbol[symbol];const idx=positions.findIndex(x=>x.symbol===symbol);if(idx>=0)positions.splice(idx,1)}
     return {...t,type:"sell",symbol,name:t.name||m.name||symbol,shares,price,currency,fxRate:rate,fee,feeUSD,costBasisUSD:basis,grossUSD,realizedPnlUSD:realized,sector:t.sector||m.sector,color:validColor(t.color||m.color),source:t.source||m.source||"twelve",schemaVersion:"10.5"};
   }).map(({_order,...t})=>t);
-  state.positions=positions.map(normalizePosition).filter(p=>p.symbol&&p.shares>0);
+  state.positions=positions.map(normalizePosition).filter(p=>p.symbol&&p.shares>0);applyAutoTaxonomy(true);
 }
 function tradeFormDraft(existing={}){
   const type=$("tradeType").value,symbol=$("tradeSymbol").value.trim().toUpperCase(),date=$("tradeDate").value,shares=num($("tradeShares").value),price=num($("tradePrice").value),currency=$("tradeCurrency").value,rate=num($("tradeFx").value),fee=num($("tradeFee").value),note=$("tradeNote").value.trim();
   if(!symbol||!date||shares<=0||price<0||rate<=0||fee<0)throw new Error("请检查交易信息");
-  return {...existing,id:existing.id||uid("tx"),date,type:type==="opening"?"opening":type,symbol,name:$("tradeName").value.trim()||existing.name||symbol,shares,price,currency,fxRate:rate,fee,note,source:$("tradeSource").value,sector:$("tradeSector").value.trim()||"未分类",color:validColor($("tradeColor").value),schemaVersion:"10.5"};
+  const sector=inferSector(symbol,$("tradeName").value.trim()||existing.name,$("tradeSector").value.trim());
+  return {...existing,id:existing.id||uid("tx"),date,type:type==="opening"?"opening":type,symbol,name:$("tradeName").value.trim()||existing.name||symbol,shares,price,currency,fxRate:rate,fee,note,source:$("tradeSource").value,sector,color:validColor($("tradeColor").value||colorForSectorMember(sector,state.positions.filter(p=>p.sector===sector).length)),schemaVersion:"10.5"};
 }
 function commitTransactionChange(nextTransactions,reason){
   const before=structuredClone(state);
