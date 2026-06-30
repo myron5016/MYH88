@@ -1,4 +1,4 @@
-﻿const VERSION="V10.7 PWA家庭版";
+﻿const VERSION="V10.12 PWA家庭版";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
 const PRICE_CACHE_KEY="v9_price_cache";
