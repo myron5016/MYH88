@@ -2,13 +2,13 @@
   "settings": {
     "title": "孟一晗的梦想金库",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1782701462200,
-    "lastPriceRefreshText": "2026/6/29 10:51:02",
+    "lastPriceRefresh": 1782829198993,
+    "lastPriceRefreshText": "2026/6/30 22:19:58",
     "version": "V10.13 PWA家庭版",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-06-29T21:28:25.719Z",
-    "localUpdatedAt": "2026-06-29T21:28:11.804Z",
+    "lastCloudSaveAt": "2026-06-30T14:20:09.329Z",
+    "localUpdatedAt": "2026-06-30T14:19:58.994Z",
     "priceProxyUrl": "https://myh88-price-proxy.myh88.workers.dev"
   },
   "fxRates": {
@@ -26,7 +26,7 @@
       "currency": "USD",
       "shares": 14,
       "avgCost": 209.76343307142858,
-      "price": 192.53,
+      "price": 196.95,
       "sector": "AI基建",
       "color": "#51ac0c",
       "note": "",
@@ -34,7 +34,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -1.63993,
+      "changePercent": 1.0155408524388316,
       "id": "pos_mqnjborg_4xhe58",
       "costBasisUSD": 2936.688063
     },
@@ -45,7 +45,7 @@
       "currency": "USD",
       "shares": 5,
       "avgCost": 325.04,
-      "price": 266.76999,
+      "price": 282.83,
       "sector": "AI基建",
       "color": "#7e9023",
       "note": "",
@@ -53,7 +53,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -5.15182,
+      "changePercent": 1.8289828982898233,
       "id": "pos_mqnjborg_zeux56",
       "costBasisUSD": 1625.2
     },
@@ -64,7 +64,7 @@
       "currency": "USD",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 135.69,
+      "price": 148.13,
       "sector": "光通讯",
       "color": "#ff6600",
       "note": "",
@@ -72,7 +72,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -2.057161,
+      "changePercent": -1.3124583610926044,
       "id": "pos_mqnjborg_p8abix",
       "costBasisUSD": 820.34
     },
@@ -102,7 +102,7 @@
       "currency": "USD",
       "shares": 30,
       "avgCost": 111.4,
-      "price": 84.54,
+      "price": 100.69,
       "sector": "太空",
       "color": "#c01b34",
       "note": "",
@@ -110,7 +110,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": 4.77135,
+      "changePercent": 2.7344148556269694,
       "id": "pos_mqnjborg_0c6vpc",
       "costBasisUSD": 3342
     },
@@ -121,7 +121,7 @@
       "currency": "USD",
       "shares": 3.0007,
       "avgCost": 310.070583197254,
-      "price": 303.95001,
+      "price": 316.16,
       "sector": "AI基建",
       "color": "#ff4f9a",
       "note": "",
@@ -129,7 +129,7 @@
       "sellPrice": "",
       "sellDate": "",
       "sellNote": "",
-      "changePercent": -6.64066,
+      "changePercent": 2.9937778936052375,
       "id": "pos_mqnjborg_n3b8py",
       "costBasisUSD": 930.428799
     },
@@ -140,14 +140,14 @@
       "currency": "USD",
       "shares": 10,
       "avgCost": 150,
-      "price": 153.23,
+      "price": 162.8,
       "status": "holding",
       "sellPrice": "",
       "sellDate": "",
       "sector": "太空",
       "color": "#00eeff",
       "note": "",
-      "changePercent": 0.150324,
+      "changePercent": -0.8465801814970377,
       "sellNote": "",
       "id": "pos_mqnjborg_pzifro",
       "costBasisUSD": 1500
@@ -160,12 +160,12 @@
       "source": "twelve",
       "shares": 2,
       "avgCost": 346.34993,
-      "price": 337.39001,
+      "price": 351.88,
       "sector": "科技",
       "color": "#dd4646",
       "note": "",
       "costBasisUSD": 692.69986,
-      "changePercent": -1.83875
+      "changePercent": -0.5004948395306043
     },
     {
       "id": "pos_mqv9tzrw_6n81s8",
@@ -175,12 +175,12 @@
       "source": "twelve",
       "shares": 1,
       "avgCost": 810.175,
-      "price": 816.97998,
+      "price": 843.77,
       "sector": "光通信",
       "color": "#b9d00b",
       "note": "",
       "costBasisUSD": 810.175,
-      "changePercent": -5.21944
+      "changePercent": -0.8961710124500817
     },
     {
       "id": "pos_mqz9i9o7_8b8hhc",
@@ -190,11 +190,12 @@
       "source": "twelve",
       "shares": 1,
       "avgCost": 1110.35,
-      "price": 1110,
+      "price": 1137.66,
       "sector": "AI基建",
       "color": "#0062ff",
       "note": "",
-      "costBasisUSD": 1110.35
+      "costBasisUSD": 1110.35,
+      "changePercent": -0.6653394803017507
     }
   ],
   "transactions": [
@@ -923,6 +924,13 @@
       "capital": 15000,
       "netAsset": 13631.84,
       "market": 12630.36,
+      "cash": 1001.49
+    },
+    {
+      "date": "2026-06-30",
+      "capital": 15000,
+      "netAsset": 14524.05,
+      "market": 13522.56,
       "cash": 1001.49
     }
   ]
