@@ -2,7 +2,7 @@ const CACHE_SECONDS = 30 * 60;
 const STALE_SECONDS = 6 * 60 * 60;
 const TWELVE_DISABLED = false;
 const TWELVE_BASE = "https://api.twelvedata.com";
-const YAHOO_BASE = "https://query1.finance.yahoo.com/v8/finance/chart";
+const FINNHUB_BASE = "https://finnhub.io/api/v1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -73,50 +73,53 @@ async function fetchJsonUpstream(url) {
     headers: { Accept: "application/json" },
     cf: { cacheTtl: CACHE_SECONDS, cacheEverything: true },
   });
-  const data = await response.clone().json().catch(() => ({}));
+  const text = await response.clone().text().catch(() => "");
+  let data = {};
+  try {
+    data = JSON.parse(text || "{}");
+  } catch {
+    data = {};
+  }
   if (!response.ok || data.code || data.status === "error") {
-    throw new Error(data.message || `Upstream error ${response.status}`);
+    throw new Error(data.message || data.error || text.slice(0, 160) || `Upstream error ${response.status}`);
   }
   return data;
 }
 
-function normalizeYahooQuote(symbol, result) {
-  const meta = result?.meta || {};
-  const quote = result?.indicators?.quote?.[0] || {};
-  const closes = Array.isArray(quote.close) ? quote.close.filter((v) => Number(v) > 0) : [];
-  const close = Number(meta.regularMarketPrice || closes.at(-1) || meta.previousClose || 0);
-  const previous = Number(meta.previousClose || close || 0);
+function normalizeFinnhubQuote(symbol, data) {
+  const close = Number(data.c || 0);
+  const previous = Number(data.pc || close || 0);
   const change = close && previous ? close - previous : 0;
   const percent = previous ? (change / previous) * 100 : 0;
   return {
     symbol,
-    name: meta.shortName || meta.longName || symbol,
-    currency: meta.currency || "USD",
-    exchange: meta.exchangeName || meta.fullExchangeName || "",
-    datetime: new Date(Number(meta.regularMarketTime || Date.now() / 1000) * 1000).toISOString(),
-    timestamp: Number(meta.regularMarketTime || Date.now() / 1000),
-    open: String(meta.regularMarketOpen || close),
-    high: String(meta.regularMarketDayHigh || close),
-    low: String(meta.regularMarketDayLow || close),
+    name: symbol,
+    currency: "USD",
+    exchange: "",
+    datetime: new Date(Number(data.t || Date.now() / 1000) * 1000).toISOString(),
+    timestamp: Number(data.t || Date.now() / 1000),
+    open: String(data.o || close),
+    high: String(data.h || close),
+    low: String(data.l || close),
     close: String(close),
     previous_close: String(previous),
     change: String(change),
     percent_change: String(percent),
-    is_market_open: Boolean(meta.currentTradingPeriod?.regular),
-    source: "yahoo",
+    is_market_open: false,
+    source: "finnhub",
   };
 }
 
-async function fetchYahooQuotes(symbols) {
+async function fetchFinnhubQuotes(symbols, apiKey) {
+  if (!apiKey) throw new Error("FINNHUB_API_KEY is not configured");
   const entries = await Promise.all(
     symbols.map(async (symbol) => {
-      const url = new URL(`${YAHOO_BASE}/${encodeURIComponent(symbol)}`);
-      url.searchParams.set("interval", "1m");
-      url.searchParams.set("range", "1d");
+      const url = new URL(`${FINNHUB_BASE}/quote`);
+      url.searchParams.set("symbol", symbol);
+      url.searchParams.set("token", apiKey);
       const data = await fetchJsonUpstream(url);
-      const result = data.chart?.result?.[0];
-      if (!result) throw new Error(`Yahoo quote missing for ${symbol}`);
-      return [symbol, normalizeYahooQuote(symbol, result)];
+      if (!(Number(data.c) > 0)) throw new Error(`Finnhub quote missing for ${symbol}`);
+      return [symbol, normalizeFinnhubQuote(symbol, data)];
     })
   );
   const quotes = Object.fromEntries(entries);
@@ -125,23 +128,31 @@ async function fetchYahooQuotes(symbols) {
 
 async function fetchTwelveQuotes(symbols, apiKey) {
   if (TWELVE_DISABLED) throw new Error("Twelve Data upstream disabled");
+  if (!apiKey || apiKey.length < 10) throw new Error("TWELVE_DATA_KEY is missing or invalid");
   const url = new URL(`${TWELVE_BASE}/quote`);
   url.searchParams.set("symbol", symbols.join(","));
   url.searchParams.set("apikey", apiKey);
   return fetchJsonUpstream(url);
 }
 
-async function fetchQuotesWithFallback(symbols, apiKey) {
+async function fetchQuotesWithFallback(symbols, twelveKey, finnhubKey) {
+  let twelveReason = "";
   try {
-    const data = await fetchTwelveQuotes(symbols, apiKey);
+    const data = await fetchTwelveQuotes(symbols, twelveKey);
     return { data, source: "twelve" };
   } catch (twelveError) {
-    const data = await fetchYahooQuotes(symbols);
-    return { data, source: "yahoo", fallbackReason: twelveError.message };
+    twelveReason = twelveError.message;
+  }
+
+  try {
+    const data = await fetchFinnhubQuotes(symbols, finnhubKey);
+    return { data, source: "finnhub", fallbackReason: twelveReason };
+  } catch (finnhubError) {
+    throw new Error(`Twelve failed: ${twelveReason}; Finnhub failed: ${finnhubError.message}`);
   }
 }
 
-async function fetchQuotesWithCache(request, env, cacheName, symbols, apiKey) {
+async function fetchQuotesWithCache(request, env, cacheName, symbols, twelveKey, finnhubKey) {
   const shared = await readSharedCache(env, cacheName);
   if (shared?.body && Date.now() - Number(shared.cachedAt || 0) < CACHE_SECONDS * 1000) {
     return responseFromCached(shared, "HIT-KV");
@@ -158,8 +169,8 @@ async function fetchQuotesWithCache(request, env, cacheName, symbols, apiKey) {
   }
 
   try {
-    const result = await fetchQuotesWithFallback(symbols, apiKey);
-    const response = jsonResponse(result.data, result.source === "twelve" ? "MISS-TWELVE" : "MISS-YAHOO");
+    const result = await fetchQuotesWithFallback(symbols, twelveKey, finnhubKey);
+    const response = jsonResponse(result.data, result.source === "twelve" ? "MISS-TWELVE" : "MISS-FINNHUB");
     response.headers.set("X-MYH88-Source", result.source);
     if (result.fallbackReason) response.headers.set("X-MYH88-Fallback-Reason", result.fallbackReason.slice(0, 120));
     response.headers.set("Cache-Control", `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=${STALE_SECONDS}`);
@@ -207,6 +218,7 @@ export default {
     try {
       if (pathname === "" || pathname === "/") {
         const apiKey = String(env.TWELVE_DATA_KEY || "").trim();
+        const finnhubKey = String(env.FINNHUB_API_KEY || "").trim();
         return json({
           ok: true,
           service: "MYH88 price proxy",
@@ -215,18 +227,20 @@ export default {
           sharedCache: Boolean(env.MYH88_CACHE),
           secretConfigured: Boolean(apiKey),
           secretLength: apiKey.length,
+          finnhubConfigured: Boolean(finnhubKey),
           twelveDisabled: TWELVE_DISABLED,
-          fallbackProvider: "yahoo",
+          fallbackProvider: "finnhub",
         });
       }
 
       const apiKey = String(env.TWELVE_DATA_KEY || "").trim();
-      if (!apiKey) return json({ error: "TWELVE_DATA_KEY is not configured" }, 500);
+      const finnhubKey = String(env.FINNHUB_API_KEY || "").trim();
+      if (!apiKey && !finnhubKey) return json({ error: "No quote provider key is configured" }, 500);
 
       if (pathname === "/quotes") {
         const symbols = normalizeSymbols(incoming.searchParams.get("symbols"));
         if (!symbols.length) return json({ error: "Missing symbols" }, 400);
-        return fetchQuotesWithCache(request, env, `quotes:${symbols.join(",")}`, symbols, apiKey);
+        return fetchQuotesWithCache(request, env, `quotes:${symbols.join(",")}`, symbols, apiKey, finnhubKey);
       }
 
       if (pathname === "/fx") {
