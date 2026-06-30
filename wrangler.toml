@@ -1,7 +1,8 @@
 name = "myh88-price-proxy"
 main = "cloudflare-worker.js"
 compatibility_date = "2026-06-25"
-workers_dev = false
+workers_dev = true
+preview_urls = true
 
 [[routes]]
 pattern = "quote.myh88.com"

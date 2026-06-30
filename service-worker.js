@@ -1,6 +1,6 @@
-const CACHE_VERSION="dream-fund-v10-15";
-const DATA_CACHE="dream-fund-data-v10-15";
-const APP_SHELL=["./","./index.html","./style.css?v=10.15","./script.js?v=10.15","./manifest.webmanifest","./avatar.png","./app-icon.svg","./icon-192.png","./icon-512.png"];
+const CACHE_VERSION="dream-fund-v10-16";
+const DATA_CACHE="dream-fund-data-v10-16";
+const APP_SHELL=["./","./index.html","./style.css?v=10.16","./script.js?v=10.16","./manifest.webmanifest","./avatar.png","./app-icon.svg","./icon-192.png","./icon-512.png"];
 
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE_VERSION).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()));
