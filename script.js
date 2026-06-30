@@ -1,4 +1,4 @@
-const VERSION="V10.13 PWA家庭版";
+const VERSION="V10.14 PWA家庭版";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
 const PRICE_CACHE_KEY="v9_price_cache";
@@ -327,7 +327,8 @@ async function doRefreshPrices(useCache=true){
   if(!proxy){status.textContent="刷新失败：管理员需要先填写 Cloudflare Worker 行情代理地址";if(!useCache)alert(status.textContent);return}
   status.textContent="正在通过行情代理刷新实时价格...";if(button)button.disabled=true;
   try{
-    await refreshFx(false);const items=state.positions.filter(p=>p.source==="twelve"&&p.symbol),symbols=[...new Set(items.map(p=>p.symbol))];
+    try{await refreshFx(false)}catch(error){console.warn("FX refresh failed; keep cached rates",error);state.fxRates={...state.fxRates,...(getFxCache()?.fxRates||{}),USD:1}}
+    const items=state.positions.filter(p=>p.source==="twelve"&&p.symbol),symbols=[...new Set(items.map(p=>p.symbol))];
     if(symbols.length){
       const res=await fetchQuoteBatchResilient(symbols);
       items.forEach(p=>{const q=symbols.length===1?res:res[p.symbol];const price=num(q?.close||q?.price);if(price>0)p.price=price;p.changePercent=num(q?.percent_change)});
