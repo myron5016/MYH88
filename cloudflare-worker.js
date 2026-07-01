@@ -1,9 +1,31 @@
 const CACHE_SECONDS = 30 * 60;
 const STALE_SECONDS = 6 * 60 * 60;
 const TWELVE_BATCH_LIMIT = 8;
+const MARKET_CLOCK_CACHE_SECONDS = 15 * 60;
+const MARKET_HOLIDAY_CACHE_SECONDS = 24 * 60 * 60;
 const TWELVE_DISABLED = false;
 const TWELVE_BASE = "https://api.twelvedata.com";
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
+const US_MARKET_TZ = "America/New_York";
+const US_MARKET_OPEN_MIN = 9 * 60 + 30;
+const US_MARKET_CLOSE_MIN = 16 * 60;
+const US_EARLY_CLOSE_MIN = 13 * 60;
+const US_STATIC_HOLIDAYS = {
+  "2026-01-01": "New Year's Day",
+  "2026-01-19": "Martin Luther King Jr. Day",
+  "2026-02-16": "Presidents' Day",
+  "2026-04-03": "Good Friday",
+  "2026-05-25": "Memorial Day",
+  "2026-06-19": "Juneteenth",
+  "2026-07-03": "Independence Day observed",
+  "2026-09-07": "Labor Day",
+  "2026-11-26": "Thanksgiving Day",
+  "2026-12-25": "Christmas Day",
+};
+const US_STATIC_EARLY_CLOSES = {
+  "2026-11-27": "Day after Thanksgiving early close",
+  "2026-12-24": "Christmas Eve early close",
+};
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,6 +48,95 @@ function normalizeSymbols(value) {
     .map((s) => s.trim().toUpperCase())
     .filter(Boolean)
     .slice(0, 50);
+}
+
+function nyParts(date = new Date()) {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: US_MARKET_TZ,
+      weekday: "short",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    })
+      .formatToParts(date)
+      .filter((p) => p.type !== "literal")
+      .map((p) => [p.type, p.value])
+  );
+  if (parts.hour === "24") parts.hour = "00";
+  return {
+    weekday: parts.weekday,
+    date: `${parts.year}-${parts.month}-${parts.day}`,
+    hour: Number(parts.hour),
+    minute: Number(parts.minute),
+  };
+}
+
+function localMarketClock(now = new Date()) {
+  const parts = nyParts(now);
+  const weekend = parts.weekday === "Sat" || parts.weekday === "Sun";
+  const holiday = US_STATIC_HOLIDAYS[parts.date];
+  const earlyClose = US_STATIC_EARLY_CLOSES[parts.date];
+  const closeMin = earlyClose ? US_EARLY_CLOSE_MIN : US_MARKET_CLOSE_MIN;
+  const minute = parts.hour * 60 + parts.minute;
+  const isOpen = !weekend && !holiday && minute >= US_MARKET_OPEN_MIN && minute < closeMin;
+  const phase = isOpen ? "open" : holiday ? "holiday" : weekend ? "weekend" : minute < US_MARKET_OPEN_MIN ? "pre" : "closed";
+  return {
+    source: "local",
+    exchange: "US",
+    timezone: US_MARKET_TZ,
+    date: parts.date,
+    isOpen,
+    phase,
+    holiday: holiday || "",
+    earlyClose: earlyClose || "",
+    openMinute: US_MARKET_OPEN_MIN,
+    closeMinute: closeMin,
+    checkedAt: now.toISOString(),
+  };
+}
+
+async function fetchFinnhubMarketClock(env) {
+  const token = String(env.FINNHUB_API_KEY || "").trim();
+  if (!token) throw new Error("FINNHUB_API_KEY is not configured");
+  const url = new URL(`${FINNHUB_BASE}/stock/market-status`);
+  url.searchParams.set("exchange", "US");
+  url.searchParams.set("token", token);
+  const data = await fetchJsonUpstream(url);
+  return {
+    ...localMarketClock(),
+    source: "finnhub",
+    exchange: data.exchange || "US",
+    timezone: data.timezone || US_MARKET_TZ,
+    isOpen: Boolean(data.isOpen),
+    phase: data.isOpen ? "open" : localMarketClock().phase,
+    session: data.session || "",
+    holiday: data.holiday || localMarketClock().holiday,
+    checkedAt: new Date().toISOString(),
+  };
+}
+
+async function fetchMarketClockWithCache(request, env) {
+  const cacheName = "market-clock:US";
+  const shared = await readSharedCache(env, cacheName);
+  if (shared?.body && Date.now() - Number(shared.cachedAt || 0) < MARKET_CLOCK_CACHE_SECONDS * 1000) {
+    return responseFromCached(shared, "HIT-MARKET-CLOCK");
+  }
+  try {
+    const data = await fetchFinnhubMarketClock(env);
+    const response = jsonResponse(data, "MISS-MARKET-CLOCK");
+    response.headers.set("Cache-Control", `public, max-age=${MARKET_CLOCK_CACHE_SECONDS}, stale-while-revalidate=${MARKET_HOLIDAY_CACHE_SECONDS}`);
+    await writeSharedCache(env, cacheName, response.clone());
+    return response;
+  } catch (error) {
+    if (shared?.body) return responseFromCached(shared, "STALE-MARKET-CLOCK");
+    const response = jsonResponse({ ...localMarketClock(), warning: error.message || "Finnhub market clock failed" }, "LOCAL-MARKET-CLOCK");
+    response.headers.set("Cache-Control", `public, max-age=${MARKET_CLOCK_CACHE_SECONDS}`);
+    return response;
+  }
 }
 
 function responseFromCached(record, cacheLabel) {
@@ -275,6 +386,7 @@ export default {
           finnhubConfigured: Boolean(finnhubKey),
           twelveDisabled: TWELVE_DISABLED,
           fallbackProvider: "finnhub",
+          marketClock: "finnhub-with-local-fallback",
         });
       }
 
@@ -300,6 +412,10 @@ export default {
           })
         );
         return json({ rates });
+      }
+
+      if (pathname === "/market-clock") {
+        return fetchMarketClockWithCache(request, env);
       }
 
       return json({ error: "Not found" }, 404);

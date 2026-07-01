@@ -1,4 +1,4 @@
-const VERSION="V10.21 PWA家庭版";
+const VERSION="V10.23 PWA家庭版";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
 const PRICE_CACHE_KEY="v9_price_cache";
@@ -13,6 +13,12 @@ const AUTO_FX_PROXY=false;
 const AUTO_REFRESH_CHECK_MS=5*60000;
 const RESUME_REFRESH_GAP_MS=20000;
 const SHARED_DATA_CHECK_MS=60000;
+const US_MARKET_TZ="America/New_York";
+const US_MARKET_OPEN_MIN=9*60+30;
+const US_MARKET_CLOSE_MIN=16*60;
+const US_EARLY_CLOSE_MIN=13*60;
+const US_STATIC_HOLIDAYS={"2026-01-01":"元旦","2026-01-19":"马丁路德金纪念日","2026-02-16":"总统日","2026-04-03":"耶稣受难日","2026-05-25":"阵亡将士纪念日","2026-06-19":"六月节","2026-07-03":"独立日观察休市","2026-09-07":"劳动节","2026-11-26":"感恩节","2026-12-25":"圣诞节"};
+const US_STATIC_EARLY_CLOSES={"2026-11-27":"感恩节后提前收盘","2026-12-24":"圣诞夜提前收盘"};
 const TAXONOMY_VERSION="sector-color-v5";
 
 const defaultState={settings:{title:"孟一晗的梦想金库",priceCacheMinutes:30,lastPriceRefresh:0,lastPriceRefreshText:"",version:VERSION},fxRates:{USD:1,EUR:1.16,HKD:.128,JPY:.0067,GBP:1.27},positions:[],transactions:[],cashFlows:[],snapshots:[]};
@@ -37,6 +43,7 @@ let lastSharedRaw="";
 let lastMarketRoute="pending";
 let lastMarketProvider="";
 let lastMarketError="";
+let marketClockState=null;
 
 const SECTOR_RULES=[
   {label:"AI基建",color:"#16c784",symbols:["NVDA","VRT"],keywords:["英伟达","维谛","ai基建","ai基础设施","算力","数据中心","电力"]},
@@ -60,6 +67,41 @@ function round(v,d=2){const p=10**d;return Math.round((num(v)+Number.EPSILON)*p)
 function money(v){const n=num(v),sign=n<0?"-":"";return sign+"$"+new Intl.NumberFormat("en-US",{maximumFractionDigits:2}).format(Math.abs(n))}
 function cls(v){return num(v)>0?"green":num(v)<0?"red":"muted"}
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function formatDuration(ms){const mins=Math.max(0,Math.ceil(ms/60000)),h=Math.floor(mins/60),m=mins%60;return h?`${h}小时${m}分`:`${m}分`}
+function nyParts(date=new Date()){
+  const parts=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:US_MARKET_TZ,weekday:"short",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hour12:false}).formatToParts(date).filter(p=>p.type!=="literal").map(p=>[p.type,p.value]));
+  if(parts.hour==="24")parts.hour="00";
+  return{weekday:parts.weekday,year:num(parts.year),month:num(parts.month),day:num(parts.day),date:`${parts.year}-${parts.month}-${parts.day}`,hour:num(parts.hour),minute:num(parts.minute)};
+}
+function nextBusinessDayLabel(parts){
+  const order=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],zh=["周日","周一","周二","周三","周四","周五","周六"],idx=order.indexOf(parts.weekday);
+  const add=idx===5?3:idx===6?2:1;
+  return zh[(idx+add)%7];
+}
+function marketClock(now=new Date()){
+  const p=nyParts(now),weekend=p.weekday==="Sat"||p.weekday==="Sun",mins=p.hour*60+p.minute;
+  const holiday=US_STATIC_HOLIDAYS[p.date]||"",earlyClose=US_STATIC_EARLY_CLOSES[p.date]||"",closeMin=earlyClose?US_EARLY_CLOSE_MIN:US_MARKET_CLOSE_MIN;
+  if(holiday)return{phase:"holiday",isOpen:false,label:`美股休市 · ${holiday}`,detail:"休市日优先使用缓存",source:"local",date:p.date,holiday,earlyClose:""};
+  if(weekend)return{phase:"weekend",isOpen:false,label:`美股周末休市 · 下次开盘 ${nextBusinessDayLabel(p)} 09:30 ET`,detail:"休市日优先使用缓存",source:"local",date:p.date,holiday:"",earlyClose:""};
+  if(mins>=US_MARKET_OPEN_MIN&&mins<closeMin){
+    const closeMs=(closeMin-mins)*60000;
+    return{phase:"open",isOpen:true,label:`美股盘中 · 距离收盘约 ${formatDuration(closeMs)}`,detail:"盘中自动刷新",source:"local",date:p.date,holiday:"",earlyClose};
+  }
+  if(!weekend&&mins<US_MARKET_OPEN_MIN){
+    const openMs=(US_MARKET_OPEN_MIN-mins)*60000;
+    return{phase:"pre",isOpen:false,label:`美股未开盘 · 距离开盘约 ${formatDuration(openMs)}`,detail:"开盘前优先使用缓存",source:"local",date:p.date,holiday:"",earlyClose};
+  }
+  return{phase:"closed",isOpen:false,label:`美股已收盘 · 下次开盘 ${nextBusinessDayLabel(p)} 09:30 ET`,detail:earlyClose?`今日${earlyClose}`:"收盘后优先使用缓存",source:"local",date:p.date,holiday:"",earlyClose};
+}
+function marketClockDisplay(clock=marketClock()){
+  if(clock.label)return clock.label;
+  const source=clock.source==="finnhub"?"实时市场状态":"本地休市表";
+  if(clock.isOpen)return`美股盘中 · ${source}`;
+  if(clock.holiday)return`美股休市 · ${clock.holiday}`;
+  if(clock.earlyClose)return`美股非盘中 · ${clock.earlyClose}`;
+  return marketClock().label;
+}
+function isUsMarketOpen(){return Boolean((marketClockState||marketClock()).isOpen||(marketClockState||marketClock()).phase==="open")}
 function validColor(v){return /^#[0-9a-f]{6}$/i.test(v||"")?v:"#888888"}
 function hexToRgb(hex){const v=validColor(hex).slice(1);return{r:parseInt(v.slice(0,2),16),g:parseInt(v.slice(2,4),16),b:parseInt(v.slice(4,6),16)}}
 function rgbToHex({r,g,b}){return"#"+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,"0")).join("")}
@@ -202,13 +244,26 @@ async function loadSharedData(autoRefresh=false){
   try{
     const raw=await fetchSharedText();applySharedDataText(raw);
     status.textContent=navigator.onLine?(isAdminMode?`已读取共享数据：${new Date().toLocaleString("zh-CN")}`:"已读取最新云端账本"):"离线模式：已读取设备中最近缓存的数据";
-    if(admin.owner&&admin.repo&&admin.token)checkCloudStatus(false);if(autoRefresh)refreshPrices(false);
+    if(admin.owner&&admin.repo&&admin.token)checkCloudStatus(false);if(autoRefresh)smartRefreshPricesOnLoad();
   }catch(error){
     console.warn("共享数据读取失败",error);
     const cached=localStorage.getItem(STATE_KEY)||localStorage.getItem("v8_last_state");
     if(cached){normalizeState(readJson(cached,defaultState));applyPriceCache();dirty=isAdminMode;lastMutationReason=isAdminMode?"正在使用本机缓存":"";renderAll();status.textContent="读取失败，已使用本机缓存"}
     else{normalizeState(defaultState);dirty=isAdminMode;lastMutationReason=isAdminMode?"云端读取失败":"";renderAll();status.textContent="读取失败，已使用默认数据"}
     renderSyncStatus();
+  }
+}
+
+async function smartRefreshPricesOnLoad(){
+  const clock=await refreshMarketClock();
+  if(clock?.isOpen||clock?.phase==="open"){
+    refreshPrices(false);
+    return;
+  }
+  if(priceCacheValid()){
+    lastMarketRoute="cache";applyPriceCache();renderAll();$("status").textContent=`${marketClockDisplay(clock)}；已使用缓存行情：${state.settings.lastPriceRefreshText||""}`;
+  }else{
+    applyPriceCache();renderAll();$("status").textContent=`${marketClockDisplay(clock)}；休市时段不自动消耗行情额度，可手动刷新。`;
   }
 }
 
@@ -268,9 +323,10 @@ function marketRouteLabel(){
   return"行情：等待刷新";
 }
 function renderDiagnostics(){
-  const version=$("versionStatus"),route=$("marketRouteStatus"),cloud=$("cloudFreshStatus");
+  const version=$("versionStatus"),route=$("marketRouteStatus"),clock=$("marketClockStatus"),cloud=$("cloudFreshStatus");
   if(version)version.textContent=`版本：${VERSION}`;
   if(route)route.textContent=marketRouteLabel();
+  if(clock)clock.textContent=marketClockDisplay(marketClockState||marketClock());
   if(cloud)cloud.textContent=isAdminMode?(cloudState?"账本：已核对 GitHub":"账本：等待核对"):(cloudState?"账本：云端最新":"账本：本机缓存");
 }
 function createBackup(reason="手动恢复点"){
@@ -322,6 +378,20 @@ async function fetchJson(url,options={}){
   }finally{
     clearTimeout(timer);
   }
+}
+async function refreshMarketClock(){
+  const proxy=priceProxyUrl();
+  marketClockState=marketClock();
+  if(proxy&&navigator.onLine){
+    try{
+      const remote=await fetchJson(`${proxy}/market-clock`,{timeout:8000});
+      marketClockState={...marketClock(),...remote};
+    }catch(error){
+      console.warn("Market clock fallback to local calendar",error);
+    }
+  }
+  renderDiagnostics();
+  return marketClockState;
 }
 async function fetchStaticQuoteCache(symbols){
   const data=await fetchJson(STATIC_QUOTES_URL,{timeout:FETCH_TIMEOUT_MS});
@@ -600,13 +670,15 @@ function kickAutoRefresh(force=false){
   const now=Date.now();
   if(!force&&now-lastAutoRefreshKick<RESUME_REFRESH_GAP_MS)return;
   if(!force&&priceCacheValid()){applyPriceCache();renderAll();return}
+  if(!force&&!isUsMarketOpen()){applyPriceCache();renderAll();return}
   lastAutoRefreshKick=now;
-  refreshPrices(true);
+  refreshPrices(!isUsMarketOpen());
 }
 function initAutoRefreshHooks(){
   if(autoRefreshTimer)clearInterval(autoRefreshTimer);
   if(sharedDataTimer)clearInterval(sharedDataTimer);
   sharedDataTimer=setInterval(()=>checkSharedDataUpdate(false),SHARED_DATA_CHECK_MS);
+  autoRefreshTimer=setInterval(()=>refreshMarketClock().then(()=>kickAutoRefresh(false)),AUTO_REFRESH_CHECK_MS);
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")checkSharedDataUpdate(true)});
   window.addEventListener("focus",()=>checkSharedDataUpdate(true));
   window.addEventListener("pageshow",()=>checkSharedDataUpdate(false));
