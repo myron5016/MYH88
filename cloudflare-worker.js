@@ -1,5 +1,6 @@
 const CACHE_SECONDS = 30 * 60;
 const STALE_SECONDS = 6 * 60 * 60;
+const TWELVE_BATCH_LIMIT = 8;
 const TWELVE_DISABLED = false;
 const TWELVE_BASE = "https://api.twelvedata.com";
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
@@ -8,6 +9,7 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Expose-Headers": "X-MYH88-Cache, X-MYH88-Source, X-MYH88-Fallback-Reason, X-MYH88-Warnings",
   "Cache-Control": `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=${STALE_SECONDS}`,
 };
 
@@ -126,6 +128,16 @@ async function fetchFinnhubQuotes(symbols, apiKey) {
   return symbols.length === 1 ? quotes[symbols[0]] : quotes;
 }
 
+async function fetchFinnhubQuote(symbol, apiKey) {
+  if (!apiKey) throw new Error("FINNHUB_API_KEY is not configured");
+  const url = new URL(`${FINNHUB_BASE}/quote`);
+  url.searchParams.set("symbol", symbol);
+  url.searchParams.set("token", apiKey);
+  const data = await fetchJsonUpstream(url);
+  if (!(Number(data.c) > 0)) throw new Error(`Finnhub quote missing for ${symbol}`);
+  return normalizeFinnhubQuote(symbol, data);
+}
+
 async function fetchTwelveQuotes(symbols, apiKey) {
   if (TWELVE_DISABLED) throw new Error("Twelve Data upstream disabled");
   if (!apiKey || apiKey.length < 10) throw new Error("TWELVE_DATA_KEY is missing or invalid");
@@ -135,11 +147,43 @@ async function fetchTwelveQuotes(symbols, apiKey) {
   return fetchJsonUpstream(url);
 }
 
+function quoteMapFromProvider(data, symbols, source) {
+  const map = {};
+  if (symbols.length === 1 && data && !data[symbols[0]]) {
+    map[symbols[0]] = { ...data, source };
+    return map;
+  }
+  for (const symbol of symbols) {
+    const quote = data?.[symbol];
+    if (quote && !quote.code && quote.status !== "error") map[symbol] = { ...quote, source };
+  }
+  return map;
+}
+
 async function fetchQuotesWithFallback(symbols, twelveKey, finnhubKey) {
+  const twelveSymbols = symbols.slice(0, TWELVE_BATCH_LIMIT);
+  const finnhubSymbols = symbols.slice(TWELVE_BATCH_LIMIT);
   let twelveReason = "";
+  const warnings = [];
+
   try {
-    const data = await fetchTwelveQuotes(symbols, twelveKey);
-    return { data, source: "twelve" };
+    const twelveData = twelveSymbols.length ? await fetchTwelveQuotes(twelveSymbols, twelveKey) : {};
+    const quotes = quoteMapFromProvider(twelveData, twelveSymbols, "twelve");
+
+    if (finnhubSymbols.length) {
+      const settled = await Promise.allSettled(finnhubSymbols.map((symbol) => fetchFinnhubQuote(symbol, finnhubKey)));
+      settled.forEach((result, index) => {
+        const symbol = finnhubSymbols[index];
+        if (result.status === "fulfilled") quotes[symbol] = result.value;
+        else warnings.push(`${symbol}: ${result.reason?.message || "Finnhub failed"}`);
+      });
+    }
+
+    if (Object.keys(quotes).length) {
+      const source = finnhubSymbols.length ? "mixed" : "twelve";
+      return { data: symbols.length === 1 ? quotes[symbols[0]] : quotes, source, warnings };
+    }
+    throw new Error("Twelve returned no usable quotes");
   } catch (twelveError) {
     twelveReason = twelveError.message;
   }
@@ -170,9 +214,10 @@ async function fetchQuotesWithCache(request, env, cacheName, symbols, twelveKey,
 
   try {
     const result = await fetchQuotesWithFallback(symbols, twelveKey, finnhubKey);
-    const response = jsonResponse(result.data, result.source === "twelve" ? "MISS-TWELVE" : "MISS-FINNHUB");
+    const response = jsonResponse(result.data, result.source === "twelve" ? "MISS-TWELVE" : result.source === "mixed" ? "MISS-MIXED" : "MISS-FINNHUB");
     response.headers.set("X-MYH88-Source", result.source);
     if (result.fallbackReason) response.headers.set("X-MYH88-Fallback-Reason", result.fallbackReason.slice(0, 120));
+    if (result.warnings?.length) response.headers.set("X-MYH88-Warnings", result.warnings.join(" | ").slice(0, 240));
     response.headers.set("Cache-Control", `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=${STALE_SECONDS}`);
     await writeSharedCache(env, cacheName, response.clone());
     await cache.put(cacheKey, response.clone());

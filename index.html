@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=10.19">
+  <link rel="stylesheet" href="style.css?v=10.21">
 </head>
 <body>
 <main class="container">
@@ -70,6 +70,7 @@
   <section id="settingsPanel" class="card settings admin-only hidden">
     <label>看板标题<input id="titleInput"></label>
     <label>行情缓存分钟<input id="cacheInput" type="number" min="5"></label>
+    <label>EUR/USD 手动汇率<input id="eurFxInput" type="number" min="0.000001" step="any"></label>
     <label>行情代理地址<input id="proxyInput" autocomplete="off" placeholder="https://myh88-price-proxy.xxx.workers.dev"></label>
     <label>Twelve Data Key<input id="apiKeyInput" type="password" autocomplete="off" placeholder="保存到 GitHub 后家人共用"></label>
     <button onclick="saveSettings()">应用设置</button>
@@ -242,6 +243,6 @@
   </div>
 </dialog>
 
-<script src="script.js?v=10.19"></script>
+<script src="script.js?v=10.21"></script>
 </body>
 </html>
