@@ -1,4 +1,4 @@
-const VERSION="V10.16 PWA家庭版";
+const VERSION="V10.19 PWA家庭版";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
 const PRICE_CACHE_KEY="v9_price_cache";
@@ -9,10 +9,11 @@ const FETCH_TIMEOUT_MS=20000;
 const PROXY_TIMEOUT_MS=25000;
 const DEFAULT_PRICE_PROXY_URLS=["https://quote.myh88.com"];
 const STATIC_QUOTES_URL="./kv-quotes-all-current.json";
+const AUTO_FX_PROXY=false;
 const AUTO_REFRESH_CHECK_MS=5*60000;
 const RESUME_REFRESH_GAP_MS=20000;
 const SHARED_DATA_CHECK_MS=60000;
-const TAXONOMY_VERSION="sector-color-v2";
+const TAXONOMY_VERSION="sector-color-v5";
 
 const defaultState={settings:{title:"孟一晗的梦想金库",priceCacheMinutes:30,lastPriceRefresh:0,lastPriceRefreshText:"",version:VERSION},fxRates:{USD:1,EUR:1.16,HKD:.128,JPY:.0067,GBP:1.27},positions:[],transactions:[],cashFlows:[],snapshots:[]};
 let state=structuredClone(defaultState);
@@ -35,16 +36,18 @@ let lastAutoRefreshKick=0;
 let lastSharedRaw="";
 let lastMarketRoute="pending";
 let lastMarketProvider="";
+let lastMarketError="";
 
 const SECTOR_RULES=[
-  {label:"AI基建",color:"#2f8f5b",symbols:["NVDA","VRT"],keywords:["英伟达","维谛","ai基建","ai基础设施","算力","数据中心","电力"]},
-  {label:"AI存储",color:"#3d6ea8",symbols:["MU"],keywords:["美光","存储","内存","dram","hbm"]},
-  {label:"光通信",color:"#2497a8",symbols:["MRVL","AAOI","LITE"],keywords:["光通信","光通讯","光模块","光电","光芯片","迈威尔","应用光电","lumentum","鲁门特姆","朗美通"]},
-  {label:"太空",color:"#b83d5a",symbols:["RKLB","SPCX"],keywords:["太空","航天","火箭","rocket","space","spacex"]},
-  {label:"科技平台",color:"#6f7f92",symbols:["GOOGL","GOOG","META","MSFT","AMZN","AAPL"],keywords:["谷歌","平台","云","搜索","广告","软件"]},
-  {label:"医疗",color:"#7b61a8",symbols:["UNH","LLY","NVO","MRK","PFE","JNJ","TMO","ISRG"],keywords:["医疗","医药","制药","生物","器械"]},
-  {label:"现金",color:"#d8b64c",symbols:["CASH"],keywords:["现金","cash"]},
-  {label:"未分类",color:"#66758a",symbols:[],keywords:["未分类"]}
+  {label:"AI基建",color:"#16c784",symbols:["NVDA","VRT"],keywords:["英伟达","维谛","ai基建","ai基础设施","算力","数据中心","电力"]},
+  {label:"AI存储",color:"#2f80ed",symbols:["MU"],keywords:["美光","存储","内存","dram","hbm"]},
+  {label:"半导体",color:"#ff8a3d",symbols:["XFAB","AVGO","AMD","TSM","ASML","ARM","QCOM","AMAT","LRCX"],keywords:["半导体","芯片","晶圆","设备"]},
+  {label:"光通信",color:"#00c2d7",symbols:["MRVL","AAOI","LITE"],keywords:["光通信","光通讯","光模块","光电","光芯片","迈威尔","应用光电","lumentum","鲁门特姆","朗美通"]},
+  {label:"太空",color:"#ff3f6c",symbols:["RKLB","SPCX"],keywords:["太空","航天","火箭","rocket","space","spacex"]},
+  {label:"科技平台",color:"#8b5cf6",symbols:["GOOGL","GOOG","META","MSFT","AMZN","AAPL"],keywords:["谷歌","平台","云","搜索","广告","软件"]},
+  {label:"医疗",color:"#a855f7",symbols:["UNH","LLY","NVO","MRK","PFE","JNJ","TMO","ISRG"],keywords:["医疗","医药","制药","生物","器械"]},
+  {label:"现金",color:"#ffd84d",symbols:["CASH"],keywords:["现金","cash"]},
+  {label:"未分类",color:"#8b5cf6",symbols:[],keywords:["未分类"]}
 ];
 const SECTOR_ALIAS={"光通讯":"光通信","通信光":"光通信","AI":"AI基建","人工智能":"AI基建","算力":"AI基建","航天":"太空","宇宙":"太空","现金":"现金","CASH":"现金"};
 
@@ -88,18 +91,18 @@ function sectorPeerIndex(symbol,sector){
 function colorForSectorMember(sector,index=0){
   const base=sectorBaseColor(sector);
   const variants=[
-    mixColor(base,"#000000",.08),
-    mixColor(base,"#ffffff",.10),
+    mixColor(base,"#000000",.03),
+    mixColor(base,"#ffffff",.30),
     mixColor(base,"#000000",.22),
-    mixColor(base,"#ffffff",.22),
-    mixColor(base,"#253044",.18),
-    mixColor(base,"#f8fafc",.30)
+    mixColor(base,"#ffffff",.46),
+    mixColor(base,"#111827",.16),
+    mixColor(base,"#fef3c7",.28)
   ];
   return variants[index%variants.length];
 }
 function autoColorForPosition(p){return colorForSectorMember(p.sector,sectorPeerIndex(p.symbol,p.sector))}
 function applyAutoTaxonomy(force=false){
-  state.positions.forEach(p=>{p.sector=inferSector(p.symbol,p.name,p.sector)});
+  state.positions.forEach(p=>{p.sector=inferSector(p.symbol,p.name,force?"":p.sector)});
   state.positions.forEach(p=>{if(force||!p.color||p.color==="#888888")p.color=autoColorForPosition(p)});
 }
 function fx(currency){return num(state.fxRates?.[String(currency||"USD").toUpperCase()])||1}
@@ -329,6 +332,11 @@ async function fetchStaticQuoteCache(symbols){
   throw new Error("Static quote cache missing requested symbols");
 }
 async function refreshFx(force=false){
+  if(!AUTO_FX_PROXY){
+    state.fxRates={...state.fxRates,USD:1};
+    localStorage.setItem(FX_CACHE_KEY,JSON.stringify({time:Date.now(),fxRates:state.fxRates,manual:true}));
+    return;
+  }
   const proxies=priceProxyUrls();if(!proxies.length)return;const cached=getFxCache();if(!force&&cached?.time&&Date.now()-cached.time<24*3600000){state.fxRates={...state.fxRates,...cached.fxRates,USD:1};return}
   const currencies=[...new Set(state.positions.map(p=>p.currency).filter(c=>c!=="USD"))];
   if(currencies.length){
@@ -380,6 +388,7 @@ async function fetchQuoteBatchResilient(symbols){
     const cached=await fetchStaticQuoteCache(symbols);
     lastMarketRoute="static";
     lastMarketProvider="static";
+    lastMarketError=lastError?.message||"proxy unavailable";
     return cached;
   }catch(error){
     lastError=lastError||error;
@@ -397,6 +406,7 @@ async function doRefreshPrices(useCache=true){
   if(useCache&&priceCacheValid()){lastMarketRoute="cache";applyPriceCache();renderAll();status.textContent="已使用缓存行情："+(state.settings.lastPriceRefreshText||"");return}
   if(!proxy){status.textContent="刷新失败：管理员需要先填写 Cloudflare Worker 行情代理地址";if(!useCache)alert(status.textContent);return}
   status.textContent="正在通过行情代理刷新实时价格...";if(button)button.disabled=true;
+  lastMarketError="";
   try{
     try{await refreshFx(false)}catch(error){console.warn("FX refresh failed; keep cached rates",error);state.fxRates={...state.fxRates,...(getFxCache()?.fxRates||{}),USD:1}}
     const items=state.positions.filter(p=>p.source==="twelve"&&p.symbol),symbols=[...new Set(items.map(p=>p.symbol))];
@@ -407,7 +417,7 @@ async function doRefreshPrices(useCache=true){
     }
     state.settings.lastPriceRefresh=Date.now();state.settings.lastPriceRefreshText=new Date().toLocaleString("zh-CN");savePriceCache();
     if(isAdminMode){captureSnapshot(false);markDirty("实时行情与今日快照已更新")}else saveLocal();
-    renderAll();status.textContent=isAdminMode?"已刷新："+state.settings.lastPriceRefreshText+"。保存到 GitHub 后家人可见":"已刷新："+state.settings.lastPriceRefreshText+"。本次价格已缓存在本设备";
+    renderAll();status.textContent=lastMarketRoute==="static"?`代理行情失败，已临时使用静态缓存：${lastMarketError}`:(isAdminMode?"已刷新："+state.settings.lastPriceRefreshText+"。保存到 GitHub 后家人可见":"已刷新："+state.settings.lastPriceRefreshText+"。本次价格已缓存在本设备");
   }catch(error){lastMarketRoute="failed";applyPriceCache();renderAll();status.textContent="代理行情暂时不可用，已保留最近缓存行情："+friendlyFetchError(error);if(!useCache&&isAdminMode)alert(status.textContent)}finally{renderDiagnostics();if(button)button.disabled=false}
 }
 function saveAdminSettings(showAlert=true){admin={owner:$("ghOwner").value.trim(),repo:$("ghRepo").value.trim(),branch:$("ghBranch").value.trim()||"main",token:$("ghToken").value.trim()};sessionStorage.setItem("v9_admin",JSON.stringify(admin));if(showAlert){alert("管理员设置已保存到当前浏览器会话");if(admin.owner&&admin.repo&&admin.token)checkCloudStatus(false)}}
@@ -444,7 +454,7 @@ function saveSettings(){state.settings.title=$("titleInput").value.trim()||defau
 
 function treemapItems(){const arr=state.positions.map(p=>({label:p.symbol,value:num(p.costBasisUSD),color:p.color})).filter(x=>x.value>0),cash=cashBalance();if(cash>0)arr.push({label:"CASH",value:cash,color:"#ffd84d"});return arr.sort((a,b)=>b.value-a.value)}
 function layout(items,x,y,w,h){if(!items.length)return[];if(items.length===1)return[{...items[0],x,y,w,h}];const total=items.reduce((s,i)=>s+i.value,0);let acc=0,split=0;for(let i=0;i<items.length;i++){if(acc<total/2){acc+=items[i].value;split=i+1}}split=Math.max(1,Math.min(items.length-1,split));const a=items.slice(0,split),b=items.slice(split),at=a.reduce((s,i)=>s+i.value,0);if(w>=h){const aw=w*at/total;return[...layout(a,x,y,aw,h),...layout(b,x+aw,y,w-aw,h)]}const ah=h*at/total;return[...layout(a,x,y,w,ah),...layout(b,x,y+ah,w,h-ah)]}
-function renderTreemap(){const box=$("treemap");box.innerHTML="";const rect=box.getBoundingClientRect(),items=treemapItems(),denom=Math.max(contributedCapital()+realizedPnl(),1);layout(items,0,0,rect.width,rect.height).forEach(t=>{const d=document.createElement("div"),area=t.w*t.h,share=round(t.value/denom*100),textColor=t.label==="CASH"?"#07101a":"white";d.className="tile"+(area<13000?" tiny":"")+(area<6200?" micro":"");Object.assign(d.style,{left:t.x+"px",top:t.y+"px",width:t.w+"px",height:t.h+"px",background:`linear-gradient(145deg, ${mixColor(t.color,"#ffffff",.08)}, ${mixColor(t.color,"#000000",.10)})`,borderColor:mixColor(t.color,"#020617",.55),color:textColor});d.title=`${t.label} ${money(t.value)} | ${share}%`;d.innerHTML=area<6200?`<div>${escapeHtml(t.label)}</div>`:`<div>${escapeHtml(t.label)}<small>${money(t.value)} | ${share}%</small></div>`;box.appendChild(d)})}
+function renderTreemap(){const box=$("treemap");box.innerHTML="";const rect=box.getBoundingClientRect(),items=treemapItems(),denom=Math.max(contributedCapital()+realizedPnl(),1);layout(items,0,0,rect.width,rect.height).forEach(t=>{const d=document.createElement("div"),area=t.w*t.h,share=round(t.value/denom*100),textColor=t.label==="CASH"?"#07101a":"white";d.className="tile"+(area<13000?" tiny":"")+(area<6200?" micro":"");Object.assign(d.style,{left:t.x+"px",top:t.y+"px",width:t.w+"px",height:t.h+"px",background:`radial-gradient(circle at 28% 18%, ${mixColor(t.color,"#ffffff",.28)}, transparent 58%), linear-gradient(145deg, ${mixColor(t.color,"#ffffff",.04)}, ${mixColor(t.color,"#000000",.18)})`,borderColor:mixColor(t.color,"#020617",.38),color:textColor});d.title=`${t.label} ${money(t.value)} | ${share}%`;d.innerHTML=area<6200?`<div>${escapeHtml(t.label)}</div>`:`<div>${escapeHtml(t.label)}<small>${money(t.value)} | ${share}%</small></div>`;box.appendChild(d)})}
 function sectorItems(){const map={};state.positions.forEach(p=>{const key=inferSector(p.symbol,p.name,p.sector);if(!map[key])map[key]={label:key,total:0,pnl:0,color:sectorBaseColor(key)};map[key].total+=num(p.costBasisUSD);map[key].pnl+=floatingPnlUSD(p)});const cash=cashBalance();if(cash>0)map["现金"]={label:"现金",total:cash,pnl:0,color:sectorBaseColor("现金")};return Object.values(map).sort((a,b)=>b.total-a.total)}
 function renderSectors(){const bar=$("sectorBar"),legend=$("sectorLegend"),total=Math.max(contributedCapital()+realizedPnl(),1);bar.innerHTML="";legend.innerHTML="";sectorItems().forEach(s=>{const seg=document.createElement("div");seg.className="segment";seg.style.width=Math.max(3,s.total/total*100)+"%";seg.style.background=s.color;seg.textContent=`${s.label} ${round(s.total/total*100)}%`;bar.appendChild(seg);legend.insertAdjacentHTML("beforeend",`<span><i class="dot" style="background:${validColor(s.color)}"></i>${escapeHtml(s.label)} ${money(s.total)} <b class="${cls(s.pnl)}">${money(s.pnl)}</b></span>`)})}
 function renderKpis(){$("kpiCapital").textContent=money(contributedCapital());$("kpiNetAsset").textContent=money(netAsset());$("kpiMarket").textContent=money(marketTotal());$("kpiCash").textContent=money(cashBalance());$("kpiCash").className=cls(cashBalance());if($("kpiRealized")){$("kpiRealized").textContent=money(realizedPnl());$("kpiRealized").className=cls(realizedPnl())}$("kpiFloating").textContent=`${money(floatingPnl())} / ${round(floatingReturn())}%`;$("kpiFloating").className=cls(floatingPnl());$("kpiPnl").textContent=`${money(totalPnl())} / ${round(totalReturn())}%`;$("kpiPnl").className=cls(totalPnl())}function renderHoldingCards(){const box=$("holdingCards");if(!state.positions.length){box.innerHTML='<div class="empty">暂无当前持仓</div>';return}box.innerHTML=state.positions.slice().sort((a,b)=>num(b.costBasisUSD)-num(a.costBasisUSD)).map(p=>`<div class="holding-card"><div class="top"><div><div class="symbol">${escapeHtml(p.symbol)}</div><div class="name">${escapeHtml(p.name)}</div></div><div class="sector-pill">${escapeHtml(p.sector)}</div></div><div class="grid"><div><div class="label">数量</div><div class="value">${round(p.shares,4)}</div></div><div><div class="label">最新价</div><div class="value">${round(p.price,4)} ${escapeHtml(p.currency)}</div></div><div><div class="label">单股成本</div><div class="value">${round(p.avgCost,4)} ${escapeHtml(p.currency)}</div></div><div><div class="label">投入成本</div><div class="value">${money(p.costBasisUSD)}</div></div><div><div class="label">市值</div><div class="value">${money(marketUSD(p))}</div></div><div><div class="label">成本仓位</div><div class="value">${round(p.costBasisUSD/Math.max(contributedCapital()+realizedPnl(),1)*100)}%</div></div><div><div class="label">浮动盈亏</div><div class="value ${cls(floatingPnlUSD(p))}">${money(floatingPnlUSD(p))} / ${round(p.costBasisUSD?floatingPnlUSD(p)/p.costBasisUSD*100:0)}%</div></div></div></div>`).join("")}function captureSnapshot(manual=false){const date=today(),snap={date,capital:round(contributedCapital()),netAsset:round(netAsset()),market:round(marketTotal()),cash:round(cashBalance())},i=state.snapshots.findIndex(x=>x.date===date),before=i>=0?JSON.stringify(state.snapshots[i]):"",changed=before!==JSON.stringify(snap);if(i>=0)state.snapshots[i]=snap;else state.snapshots.push(snap);state.snapshots.sort((a,b)=>a.date.localeCompare(b.date));saveLocal();if(manual){markDirty("今日资产快照已记录");renderChart();alert("今日资产快照已记录，尚未保存到 GitHub")}return changed}
@@ -579,7 +589,7 @@ function submitPositionEdit(event){
   state.transactions.forEach(t=>{if(t.symbol===p.symbol){t.name=p.name;t.sector=p.sector;t.source=p.source;t.color=p.color}});
   markDirty(`${p.symbol} 资产资料与颜色已编辑`);$("positionDialog").close();renderAll()
 }
-function renderSectorsV2(){const bar=$("sectorBar"),legend=$("sectorLegend"),total=Math.max(contributedCapital()+realizedPnl(),1);bar.innerHTML="";legend.innerHTML="";sectorItems().forEach(s=>{const pct=round(s.total/total*100),seg=document.createElement("div");seg.className="segment"+(pct>=14?" major":"");seg.style.width=Math.max(4,pct)+"%";seg.style.background=`linear-gradient(90deg, ${mixColor(s.color,"#ffffff",.08)}, ${mixColor(s.color,"#000000",.08)})`;seg.title=`${s.label} ${pct}%`;seg.textContent=pct>=14?`${s.label} ${pct}%`:"";bar.appendChild(seg);legend.insertAdjacentHTML("beforeend",`<span><i class="dot" style="background:${validColor(s.color)}"></i>${escapeHtml(s.label)} ${money(s.total)} <b class="${cls(s.pnl)}">${money(s.pnl)}</b></span>`)})}
+function renderSectorsV2(){const bar=$("sectorBar"),legend=$("sectorLegend"),total=Math.max(contributedCapital()+realizedPnl(),1);bar.innerHTML="";legend.innerHTML="";sectorItems().forEach(s=>{const pct=round(s.total/total*100),seg=document.createElement("div");seg.className="segment"+(pct>=14?" major":"");seg.style.width=Math.max(4,pct)+"%";seg.style.background=`linear-gradient(90deg, ${mixColor(s.color,"#ffffff",.14)}, ${mixColor(s.color,"#000000",.12)})`;seg.title=`${s.label} ${pct}%`;seg.textContent=pct>=14?`${s.label} ${pct}%`:"";bar.appendChild(seg);legend.insertAdjacentHTML("beforeend",`<span><i class="dot" style="background:${validColor(s.color)}"></i>${escapeHtml(s.label)} ${money(s.total)} <b class="${cls(s.pnl)}">${money(s.pnl)}</b></span>`)})}
 function renderChartV2(){const svg=$("assetChart"),data=state.snapshots.slice(-120);if(data.length<2){svg.classList.add("hidden");$("chartEmpty").classList.remove("hidden");return}svg.classList.remove("hidden");$("chartEmpty").classList.add("hidden");const mobile=svg.clientWidth&&svg.clientWidth<700,W=mobile?430:1200,H=mobile?300:260,pad=mobile?{l:92,r:22,t:28,b:42}:{l:82,r:24,t:24,b:34},values=data.flatMap(x=>[num(x.netAsset),num(x.capital)]),min=Math.min(...values),max=Math.max(...values),range=Math.max(max-min,1),x=i=>pad.l+i*(W-pad.l-pad.r)/Math.max(data.length-1,1),y=v=>pad.t+(max-v)*(H-pad.t-pad.b)/range,path=key=>data.map((d,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(num(d[key])).toFixed(1)).join(" "),area=`${path("netAsset")} L ${x(data.length-1)} ${H-pad.b} L ${x(0)} ${H-pad.b} Z`;let grid="";for(let i=0;i<4;i++){const val=max-range*i/3,yy=y(val);grid+=`<line class="chart-grid" x1="${pad.l}" y1="${yy}" x2="${W-pad.r}" y2="${yy}"/><text class="chart-label" x="${mobile?4:8}" y="${yy+5}">${money(val)}</text>`}svg.setAttribute("viewBox",`0 0 ${W} ${H}`);svg.innerHTML=`<defs><linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4f9a" stop-opacity=".25"/><stop offset="1" stop-color="#ff4f9a" stop-opacity="0"/></linearGradient></defs>${grid}<path class="chart-area" d="${area}"/><path class="chart-capital" d="${path("capital")}"/><path class="chart-asset" d="${path("netAsset")}"/><circle class="chart-dot" cx="${x(data.length-1)}" cy="${y(data.at(-1).netAsset)}" r="${mobile?6:5}"/><text class="chart-line-label" text-anchor="end" x="${W-pad.r}" y="${Math.max(18,y(data.at(-1).netAsset)-10)}">${money(data.at(-1).netAsset)}</text><text class="chart-label" x="${pad.l}" y="${H-8}">${escapeHtml(data[0].date)}</text><text class="chart-label" text-anchor="end" x="${W-pad.r}" y="${H-8}">${escapeHtml(data.at(-1).date)}</text>`}
 function renderHoldingCardsV2(){const box=$("holdingCards");if(!state.positions.length){box.innerHTML='<div class="empty">暂无当前持仓</div>';return}const total=Math.max(contributedCapital()+realizedPnl(),1);box.innerHTML=state.positions.slice().sort((a,b)=>num(b.costBasisUSD)-num(a.costBasisUSD)).map(p=>{const pnl=floatingPnlUSD(p),ret=round(p.costBasisUSD?pnl/p.costBasisUSD*100:0),weight=round(p.costBasisUSD/total*100),change=round(p.changePercent||0);return`<div class="holding-card"><div class="holding-main"><div><div class="symbol">${escapeHtml(p.symbol)}</div><div class="name">${escapeHtml(p.name)||escapeHtml(p.sector)}</div></div><div class="holding-value"><strong>${money(marketUSD(p))}</strong><span class="${cls(pnl)}">${money(pnl)} / ${ret}%</span></div></div><div class="holding-meta"><span>${escapeHtml(p.sector)}</span><span class="${cls(change)}">${change?`${change}%`:"--"}</span></div><div class="holding-progress"><i style="width:${Math.min(100,Math.max(2,weight))}%;background:${validColor(p.color)}"></i></div><div class="grid compact"><div><div class="label">成本仓位</div><div class="value">${weight}%</div></div><div><div class="label">数量</div><div class="value">${round(p.shares,4)}</div></div><div><div class="label">最新价</div><div class="value">${round(p.price,4)} ${escapeHtml(p.currency)}</div></div><div><div class="label">投入成本</div><div class="value">${money(p.costBasisUSD)}</div></div></div></div>`}).join("")}
 function renderAll(){renderKpis();renderTreemap();renderSectorsV2();renderChartV2();renderHoldingCardsV2();renderPositionTable();renderTransactionTable();renderCashFlowTable();renderBackupList();$("positionCount").textContent=state.positions.length;$("transactionCount").textContent=state.transactions.length;$("cashFlowCount").textContent=state.cashFlows.length;$("pageTitle").textContent=state.settings.title;document.title=state.settings.title;$("titleInput").value=state.settings.title;$("cacheInput").value=state.settings.priceCacheMinutes;if($("proxyInput"))$("proxyInput").value=priceProxyUrl();$("apiKeyInput").value=marketKey();renderSyncStatus();renderDiagnostics()}

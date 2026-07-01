@@ -4,7 +4,7 @@
     "priceCacheMinutes": 30,
     "lastPriceRefresh": 1782829198993,
     "lastPriceRefreshText": "2026/6/30 22:19:58",
-    "version": "V10.16 PWA家庭版",
+    "version": "V10.19 PWA家庭版",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
     "lastCloudSaveAt": "2026-06-30T14:20:09.329Z",
@@ -12,7 +12,8 @@
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
-    ]
+    ],
+    "fxMode": "manual"
   },
   "fxRates": {
     "USD": 1,
@@ -139,7 +140,7 @@
     {
       "symbol": "SPCX",
       "name": "Space X",
-      "source": "twelve",
+      "source": "manual",
       "currency": "USD",
       "shares": 10,
       "avgCost": 150,
@@ -149,7 +150,7 @@
       "sellDate": "",
       "sector": "太空",
       "color": "#00eeff",
-      "note": "",
+      "note": "手动价，避免 Twelve 免费额度每分钟超限",
       "changePercent": -0.8465801814970377,
       "sellNote": "",
       "id": "pos_mqnjborg_pzifro",
@@ -296,7 +297,8 @@
       "grossUSD": 588.613179,
       "realizedPnlUSD": 0,
       "note": "V8 迁移：期初持仓",
-      "migration": true
+      "migration": true,
+      "source": "manual"
     },
     {
       "id": "tx_mqnjborg_ymji54",
@@ -485,7 +487,8 @@
       "grossUSD": 1500,
       "realizedPnlUSD": 0,
       "note": "V8 迁移：期初持仓",
-      "migration": true
+      "migration": true,
+      "source": "manual"
     },
     {
       "id": "tx_mqnjborg_uy5123",
@@ -503,7 +506,8 @@
       "grossUSD": 1225,
       "realizedPnlUSD": 175,
       "note": " 部分卖出",
-      "migration": true
+      "migration": true,
+      "source": "manual"
     },
     {
       "id": "tx_mqnjborg_4imxoc",
