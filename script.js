@@ -1,4 +1,4 @@
-const VERSION="V10.26 PWA家庭版";
+const VERSION="V10.28 PWA家庭版";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
 const PRICE_CACHE_KEY="v9_price_cache";
@@ -268,11 +268,7 @@ async function smartRefreshPricesOnLoad(){
     refreshPrices(false);
     return;
   }
-  if(priceCacheValid()){
-    lastMarketRoute="cache";applyPriceCache();renderAll();$("status").textContent=`${marketClockDisplay(clock)}；已使用缓存行情：${state.settings.lastPriceRefreshText||""}`;
-  }else{
-    applyPriceCache();renderAll();$("status").textContent=`${marketClockDisplay(clock)}；休市时段不自动消耗行情额度，可手动刷新。`;
-  }
+  refreshLastClosePrices(clock);
 }
 
 async function checkSharedDataUpdate(force=false){
@@ -325,6 +321,7 @@ function marketRouteLabel(){
   if(lastMarketRoute==="proxy")return provider?`行情：${provider} 代理`:"行情：代理线路";
   if(lastMarketRoute==="fallback")return provider?`行情：${provider} 备用`:"行情：备用线路";
   if(lastMarketRoute==="direct")return"行情：直连线路";
+  if(lastMarketRoute==="last-close")return"行情：上个交易日收盘价";
   if(lastMarketRoute==="cache")return"行情：本机缓存";
   if(lastMarketRoute==="static")return"行情：静态缓存";
   if(lastMarketRoute==="failed")return"行情：刷新失败";
@@ -343,8 +340,7 @@ function autoRefreshPlan(){
   const clock=marketClockState||marketClock();
   if(!navigator.onLine)return"离线：不刷新";
   if(clock.isOpen||clock.phase==="open")return"盘中：自动实时刷新";
-  if(priceCacheValid())return"休市：使用本机缓存";
-  return"休市：等待手动刷新";
+  return"休市：读取上个交易日收盘价";
 }
 function renderMarketAdminPanel(){
   const box=$("marketAdminGrid");if(!box)return;
@@ -523,14 +519,15 @@ async function fetchQuoteBatch(symbols){
   }
   throw lastError;
 }
-async function fetchQuoteBatchResilient(symbols){
+async function fetchQuoteBatchResilient(symbols,mode="live"){
   let lastError=null;
   const proxies=priceProxyUrls();
   if(!proxies.length)throw new Error("Missing Cloudflare Worker price proxy URL");
   for(let attempt=1;attempt<=3;attempt++){
     for(const proxy of proxies){
       try{
-        const meta=await fetchJsonWithHeaders(`${proxy}/quotes?symbols=${encodeURIComponent(symbols.join(","))}`,{timeout:PROXY_TIMEOUT_MS});
+        const modeParam=mode==="last-close"?"&mode=last-close":"";
+        const meta=await fetchJsonWithHeaders(`${proxy}/quotes?symbols=${encodeURIComponent(symbols.join(","))}${modeParam}`,{timeout:PROXY_TIMEOUT_MS});
         const res=meta.data;
         lastQuoteCache=meta.headers.get("X-MYH88-Cache")||"";
         lastQuoteWarnings=meta.headers.get("X-MYH88-Warnings")||"";
@@ -560,6 +557,43 @@ async function refreshPrices(useCache=true){
   if(priceRefreshPromise)return priceRefreshPromise;
   priceRefreshPromise=doRefreshPrices(useCache).finally(()=>{priceRefreshPromise=null});
   return priceRefreshPromise;
+}
+async function refreshPricesSmart(){
+  const status=$("status");
+  const clock=await refreshMarketClock();
+  if(clock?.isOpen||clock?.phase==="open")return refreshPrices(false);
+  return refreshLastClosePrices(clock);
+}
+function refreshPricesForced(){
+  return refreshPrices(false);
+}
+async function refreshLastClosePrices(clock=marketClockState||marketClock()){
+  const status=$("status"),button=$("refreshButton");
+  if(!navigator.onLine||!priceProxyUrl()){
+    lastMarketRoute="cache";applyPriceCache();renderAll();
+    if(status)status.textContent=`${marketClockDisplay(clock)}；离线或未配置代理，显示本机历史价格：${state.settings.lastPriceRefreshText||"暂无记录"}`;
+    return;
+  }
+  if(button)button.disabled=true;
+  try{
+    const items=state.positions.filter(p=>p.source==="twelve"&&p.symbol),symbols=[...new Set(items.map(p=>p.symbol))];
+    if(symbols.length){
+      const res=await fetchQuoteBatchResilient(symbols,"last-close"),providers=new Set();
+      items.forEach(p=>{const q=symbols.length===1?res:res[p.symbol];const provider=String(q?.source||"last-close").toLowerCase();if(provider)providers.add(provider);const price=num(q?.close||q?.price);if(price>0)p.price=price;p.changePercent=num(q?.percent_change)});
+      if(providers.size===1)lastMarketProvider=[...providers][0];else if(providers.size>1)lastMarketProvider="mixed";
+      lastMarketRoute="last-close";
+    }else lastMarketRoute="last-close";
+    state.settings.lastPriceRefresh=Date.now();state.settings.lastPriceRefreshText=new Date().toLocaleString("zh-CN");savePriceCache();
+    if(isAdminMode){captureSnapshot(false);markDirty("休市收盘价与今日快照已更新")}else saveLocal();
+    renderAll();
+    if(status)status.textContent=`${marketClockDisplay(clock)}；已使用上个交易日收盘价`;
+  }catch(error){
+    lastMarketRoute="cache";applyPriceCache();renderAll();
+    if(status)status.textContent=`${marketClockDisplay(clock)}；收盘价读取失败，显示本机历史价格：${friendlyFetchError(error)}`;
+  }finally{
+    renderDiagnostics();
+    if(button)button.disabled=false;
+  }
 }
 async function doRefreshPrices(useCache=true){
   const status=$("status"),button=$("refreshButton"),proxy=priceProxyUrl();

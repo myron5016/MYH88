@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=10.26">
+  <link rel="stylesheet" href="style.css?v=10.28">
 </head>
 <body>
 <main class="container">
@@ -27,7 +27,7 @@
       </div>
     </div>
     <div class="hero-actions">
-      <button class="primary" id="refreshButton" onclick="refreshPrices(false)">刷新实时价格</button>
+      <button class="primary" id="refreshButton" onclick="refreshPricesSmart()">智能刷新行情</button>
       <button id="installAppButton" class="install-button" onclick="installApp()">安装到手机</button>
     </div>
   </header>
@@ -86,7 +86,7 @@
       <div class="buttons">
         <button onclick="refreshWorkerHealth()">检测代理</button>
         <button onclick="refreshMarketClock()">同步美股时钟</button>
-        <button class="primary" onclick="refreshPrices(false)">强制刷新行情</button>
+        <button class="primary" onclick="refreshPricesForced()">强制刷新行情</button>
       </div>
     </div>
     <div id="marketAdminGrid" class="market-admin-grid"></div>
@@ -276,6 +276,6 @@
   </div>
 </dialog>
 
-<script src="script.js?v=10.26"></script>
+<script src="script.js?v=10.28"></script>
 </body>
 </html>
