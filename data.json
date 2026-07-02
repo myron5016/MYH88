@@ -2,13 +2,13 @@
   "settings": {
     "title": "孟一晗的梦想金库",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1782998586568,
-    "lastPriceRefreshText": "2026/7/2 21:23:06",
-    "version": "V10.25 PWA家庭版",
+    "lastPriceRefresh": 1783000949173,
+    "lastPriceRefreshText": "2026/7/2 22:02:29",
+    "version": "V10.26 PWA家庭版",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-02T13:28:57.489Z",
-    "localUpdatedAt": "2026-07-02T13:28:30.711Z",
+    "lastCloudSaveAt": "2026-07-02T14:04:59.150Z",
+    "localUpdatedAt": "2026-07-02T14:02:29.173Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -32,14 +32,14 @@
       "source": "twelve",
       "shares": 14,
       "avgCost": 209.76343307142858,
-      "price": 197.58,
+      "price": 198.435,
       "sector": "AI基建",
       "color": "#15c180",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 2936.688063,
-      "changePercent": -1.25443
+      "changePercent": 0.43273518
     },
     {
       "id": "pos_mqnjborg_zeux56",
@@ -47,16 +47,16 @@
       "name": "迈威尔",
       "currency": "USD",
       "source": "twelve",
-      "shares": 1,
+      "shares": 5,
       "avgCost": 325.04,
-      "price": 272.049988,
+      "price": 272.5,
       "sector": "光通信",
       "color": "#0097a8",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 325.04,
-      "changePercent": -8.67435
+      "costBasisUSD": 1625.2,
+      "changePercent": 0.16541526
     },
     {
       "id": "pos_mqnjborg_p8abix",
@@ -66,14 +66,14 @@
       "source": "twelve",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 139,
+      "price": 137.42,
       "sector": "光通信",
       "color": "#00bcd1",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 820.34,
-      "changePercent": -6.18251
+      "changePercent": -1.13669
     },
     {
       "id": "pos_mqnjborg_q3swfw",
@@ -98,16 +98,16 @@
       "name": "火箭实验室",
       "currency": "USD",
       "source": "twelve",
-      "shares": 20,
+      "shares": 30,
       "avgCost": 111.4,
-      "price": 100.07,
+      "price": 106.19,
       "sector": "太空",
       "color": "#f73d69",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 2228,
-      "changePercent": -1.55435
+      "costBasisUSD": 3342,
+      "changePercent": 6.11572
     },
     {
       "id": "pos_mqnjborg_n3b8py",
@@ -115,16 +115,16 @@
       "name": "维谛技术",
       "currency": "USD",
       "source": "twelve",
-      "shares": 1.0007,
-      "avgCost": 310.0717487758569,
-      "price": 311.42001,
+      "shares": 3.0007,
+      "avgCost": 310.070583197254,
+      "price": 311.87,
       "sector": "AI基建",
       "color": "#5cd8a9",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 310.288799,
-      "changePercent": -6.98883
+      "costBasisUSD": 930.428799,
+      "changePercent": 0.14449507
     },
     {
       "id": "pos_mqnjborg_pzifro",
@@ -132,16 +132,16 @@
       "name": "Space X",
       "currency": "USD",
       "source": "twelve",
-      "shares": 3,
+      "shares": 10,
       "avgCost": 150,
-      "price": 157.53999,
+      "price": 160.56,
       "sector": "太空",
       "color": "#ff7998",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 450,
-      "changePercent": -7.79586
+      "costBasisUSD": 1500,
+      "changePercent": 1.91698
     },
     {
       "id": "pos_mqpb20pj_q02ooh",
@@ -151,14 +151,14 @@
       "source": "twelve",
       "shares": 2,
       "avgCost": 346.34993,
-      "price": 361.20999,
+      "price": 362.905,
       "sector": "科技平台",
       "color": "#8759ef",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 692.69986,
-      "changePercent": 1.074516
+      "changePercent": 0.46925849
     },
     {
       "id": "pos_mqv9tzrw_6n81s8",
@@ -168,14 +168,14 @@
       "source": "twelve",
       "shares": 1,
       "avgCost": 810.175,
-      "price": 801.15997,
+      "price": 797.54,
       "sector": "光通信",
       "color": "#4dd4e3",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 810.175,
-      "changePercent": -6.63124
+      "changePercent": -0.45184149
     },
     {
       "id": "pos_mqz9i9o7_8b8hhc",
@@ -185,14 +185,14 @@
       "source": "twelve",
       "shares": 2,
       "avgCost": 1095.35,
-      "price": 1032.28,
+      "price": 1054.49,
       "sector": "AI存储",
       "color": "#2e7ce6",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 2190.7,
-      "changePercent": -10.570134021779621
+      "changePercent": 2.1515480296043745
     }
   ],
   "transactions": [
@@ -216,7 +216,7 @@
       "sector": "AI基建",
       "source": "twelve",
       "color": "#51ac0c",
-      "schemaVersion": "10.5"
+      "schemaVersion": "10.6"
     },
     {
       "id": "tx_mqnjborg_yfihv6",
@@ -238,7 +238,7 @@
       "sector": "光通信",
       "color": "#0097a8",
       "source": "twelve",
-      "schemaVersion": "10.5"
+      "schemaVersion": "10.6"
     },
     {
       "id": "tx_mqnjborg_9zvalh",
@@ -260,7 +260,7 @@
       "sector": "光通信",
       "color": "#00bcd1",
       "source": "twelve",
-      "schemaVersion": "10.5"
+      "schemaVersion": "10.6"
     },
     {
       "id": "tx_mqnjborg_l6didq",
@@ -282,7 +282,7 @@
       "sector": "光通信",
       "source": "twelve",
       "color": "#b9d00b",
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "closedHistory": true
     },
     {
@@ -305,7 +305,7 @@
       "source": "manual",
       "sector": "半导体",
       "color": "#f7863b",
-      "schemaVersion": "10.5"
+      "schemaVersion": "10.6"
     },
     {
       "id": "tx_mqnjborg_ymji54",
@@ -327,7 +327,7 @@
       "sector": "未分类",
       "color": "#8b5cf6",
       "source": "twelve",
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "closedHistory": true
     },
     {
@@ -350,7 +350,7 @@
       "sector": "太空",
       "source": "twelve",
       "color": "#c01b34",
-      "schemaVersion": "10.5"
+      "schemaVersion": "10.6"
     },
     {
       "id": "tx_mqnjborg_ju1ddv",
@@ -372,7 +372,7 @@
       "sector": "AI基建",
       "color": "#5cd8a9",
       "source": "twelve",
-      "schemaVersion": "10.5"
+      "schemaVersion": "10.6"
     },
     {
       "id": "tx_mqnjborg_382ae8",
@@ -394,7 +394,7 @@
       "sector": "未分类",
       "color": "#8b5cf6",
       "source": "twelve",
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "closedHistory": true
     },
     {
@@ -417,7 +417,7 @@
       "sector": "未分类",
       "color": "#8b5cf6",
       "source": "twelve",
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "closedHistory": true
     },
     {
@@ -440,7 +440,7 @@
       "sector": "未分类",
       "color": "#8b5cf6",
       "source": "twelve",
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "closedHistory": true
     },
     {
@@ -463,7 +463,7 @@
       "sector": "AI基建",
       "source": "twelve",
       "color": "#0062ff",
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "closedHistory": true
     },
     {
@@ -486,7 +486,7 @@
       "sector": "未分类",
       "color": "#8b5cf6",
       "source": "twelve",
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "closedHistory": true
     },
     {
@@ -509,7 +509,8 @@
       "sector": "太空",
       "source": "twelve",
       "color": "#c01b34",
-      "schemaVersion": "10.5"
+      "schemaVersion": "10.6",
+      "closedHistory": true
     },
     {
       "id": "tx_mqnjborg_1jspyf",
@@ -531,7 +532,7 @@
       "source": "twelve",
       "sector": "太空",
       "color": "#ff7998",
-      "schemaVersion": "10.5"
+      "schemaVersion": "10.6"
     },
     {
       "id": "tx_mqnjborg_uy5123",
@@ -553,7 +554,8 @@
       "source": "twelve",
       "sector": "太空",
       "color": "#ff7998",
-      "schemaVersion": "10.5"
+      "schemaVersion": "10.6",
+      "closedHistory": true
     },
     {
       "id": "tx_mqnjborg_4imxoc",
@@ -575,7 +577,8 @@
       "sector": "光通信",
       "color": "#0097a8",
       "source": "twelve",
-      "schemaVersion": "10.5"
+      "schemaVersion": "10.6",
+      "closedHistory": true
     },
     {
       "id": "tx_mqnjborg_r93q0b",
@@ -597,7 +600,8 @@
       "sector": "AI基建",
       "color": "#5cd8a9",
       "source": "twelve",
-      "schemaVersion": "10.5"
+      "schemaVersion": "10.6",
+      "closedHistory": true
     },
     {
       "id": "tx_mqpb20pj_4jkp7j",
@@ -616,7 +620,7 @@
       "realizedPnlUSD": 0,
       "note": "",
       "positionBefore": null,
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "sector": "科技平台",
       "color": "#8759ef",
       "source": "twelve"
@@ -638,7 +642,7 @@
       "realizedPnlUSD": 0,
       "note": "",
       "positionBefore": null,
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "sector": "未分类",
       "color": "#8b5cf6",
       "source": "twelve"
@@ -674,7 +678,7 @@
         "costBasisUSD": 3030.34,
         "changePercent": 11.59917
       },
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "sector": "未分类",
       "color": "#8b5cf6",
       "source": "twelve"
@@ -710,7 +714,7 @@
         "costBasisUSD": 2121.2380000000003,
         "changePercent": -1.10844
       },
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "sector": "未分类",
       "color": "#8b5cf6",
       "source": "twelve"
@@ -746,7 +750,7 @@
         "costBasisUSD": 350.35,
         "changePercent": -0.24268232
       },
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "sector": "科技平台",
       "color": "#8759ef",
       "source": "twelve"
@@ -786,7 +790,7 @@
         "id": "pos_mqnjborg_4xhe58",
         "costBasisUSD": 2152
       },
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "sector": "AI基建",
       "source": "twelve",
       "color": "#51ac0c"
@@ -808,7 +812,7 @@
       "realizedPnlUSD": 0,
       "note": "",
       "positionBefore": null,
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "sector": "光通信",
       "source": "twelve",
       "color": "#b9d00b"
@@ -848,7 +852,7 @@
         "id": "pos_mqnjborg_n3b8py",
         "costBasisUSD": 930.21
       },
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "sector": "AI基建",
       "color": "#5cd8a9",
       "source": "twelve"
@@ -870,7 +874,7 @@
       "realizedPnlUSD": 0,
       "note": "",
       "positionBefore": null,
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "sector": "AI基建",
       "source": "twelve",
       "color": "#0062ff"
@@ -910,7 +914,7 @@
         "id": "pos_mqnjborg_4xhe58",
         "costBasisUSD": 2554.348063
       },
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "sector": "AI基建",
       "source": "twelve",
       "color": "#51ac0c"
@@ -946,7 +950,7 @@
         "costBasisUSD": 1620.35,
         "changePercent": -5.21944
       },
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "sector": "光通信",
       "source": "twelve",
       "color": "#b9d00b"
@@ -966,7 +970,7 @@
       "source": "twelve",
       "sector": "AI存储",
       "color": "#2e7ce6",
-      "schemaVersion": "10.5",
+      "schemaVersion": "10.6",
       "feeUSD": 0.35,
       "costBasisUSD": 1080.35,
       "grossUSD": 1080,
@@ -1036,9 +1040,9 @@
     {
       "date": "2026-07-02",
       "capital": 15000,
-      "netAsset": 14475.81,
-      "market": 10443.58,
-      "cash": 4032.24
+      "netAsset": 14379.86,
+      "market": 14431.92,
+      "cash": -52.06
     }
   ]
 }
