@@ -1,4 +1,4 @@
-const VERSION="V10.25 PWA家庭版";
+const VERSION="V10.26 PWA家庭版";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
 const PRICE_CACHE_KEY="v9_price_cache";
@@ -227,6 +227,10 @@ function normalizeState(raw){
   state.cashFlows=Array.isArray(state.cashFlows)?state.cashFlows:[];
   state.snapshots=Array.isArray(state.snapshots)?state.snapshots:[];
   if(!state.cashFlows.length){const legacy=num(state.settings.totalAsset)||15000;state.cashFlows=[{id:uid("cash"),date:today(),type:"deposit",amountUSD:legacy,note:"迁移本金",migration:true}]}
+  if(state.transactions.length){
+    try{rebuildCurrentPositionsFromTransactions(state.transactions)}
+    catch(error){console.warn("Position rebuild skipped during normalizeState",error)}
+  }
   delete state.data;delete state.settings.totalAsset;
 }
 
@@ -660,39 +664,74 @@ function transactionMetaMap(transactions=state.transactions){
   transactions.forEach(t=>{const symbol=String(t.symbol||"").toUpperCase();if(!symbol)return;const sector=inferSector(symbol,t.name,t.sector||map[symbol]?.sector);map[symbol]={...(map[symbol]||{}),name:t.name||map[symbol]?.name||"",sector,color:validColor(t.color||map[symbol]?.color||sectorBaseColor(sector)),source:t.source==="manual"?"manual":map[symbol]?.source||"twelve",currency:String(t.currency||map[symbol]?.currency||"USD").toUpperCase()}});
   return map;
 }
+function transactionDateValue(t){return String(t?.date||"0000-00-00")}
+function openingBaselineDates(transactions){
+  const map={};
+  (transactions||[]).forEach(t=>{
+    if(t?.voided||t?.type!=="opening")return;
+    const symbol=String(t.symbol||"").trim().toUpperCase();
+    if(!symbol)return;
+    const date=transactionDateValue(t);
+    if(!map[symbol]||date<map[symbol])map[symbol]=date;
+  });
+  return map;
+}
+function transactionAffectsCurrentPosition(t,baselineDates){
+  if(t?.type==="opening")return true;
+  const symbol=String(t?.symbol||"").trim().toUpperCase();
+  const baseline=baselineDates[symbol];
+  return !baseline||transactionDateValue(t)>=baseline;
+}
+function orderedTransactionsForRebuild(transactions){
+  return (transactions||[]).map((t,index)=>({...t,_order:index})).sort((a,b)=>{
+    const ao=a.type==="opening"?0:1,bo=b.type==="opening"?0:1;
+    if(ao!==bo)return ao-bo;
+    const ad=transactionDateValue(a),bd=transactionDateValue(b);
+    if(ad!==bd)return ad.localeCompare(bd);
+    return a._order-b._order;
+  });
+}
 function rebuildCurrentPositionsFromTransactions(transactions=state.transactions){
-  const meta=transactionMetaMap(transactions),positions=[],bySymbol={};
-  state.transactions=transactions.map((original,index)=>{
-    const t={...original,_order:index};
-    if(t.voided)return t;
+  const meta=transactionMetaMap(transactions),positions=[],bySymbol={},baselineDates=openingBaselineDates(transactions),rebuiltByOrder={};
+  orderedTransactionsForRebuild(transactions).forEach(original=>{
+    const index=original._order,t={...original};
+    if(t.voided){rebuiltByOrder[index]=t;return}
     const type=t.type==="sell"?"sell":"buy",symbol=String(t.symbol||"").trim().toUpperCase(),shares=num(t.shares),price=num(t.price),currency=String(t.currency||meta[symbol]?.currency||"USD").toUpperCase(),rate=num(t.fxRate)||fx(currency),fee=num(t.fee);
-    if(!symbol||shares<=0||price<0||rate<=0||fee<0)throw new Error(`第 ${index+1} 条交易数据不完整`);
+    if(!symbol||shares<=0||price<0||rate<=0||fee<0)throw new Error("Transaction #"+(index+1)+" is incomplete");
     const m=meta[symbol]||{},nativeValue=shares*price,feeUSD=fee*rate;
+    if(!transactionAffectsCurrentPosition(t,baselineDates)){
+      const grossUSD=nativeValue*rate,keptBasis=num(t.costBasisUSD),keptRealized=Number.isFinite(Number(t.realizedPnlUSD))?num(t.realizedPnlUSD):(type==="sell"?grossUSD-feeUSD-keptBasis:0);
+      rebuiltByOrder[index]={...t,type:original.type==="sell"?"sell":"buy",symbol,name:t.name||m.name||symbol,shares,price,currency,fxRate:rate,fee,feeUSD,costBasisUSD:keptBasis,grossUSD,realizedPnlUSD:keptRealized,sector:t.sector||m.sector,color:validColor(t.color||m.color),source:t.source||m.source||"twelve",schemaVersion:"10.6",closedHistory:true};
+      return;
+    }
     if(type==="buy"){
       let p=bySymbol[symbol];
       const nativeCost=nativeValue+fee,usdCost=nativeCost*rate;
       if(!p){
-        p=normalizePosition({id:m.id||uid("pos"),symbol,name:t.name||m.name||symbol,currency,source:t.source||m.source||"twelve",shares:0,avgCost:0,price:m.price||price,sector:t.sector||m.sector||"未分类",color:validColor(t.color||m.color),sectorLocked:m.sectorLocked,colorLocked:m.colorLocked,note:m.note||"",costBasisUSD:0,changePercent:m.changePercent||0});
+        p=normalizePosition({id:m.id||uid("pos"),symbol,name:t.name||m.name||symbol,currency,source:t.source||m.source||"twelve",shares:0,avgCost:0,price:m.price||price,sector:t.sector||m.sector||"???",color:validColor(t.color||m.color),sectorLocked:m.sectorLocked,colorLocked:m.colorLocked,note:m.note||"",costBasisUSD:0,changePercent:m.changePercent||0});
         bySymbol[symbol]=p;positions.push(p);
       }
-      if(p.currency!==currency)throw new Error(`${symbol} 存在不同币种交易，无法自动重算`);
+      if(p.currency!==currency)throw new Error(symbol+" has mixed-currency trades and cannot be rebuilt automatically");
       const oldNative=p.avgCost*p.shares;
       p.avgCost=(oldNative+nativeCost)/(p.shares+shares);
       p.shares=round(p.shares+shares,8);
       p.costBasisUSD=round(num(p.costBasisUSD)+usdCost,6);
       p.name=t.name||p.name;p.sector=t.sector||p.sector;p.color=validColor(t.color||p.color);p.source=t.source||p.source;p.price=num(m.price)||p.price||price;
-      return {...t,type:original.type==="opening"?"opening":"buy",symbol,name:p.name,shares,price,currency,fxRate:rate,fee,feeUSD,costBasisUSD:usdCost,grossUSD:nativeValue*rate,realizedPnlUSD:0,sector:p.sector,color:p.color,source:p.source,schemaVersion:"10.5"};
+      rebuiltByOrder[index]={...t,type:original.type==="opening"?"opening":"buy",symbol,name:p.name,shares,price,currency,fxRate:rate,fee,feeUSD,costBasisUSD:usdCost,grossUSD:nativeValue*rate,realizedPnlUSD:0,sector:p.sector,color:p.color,source:p.source,schemaVersion:"10.6"};
+      return;
     }
     const p=bySymbol[symbol];
-    if(!p)return {...t,type:"sell",symbol,name:t.name||m.name||symbol,shares,price,currency,fxRate:rate,fee,feeUSD,costBasisUSD:num(t.costBasisUSD),grossUSD:nativeValue*rate,realizedPnlUSD:Number.isFinite(Number(t.realizedPnlUSD))?num(t.realizedPnlUSD):nativeValue*rate-feeUSD-num(t.costBasisUSD),sector:t.sector||m.sector,color:validColor(t.color||m.color),source:t.source||m.source||"twelve",schemaVersion:"10.5",closedHistory:true};
-    if(p.shares+1e-9<shares)throw new Error(`${symbol} 卖出数量超过此前持仓，请先检查这笔交易前的买入记录`);
+    if(!p){rebuiltByOrder[index]={...t,type:"sell",symbol,name:t.name||m.name||symbol,shares,price,currency,fxRate:rate,fee,feeUSD,costBasisUSD:num(t.costBasisUSD),grossUSD:nativeValue*rate,realizedPnlUSD:Number.isFinite(Number(t.realizedPnlUSD))?num(t.realizedPnlUSD):nativeValue*rate-feeUSD-num(t.costBasisUSD),sector:t.sector||m.sector,color:validColor(t.color||m.color),source:t.source||m.source||"twelve",schemaVersion:"10.6",closedHistory:true};return}
+    if(p.shares+1e-9<shares)throw new Error(symbol+" sell quantity exceeds the current rebuilt holding");
     const basis=p.costBasisUSD/p.shares*shares,grossUSD=nativeValue*rate,realized=grossUSD-feeUSD-basis;
     p.shares=round(p.shares-shares,8);p.costBasisUSD=round(Math.max(0,p.costBasisUSD-basis),6);p.price=num(m.price)||price;
     if(p.shares<=1e-8){delete bySymbol[symbol];const idx=positions.findIndex(x=>x.symbol===symbol);if(idx>=0)positions.splice(idx,1)}
-    return {...t,type:"sell",symbol,name:t.name||m.name||symbol,shares,price,currency,fxRate:rate,fee,feeUSD,costBasisUSD:basis,grossUSD,realizedPnlUSD:realized,sector:t.sector||m.sector,color:validColor(t.color||m.color),source:t.source||m.source||"twelve",schemaVersion:"10.5"};
-  }).map(({_order,...t})=>t);
+    rebuiltByOrder[index]={...t,type:"sell",symbol,name:t.name||m.name||symbol,shares,price,currency,fxRate:rate,fee,feeUSD,costBasisUSD:basis,grossUSD,realizedPnlUSD:realized,sector:t.sector||m.sector,color:validColor(t.color||m.color),source:t.source||m.source||"twelve",schemaVersion:"10.6"};
+  });
+  state.transactions=transactions.map((_,index)=>rebuiltByOrder[index]||transactions[index]).map(({_order,...t})=>t);
   state.positions=positions.map(normalizePosition).filter(p=>p.symbol&&p.shares>0);applyAutoTaxonomy(true);
 }
+
 function tradeFormDraft(existing={}){
   const type=$("tradeType").value,symbol=$("tradeSymbol").value.trim().toUpperCase(),date=$("tradeDate").value,shares=num($("tradeShares").value),price=num($("tradePrice").value),currency=$("tradeCurrency").value,rate=num($("tradeFx").value),fee=num($("tradeFee").value),note=$("tradeNote").value.trim();
   if(!symbol||!date||shares<=0||price<0||rate<=0||fee<0)throw new Error("请检查交易信息");
