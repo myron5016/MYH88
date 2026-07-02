@@ -13,7 +13,7 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=10.23">
+  <link rel="stylesheet" href="style.css?v=10.25">
 </head>
 <body>
 <main class="container">
@@ -75,6 +75,36 @@
     <label>行情代理地址<input id="proxyInput" autocomplete="off" placeholder="https://myh88-price-proxy.xxx.workers.dev"></label>
     <label>Twelve Data Key<input id="apiKeyInput" type="password" autocomplete="off" placeholder="保存到 GitHub 后家人共用"></label>
     <button onclick="saveSettings()">应用设置</button>
+  </section>
+
+  <section id="marketAdminPanel" class="card admin-only hidden market-admin-panel">
+    <div class="section-head">
+      <div>
+        <h2>行情状态面板</h2>
+        <p class="section-note">TWE/FIN 分流、休市时钟、手动汇率和缓存状态</p>
+      </div>
+      <div class="buttons">
+        <button onclick="refreshWorkerHealth()">检测代理</button>
+        <button onclick="refreshMarketClock()">同步美股时钟</button>
+        <button class="primary" onclick="refreshPrices(false)">强制刷新行情</button>
+      </div>
+    </div>
+    <div id="marketAdminGrid" class="market-admin-grid"></div>
+  </section>
+
+  <section id="sectorAdminPanel" class="card admin-only hidden sector-admin-panel">
+    <div class="section-head">
+      <div>
+        <h2>板块分类与颜色</h2>
+        <p class="section-note">自动分类、同义板块合并、同板块色阶和手动锁定</p>
+      </div>
+      <div class="buttons">
+        <button onclick="applySectorRules('merge')">合并同义板块</button>
+        <button onclick="applySectorRules('colors')">只重配颜色</button>
+        <button class="primary" onclick="applySectorRules('all')">重新分类配色</button>
+      </div>
+    </div>
+    <div id="sectorRuleGrid" class="sector-rule-grid"></div>
   </section>
 
   <section class="kpis">
@@ -206,9 +236,11 @@
     <div class="form-grid one-col">
       <label>资产名称<input id="positionEditName"></label>
       <label>板块<input id="positionEditSector"></label>
+      <label class="check-row"><input id="positionEditSectorLocked" type="checkbox">锁定板块，不被自动分类覆盖</label>
       <label>数据源<select id="positionEditSource"><option value="twelve">Twelve</option><option value="manual">Manual</option></select></label>
       <label id="positionEditPriceLabel">手动最新价<input id="positionEditPrice" type="number" min="0" step="any"></label>
       <label>看板颜色<input id="positionEditColor" type="color" value="#38bdf8"></label>
+      <label class="check-row"><input id="positionEditColorLocked" type="checkbox">锁定颜色，不被自动配色覆盖</label>
       <div class="color-swatches" aria-label="常用颜色">
         <button type="button" style="--swatch:#64d20f" onclick="setPositionEditColor('#64d20f')" title="绿色"></button>
         <button type="button" style="--swatch:#1f82c4" onclick="setPositionEditColor('#1f82c4')" title="蓝色"></button>
@@ -244,6 +276,6 @@
   </div>
 </dialog>
 
-<script src="script.js?v=10.22"></script>
+<script src="script.js?v=10.25"></script>
 </body>
 </html>
