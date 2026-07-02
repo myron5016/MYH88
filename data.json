@@ -2,173 +2,146 @@
   "settings": {
     "title": "孟一晗的梦想金库",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1782829198993,
-    "lastPriceRefreshText": "2026/6/30 22:19:58",
+    "lastPriceRefresh": 1782998586568,
+    "lastPriceRefreshText": "2026/7/2 21:23:06",
     "version": "V10.25 PWA家庭版",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-06-30T14:20:09.329Z",
-    "localUpdatedAt": "2026-06-30T14:19:58.994Z",
+    "lastCloudSaveAt": "2026-07-02T13:28:57.489Z",
+    "localUpdatedAt": "2026-07-02T13:28:30.711Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
     ],
-    "fxMode": "manual"
+    "fxMode": "manual",
+    "taxonomyVersion": "sector-color-v6"
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.14237,
+    "EUR": 1.14143,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
   },
   "positions": [
     {
+      "id": "pos_mqnjborg_4xhe58",
       "symbol": "NVDA",
       "name": "英伟达",
-      "source": "twelve",
       "currency": "USD",
+      "source": "twelve",
       "shares": 14,
       "avgCost": 209.76343307142858,
-      "price": 196.95,
+      "price": 197.58,
       "sector": "AI基建",
-      "color": "#51ac0c",
-      "note": "",
-      "status": "holding",
-      "sellPrice": "",
-      "sellDate": "",
-      "sellNote": "",
-      "changePercent": 1.0155408524388316,
-      "id": "pos_mqnjborg_4xhe58",
-      "costBasisUSD": 2936.688063,
+      "color": "#15c180",
       "sectorLocked": false,
-      "colorLocked": false
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 2936.688063,
+      "changePercent": -1.25443
     },
     {
+      "id": "pos_mqnjborg_zeux56",
       "symbol": "MRVL",
       "name": "迈威尔",
-      "source": "twelve",
       "currency": "USD",
-      "shares": 5,
+      "source": "twelve",
+      "shares": 1,
       "avgCost": 325.04,
-      "price": 282.83,
-      "sector": "AI基建",
-      "color": "#7e9023",
-      "note": "",
-      "status": "holding",
-      "sellPrice": "",
-      "sellDate": "",
-      "sellNote": "",
-      "changePercent": 1.8289828982898233,
-      "id": "pos_mqnjborg_zeux56",
-      "costBasisUSD": 1625.2,
+      "price": 272.049988,
+      "sector": "光通信",
+      "color": "#0097a8",
       "sectorLocked": false,
-      "colorLocked": false
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 325.04,
+      "changePercent": -8.67435
     },
     {
+      "id": "pos_mqnjborg_p8abix",
       "symbol": "AAOI",
       "name": "应用光电",
-      "source": "twelve",
       "currency": "USD",
+      "source": "twelve",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 148.13,
-      "sector": "光通讯",
-      "color": "#ff6600",
-      "note": "",
-      "status": "holding",
-      "sellPrice": "",
-      "sellDate": "",
-      "sellNote": "",
-      "changePercent": -1.3124583610926044,
-      "id": "pos_mqnjborg_p8abix",
-      "costBasisUSD": 820.34,
+      "price": 139,
+      "sector": "光通信",
+      "color": "#00bcd1",
       "sectorLocked": false,
-      "colorLocked": false
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 820.34,
+      "changePercent": -6.18251
     },
     {
+      "id": "pos_mqnjborg_q3swfw",
       "symbol": "XFAB",
       "name": "芯片代工",
-      "source": "manual",
       "currency": "EUR",
+      "source": "manual",
       "shares": 44,
       "avgCost": 11.685,
-      "price": 9.47,
-      "sector": "光通讯",
-      "color": "#8e3bce",
-      "note": "手动价，EUR",
-      "status": "holding",
-      "sellPrice": "",
-      "sellDate": "",
-      "sellNote": "",
-      "id": "pos_mqnjborg_q3swfw",
-      "costBasisUSD": 588.613179,
-      "changePercent": 0,
+      "price": 7.61,
+      "sector": "半导体",
+      "color": "#f7863b",
       "sectorLocked": false,
-      "colorLocked": false
+      "colorLocked": false,
+      "note": "手动价，EUR",
+      "costBasisUSD": 588.613179,
+      "changePercent": 0
     },
     {
+      "id": "pos_mqnjborg_0c6vpc",
       "symbol": "RKLB",
       "name": "火箭实验室",
-      "source": "twelve",
       "currency": "USD",
-      "shares": 30,
+      "source": "twelve",
+      "shares": 20,
       "avgCost": 111.4,
-      "price": 100.69,
+      "price": 100.07,
       "sector": "太空",
-      "color": "#c01b34",
-      "note": "",
-      "status": "holding",
-      "sellPrice": "",
-      "sellDate": "",
-      "sellNote": "",
-      "changePercent": 2.7344148556269694,
-      "id": "pos_mqnjborg_0c6vpc",
-      "costBasisUSD": 3342,
+      "color": "#f73d69",
       "sectorLocked": false,
-      "colorLocked": false
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 2228,
+      "changePercent": -1.55435
     },
     {
+      "id": "pos_mqnjborg_n3b8py",
       "symbol": "VRT",
       "name": "维谛技术",
-      "source": "twelve",
       "currency": "USD",
-      "shares": 3.0007,
-      "avgCost": 310.070583197254,
-      "price": 316.16,
+      "source": "twelve",
+      "shares": 1.0007,
+      "avgCost": 310.0717487758569,
+      "price": 311.42001,
       "sector": "AI基建",
-      "color": "#ff4f9a",
-      "note": "",
-      "status": "holding",
-      "sellPrice": "",
-      "sellDate": "",
-      "sellNote": "",
-      "changePercent": 2.9937778936052375,
-      "id": "pos_mqnjborg_n3b8py",
-      "costBasisUSD": 930.428799,
+      "color": "#5cd8a9",
       "sectorLocked": false,
-      "colorLocked": false
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 310.288799,
+      "changePercent": -6.98883
     },
     {
+      "id": "pos_mqnjborg_pzifro",
       "symbol": "SPCX",
       "name": "Space X",
-      "source": "twelve",
       "currency": "USD",
-      "shares": 10,
+      "source": "twelve",
+      "shares": 3,
       "avgCost": 150,
-      "price": 162.8,
-      "status": "holding",
-      "sellPrice": "",
-      "sellDate": "",
+      "price": 157.53999,
       "sector": "太空",
-      "color": "#00eeff",
-      "note": "",
-      "changePercent": -0.8465801814970377,
-      "sellNote": "",
-      "id": "pos_mqnjborg_pzifro",
-      "costBasisUSD": 1500,
+      "color": "#ff7998",
       "sectorLocked": false,
-      "colorLocked": false
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 450,
+      "changePercent": -7.79586
     },
     {
       "id": "pos_mqpb20pj_q02ooh",
@@ -178,14 +151,14 @@
       "source": "twelve",
       "shares": 2,
       "avgCost": 346.34993,
-      "price": 351.88,
-      "sector": "科技",
-      "color": "#dd4646",
+      "price": 361.20999,
+      "sector": "科技平台",
+      "color": "#8759ef",
+      "sectorLocked": false,
+      "colorLocked": false,
       "note": "",
       "costBasisUSD": 692.69986,
-      "changePercent": -0.5004948395306043,
-      "sectorLocked": false,
-      "colorLocked": false
+      "changePercent": 1.074516
     },
     {
       "id": "pos_mqv9tzrw_6n81s8",
@@ -195,14 +168,14 @@
       "source": "twelve",
       "shares": 1,
       "avgCost": 810.175,
-      "price": 843.77,
+      "price": 801.15997,
       "sector": "光通信",
-      "color": "#b9d00b",
+      "color": "#4dd4e3",
+      "sectorLocked": false,
+      "colorLocked": false,
       "note": "",
       "costBasisUSD": 810.175,
-      "changePercent": -0.8961710124500817,
-      "sectorLocked": false,
-      "colorLocked": false
+      "changePercent": -6.63124
     },
     {
       "id": "pos_mqz9i9o7_8b8hhc",
@@ -210,16 +183,16 @@
       "name": "美光",
       "currency": "USD",
       "source": "twelve",
-      "shares": 1,
-      "avgCost": 1110.35,
-      "price": 1137.66,
-      "sector": "AI基建",
-      "color": "#0062ff",
-      "note": "",
-      "costBasisUSD": 1110.35,
-      "changePercent": -0.6653394803017507,
+      "shares": 2,
+      "avgCost": 1095.35,
+      "price": 1032.28,
+      "sector": "AI存储",
+      "color": "#2e7ce6",
       "sectorLocked": false,
-      "colorLocked": false
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 2190.7,
+      "changePercent": -10.570134021779621
     }
   ],
   "transactions": [
@@ -242,7 +215,8 @@
       "migration": true,
       "sector": "AI基建",
       "source": "twelve",
-      "color": "#51ac0c"
+      "color": "#51ac0c",
+      "schemaVersion": "10.5"
     },
     {
       "id": "tx_mqnjborg_yfihv6",
@@ -260,7 +234,11 @@
       "grossUSD": 1625.2,
       "realizedPnlUSD": 0,
       "note": "V8 迁移：期初持仓",
-      "migration": true
+      "migration": true,
+      "sector": "光通信",
+      "color": "#0097a8",
+      "source": "twelve",
+      "schemaVersion": "10.5"
     },
     {
       "id": "tx_mqnjborg_9zvalh",
@@ -278,7 +256,11 @@
       "grossUSD": 820.34,
       "realizedPnlUSD": 0,
       "note": "V8 迁移：期初持仓",
-      "migration": true
+      "migration": true,
+      "sector": "光通信",
+      "color": "#00bcd1",
+      "source": "twelve",
+      "schemaVersion": "10.5"
     },
     {
       "id": "tx_mqnjborg_l6didq",
@@ -299,7 +281,9 @@
       "migration": true,
       "sector": "光通信",
       "source": "twelve",
-      "color": "#b9d00b"
+      "color": "#b9d00b",
+      "schemaVersion": "10.5",
+      "closedHistory": true
     },
     {
       "id": "tx_mqnjborg_dndtbg",
@@ -318,7 +302,10 @@
       "realizedPnlUSD": 0,
       "note": "V8 迁移：期初持仓",
       "migration": true,
-      "source": "manual"
+      "source": "manual",
+      "sector": "半导体",
+      "color": "#f7863b",
+      "schemaVersion": "10.5"
     },
     {
       "id": "tx_mqnjborg_ymji54",
@@ -336,7 +323,12 @@
       "grossUSD": 1125,
       "realizedPnlUSD": 82.5,
       "note": "V8 已结算记录",
-      "migration": true
+      "migration": true,
+      "sector": "未分类",
+      "color": "#8b5cf6",
+      "source": "twelve",
+      "schemaVersion": "10.5",
+      "closedHistory": true
     },
     {
       "id": "tx_mqnjborg_b6vxv2",
@@ -357,7 +349,8 @@
       "migration": true,
       "sector": "太空",
       "source": "twelve",
-      "color": "#c01b34"
+      "color": "#c01b34",
+      "schemaVersion": "10.5"
     },
     {
       "id": "tx_mqnjborg_ju1ddv",
@@ -375,7 +368,11 @@
       "grossUSD": 930.21,
       "realizedPnlUSD": 0,
       "note": "V8 迁移：期初持仓",
-      "migration": true
+      "migration": true,
+      "sector": "AI基建",
+      "color": "#5cd8a9",
+      "source": "twelve",
+      "schemaVersion": "10.5"
     },
     {
       "id": "tx_mqnjborg_382ae8",
@@ -393,7 +390,12 @@
       "grossUSD": 1260,
       "realizedPnlUSD": 26.700000000000045,
       "note": "V8 已结算记录",
-      "migration": true
+      "migration": true,
+      "sector": "未分类",
+      "color": "#8b5cf6",
+      "source": "twelve",
+      "schemaVersion": "10.5",
+      "closedHistory": true
     },
     {
       "id": "tx_mqnjborg_9er3kw",
@@ -411,7 +413,12 @@
       "grossUSD": 980,
       "realizedPnlUSD": -12,
       "note": "V8 已结算记录",
-      "migration": true
+      "migration": true,
+      "sector": "未分类",
+      "color": "#8b5cf6",
+      "source": "twelve",
+      "schemaVersion": "10.5",
+      "closedHistory": true
     },
     {
       "id": "tx_mqnjborg_ybbsgg",
@@ -429,7 +436,12 @@
       "grossUSD": 904.02,
       "realizedPnlUSD": -93.48000000000002,
       "note": "V8 已结算记录",
-      "migration": true
+      "migration": true,
+      "sector": "未分类",
+      "color": "#8b5cf6",
+      "source": "twelve",
+      "schemaVersion": "10.5",
+      "closedHistory": true
     },
     {
       "id": "tx_mqnjborg_vq7qjm",
@@ -450,7 +462,9 @@
       "migration": true,
       "sector": "AI基建",
       "source": "twelve",
-      "color": "#0062ff"
+      "color": "#0062ff",
+      "schemaVersion": "10.5",
+      "closedHistory": true
     },
     {
       "id": "tx_mqnjborg_gfs9bn",
@@ -468,7 +482,12 @@
       "grossUSD": 2400,
       "realizedPnlUSD": 60,
       "note": "V8 已结算记录",
-      "migration": true
+      "migration": true,
+      "sector": "未分类",
+      "color": "#8b5cf6",
+      "source": "twelve",
+      "schemaVersion": "10.5",
+      "closedHistory": true
     },
     {
       "id": "tx_mqnjborg_n30342",
@@ -482,14 +501,15 @@
       "fxRate": 1,
       "fee": 0,
       "feeUSD": 0,
-      "costBasisUSD": 1140.8,
+      "costBasisUSD": 1114,
       "grossUSD": 1250,
-      "realizedPnlUSD": 109.20000000000005,
+      "realizedPnlUSD": 136,
       "note": " 部分卖出",
       "migration": true,
       "sector": "太空",
       "source": "twelve",
-      "color": "#c01b34"
+      "color": "#c01b34",
+      "schemaVersion": "10.5"
     },
     {
       "id": "tx_mqnjborg_1jspyf",
@@ -508,7 +528,10 @@
       "realizedPnlUSD": 0,
       "note": "V8 迁移：期初持仓",
       "migration": true,
-      "source": "twelve"
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#ff7998",
+      "schemaVersion": "10.5"
     },
     {
       "id": "tx_mqnjborg_uy5123",
@@ -527,7 +550,10 @@
       "realizedPnlUSD": 175,
       "note": " 部分卖出",
       "migration": true,
-      "source": "twelve"
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#ff7998",
+      "schemaVersion": "10.5"
     },
     {
       "id": "tx_mqnjborg_4imxoc",
@@ -545,7 +571,11 @@
       "grossUSD": 1260,
       "realizedPnlUSD": -40.16000000000008,
       "note": " 部分卖出",
-      "migration": true
+      "migration": true,
+      "sector": "光通信",
+      "color": "#0097a8",
+      "source": "twelve",
+      "schemaVersion": "10.5"
     },
     {
       "id": "tx_mqnjborg_r93q0b",
@@ -563,14 +593,18 @@
       "grossUSD": 660,
       "realizedPnlUSD": 39.860000000000014,
       "note": " 部分卖出",
-      "migration": true
+      "migration": true,
+      "sector": "AI基建",
+      "color": "#5cd8a9",
+      "source": "twelve",
+      "schemaVersion": "10.5"
     },
     {
       "id": "tx_mqpb20pj_4jkp7j",
       "date": "2026-06-22",
       "type": "buy",
       "symbol": "GOOGL",
-      "name": "",
+      "name": "谷歌",
       "shares": 1,
       "price": 350,
       "currency": "USD",
@@ -582,7 +616,10 @@
       "realizedPnlUSD": 0,
       "note": "",
       "positionBefore": null,
-      "schemaVersion": "10"
+      "schemaVersion": "10.5",
+      "sector": "科技平台",
+      "color": "#8759ef",
+      "source": "twelve"
     },
     {
       "id": "tx_mqpb3vqg_npglti",
@@ -601,7 +638,10 @@
       "realizedPnlUSD": 0,
       "note": "",
       "positionBefore": null,
-      "schemaVersion": "10"
+      "schemaVersion": "10.5",
+      "sector": "未分类",
+      "color": "#8b5cf6",
+      "source": "twelve"
     },
     {
       "id": "tx_mqpj1itm_sd0nbc",
@@ -634,7 +674,10 @@
         "costBasisUSD": 3030.34,
         "changePercent": 11.59917
       },
-      "schemaVersion": "10"
+      "schemaVersion": "10.5",
+      "sector": "未分类",
+      "color": "#8b5cf6",
+      "source": "twelve"
     },
     {
       "id": "tx_mqszbo4r_u58i8w",
@@ -648,9 +691,9 @@
       "fxRate": 1,
       "fee": 0.384319,
       "feeUSD": 0.384319,
-      "costBasisUSD": 2121.2380000000003,
+      "costBasisUSD": 2121.238,
       "grossUSD": 1960,
-      "realizedPnlUSD": -161.6223190000003,
+      "realizedPnlUSD": -161.62231899999983,
       "note": "",
       "positionBefore": {
         "id": "pos_mqpb3vqg_vlx0kn",
@@ -667,7 +710,10 @@
         "costBasisUSD": 2121.2380000000003,
         "changePercent": -1.10844
       },
-      "schemaVersion": "10"
+      "schemaVersion": "10.5",
+      "sector": "未分类",
+      "color": "#8b5cf6",
+      "source": "twelve"
     },
     {
       "id": "tx_mqsze5ls_d0n46e",
@@ -700,7 +746,10 @@
         "costBasisUSD": 350.35,
         "changePercent": -0.24268232
       },
-      "schemaVersion": "10"
+      "schemaVersion": "10.5",
+      "sector": "科技平台",
+      "color": "#8759ef",
+      "source": "twelve"
     },
     {
       "id": "tx_mqszfh6h_n9zn35",
@@ -737,7 +786,7 @@
         "id": "pos_mqnjborg_4xhe58",
         "costBasisUSD": 2152
       },
-      "schemaVersion": "10",
+      "schemaVersion": "10.5",
       "sector": "AI基建",
       "source": "twelve",
       "color": "#51ac0c"
@@ -759,7 +808,7 @@
       "realizedPnlUSD": 0,
       "note": "",
       "positionBefore": null,
-      "schemaVersion": "10",
+      "schemaVersion": "10.5",
       "sector": "光通信",
       "source": "twelve",
       "color": "#b9d00b"
@@ -799,7 +848,10 @@
         "id": "pos_mqnjborg_n3b8py",
         "costBasisUSD": 930.21
       },
-      "schemaVersion": "10"
+      "schemaVersion": "10.5",
+      "sector": "AI基建",
+      "color": "#5cd8a9",
+      "source": "twelve"
     },
     {
       "id": "tx_mqz9i9o7_tgjwo5",
@@ -818,7 +870,7 @@
       "realizedPnlUSD": 0,
       "note": "",
       "positionBefore": null,
-      "schemaVersion": "10",
+      "schemaVersion": "10.5",
       "sector": "AI基建",
       "source": "twelve",
       "color": "#0062ff"
@@ -858,7 +910,7 @@
         "id": "pos_mqnjborg_4xhe58",
         "costBasisUSD": 2554.348063
       },
-      "schemaVersion": "10",
+      "schemaVersion": "10.5",
       "sector": "AI基建",
       "source": "twelve",
       "color": "#51ac0c"
@@ -894,10 +946,31 @@
         "costBasisUSD": 1620.35,
         "changePercent": -5.21944
       },
-      "schemaVersion": "10",
+      "schemaVersion": "10.5",
       "sector": "光通信",
       "source": "twelve",
       "color": "#b9d00b"
+    },
+    {
+      "id": "tx_mr3ji5kj_m8ogzy",
+      "date": "2026-07-01",
+      "type": "buy",
+      "symbol": "MU",
+      "name": "美光",
+      "shares": 1,
+      "price": 1080,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.35,
+      "note": "",
+      "source": "twelve",
+      "sector": "AI存储",
+      "color": "#2e7ce6",
+      "schemaVersion": "10.5",
+      "feeUSD": 0.35,
+      "costBasisUSD": 1080.35,
+      "grossUSD": 1080,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -959,6 +1032,13 @@
       "netAsset": 14524.05,
       "market": 13522.56,
       "cash": 1001.49
+    },
+    {
+      "date": "2026-07-02",
+      "capital": 15000,
+      "netAsset": 14475.81,
+      "market": 10443.58,
+      "cash": 4032.24
     }
   ]
 }
