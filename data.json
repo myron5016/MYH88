@@ -7,8 +7,8 @@
     "version": "V10.28 PWA家庭版",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-06T15:23:14.979Z",
-    "localUpdatedAt": "2026-07-06T15:22:11.895Z",
+    "lastCloudSaveAt": "2026-07-06T15:25:20.632Z",
+    "localUpdatedAt": "2026-07-06T15:24:58.186Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -83,7 +83,7 @@
       "source": "manual",
       "shares": 44,
       "avgCost": 11.685,
-      "price": 7.61,
+      "price": 8.865,
       "sector": "半导体",
       "color": "#f7863b",
       "sectorLocked": false,
