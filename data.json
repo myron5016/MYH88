@@ -2,13 +2,13 @@
   "settings": {
     "title": "孟一晗的梦想金库",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1783000949173,
-    "lastPriceRefreshText": "2026/7/2 22:02:29",
-    "version": "V10.26 PWA家庭版",
+    "lastPriceRefresh": 1783351288998,
+    "lastPriceRefreshText": "2026/7/6 23:21:28",
+    "version": "V10.28 PWA家庭版",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-02T14:04:59.150Z",
-    "localUpdatedAt": "2026-07-02T14:02:29.173Z",
+    "lastCloudSaveAt": "2026-07-06T15:23:14.979Z",
+    "localUpdatedAt": "2026-07-06T15:22:11.895Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -32,14 +32,14 @@
       "source": "twelve",
       "shares": 14,
       "avgCost": 209.76343307142858,
-      "price": 198.435,
+      "price": 195.91,
       "sector": "AI基建",
       "color": "#15c180",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 2936.688063,
-      "changePercent": 0.43273518
+      "changePercent": 0.55432847
     },
     {
       "id": "pos_mqnjborg_zeux56",
@@ -49,14 +49,14 @@
       "source": "twelve",
       "shares": 5,
       "avgCost": 325.04,
-      "price": 272.5,
+      "price": 254.67,
       "sector": "光通信",
       "color": "#0097a8",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 1625.2,
-      "changePercent": 0.16541526
+      "changePercent": 3.82405
     },
     {
       "id": "pos_mqnjborg_p8abix",
@@ -66,14 +66,14 @@
       "source": "twelve",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 137.42,
+      "price": 126.8,
       "sector": "光通信",
       "color": "#00bcd1",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 820.34,
-      "changePercent": -1.13669
+      "changePercent": 4.83671
     },
     {
       "id": "pos_mqnjborg_q3swfw",
@@ -100,14 +100,14 @@
       "source": "twelve",
       "shares": 30,
       "avgCost": 111.4,
-      "price": 106.19,
+      "price": 96.9,
       "sector": "太空",
       "color": "#f73d69",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 3342,
-      "changePercent": 6.11572
+      "changePercent": -3.5437
     },
     {
       "id": "pos_mqnjborg_n3b8py",
@@ -115,16 +115,16 @@
       "name": "维谛技术",
       "currency": "USD",
       "source": "twelve",
-      "shares": 3.0007,
+      "shares": 0.0007,
       "avgCost": 310.070583197254,
-      "price": 311.87,
+      "price": 326.05,
       "sector": "AI基建",
       "color": "#5cd8a9",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 930.428799,
-      "changePercent": 0.14449507
+      "costBasisUSD": 0.217049,
+      "changePercent": 8.49167
     },
     {
       "id": "pos_mqnjborg_pzifro",
@@ -134,14 +134,14 @@
       "source": "twelve",
       "shares": 10,
       "avgCost": 150,
-      "price": 160.56,
+      "price": 161.63,
       "sector": "太空",
       "color": "#ff7998",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 1500,
-      "changePercent": 1.91698
+      "changePercent": -0.22839506
     },
     {
       "id": "pos_mqpb20pj_q02ooh",
@@ -151,14 +151,14 @@
       "source": "twelve",
       "shares": 2,
       "avgCost": 346.34993,
-      "price": 362.905,
+      "price": 362.505,
       "sector": "科技平台",
       "color": "#8759ef",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 692.69986,
-      "changePercent": 0.46925849
+      "changePercent": 0.72101256
     },
     {
       "id": "pos_mqv9tzrw_6n81s8",
@@ -168,14 +168,14 @@
       "source": "twelve",
       "shares": 1,
       "avgCost": 810.175,
-      "price": 797.54,
+      "price": 730.07,
       "sector": "光通信",
       "color": "#4dd4e3",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 810.175,
-      "changePercent": -0.45184149
+      "changePercent": 0.24027799
     },
     {
       "id": "pos_mqz9i9o7_8b8hhc",
@@ -185,14 +185,14 @@
       "source": "twelve",
       "shares": 2,
       "avgCost": 1095.35,
-      "price": 1054.49,
+      "price": 999.06,
       "sector": "AI存储",
       "color": "#2e7ce6",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 2190.7,
-      "changePercent": 2.1515480296043745
+      "changePercent": 2.4088728525154783
     }
   ],
   "transactions": [
@@ -975,6 +975,27 @@
       "costBasisUSD": 1080.35,
       "grossUSD": 1080,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mr9dc6cx_uemrnl",
+      "date": "2026-07-06",
+      "type": "sell",
+      "symbol": "VRT",
+      "name": "维谛技术",
+      "shares": 3,
+      "price": 327,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.36,
+      "note": "",
+      "source": "twelve",
+      "sector": "AI基建",
+      "color": "#5cd8a9",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.36,
+      "costBasisUSD": 930.211749591762,
+      "grossUSD": 981,
+      "realizedPnlUSD": 50.428250408238
     }
   ],
   "cashFlows": [
@@ -1043,6 +1064,13 @@
       "netAsset": 14379.86,
       "market": 14431.92,
       "cash": -52.06
+    },
+    {
+      "date": "2026-07-06",
+      "capital": 15000,
+      "netAsset": 13810.79,
+      "market": 12882.21,
+      "cash": 928.58
     }
   ]
 }
