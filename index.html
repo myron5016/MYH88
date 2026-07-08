@@ -13,9 +13,20 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=10.28">
+  <link rel="stylesheet" href="style.css?v=10.31">
 </head>
 <body>
+<aside class="app-sidebar" aria-label="梦想金库导航">
+  <div class="side-mark">MYH</div>
+  <nav>
+    <a href="#syncStrip" class="active">总览</a>
+    <a href="#treemap">配置地图</a>
+    <a href="#sectorBar">板块配置</a>
+    <a href="#assetChart">收益分析</a>
+    <a href="#ledgerPanel">账本</a>
+  </nav>
+  <div class="side-foot"><span>家庭目标</span><strong>$100,000</strong></div>
+</aside>
 <main class="container">
   <header class="hero">
     <div class="hero-left">
@@ -117,12 +128,23 @@
     <div class="kpi"><span>累计总盈亏</span><strong id="kpiPnl">$0 / 0%</strong></div>
   </section>
 
-  <section class="card">
-    <div class="section-head">
-      <div><h2>本金配置地图</h2><p class="section-note">按持仓成本展示本金部署，行情涨跌不会改变方块面积</p></div>
-      <span id="status">正在读取共享数据...</span>
+  <section class="terminal-grid">
+    <div class="card map-card">
+      <div class="section-head">
+        <div><h2>本金配置地图</h2><p class="section-note">按持仓成本展示本金部署，行情涨跌不会改变方块面积</p></div>
+        <span id="status">正在读取共享数据...</span>
+      </div>
+      <div id="treemap"></div>
     </div>
-    <div id="treemap"></div>
+    <aside class="card map-side-card">
+      <div class="section-head compact-head"><div><h2>持仓明细</h2><p class="section-note">按成本占比排序</p></div></div>
+      <div class="map-table-wrap">
+        <table class="map-holding-table">
+          <thead><tr><th>资产</th><th>市值</th><th>占比</th><th>盈亏</th></tr></thead>
+          <tbody id="mapHoldingBody"></tbody>
+        </table>
+      </div>
+    </aside>
   </section>
 
   <section class="card">
@@ -164,7 +186,7 @@
 
     <div id="positionsPane" class="tab-pane">
       <div class="table-tools"><input id="positionSearch" placeholder="搜索代码或名称" oninput="renderPositionTable()"></div>
-      <div class="table-wrap"><table class="compact-table"><thead><tr><th>资产</th><th>数量</th><th>平均成本</th><th>总成本 USD</th><th>市值 USD</th><th>浮动盈亏</th><th>板块</th><th>操作</th></tr></thead><tbody id="positionBody"></tbody></table></div>
+      <div class="table-wrap"><table class="compact-table"><thead><tr><th>资产</th><th>数量</th><th>平均成本</th><th>总成本 USD</th><th>市值 USD</th><th>浮动盈亏</th><th>行情来源</th><th>板块</th><th>操作</th></tr></thead><tbody id="positionBody"></tbody></table></div>
     </div>
 
     <div id="transactionsPane" class="tab-pane hidden">
@@ -276,6 +298,6 @@
   </div>
 </dialog>
 
-<script src="script.js?v=10.28"></script>
+  <script src="script.js?v=10.31"></script>
 </body>
 </html>
