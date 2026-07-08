@@ -34,6 +34,8 @@ body.viewer-mode .admin-only{display:none!important}
   --blue:#4f8df7;
 }
 body{
+  font-family:Inter,"HarmonyOS Sans SC","Microsoft YaHei UI","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+  font-variant-numeric:tabular-nums;
   background:
     radial-gradient(circle at 10% 0%,rgba(239,71,111,.20),transparent 26%),
     radial-gradient(circle at 90% 6%,rgba(24,201,215,.15),transparent 24%),
@@ -264,16 +266,22 @@ h1{font-size:42px}
   justify-content:flex-start;
   text-align:left;
   padding:22px;
+  min-width:0;
+  min-height:0;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -18px 34px rgba(0,0,0,.13);
 }
 .tile:after{border-radius:3px}
 .tile>div{
   width:100%;
   line-height:1.18;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 .tile small{
   font-size:14px;
   font-weight:900;
+  white-space:normal;
 }
 .tile.tiny{
   padding:12px;
@@ -286,6 +294,16 @@ h1{font-size:42px}
   align-items:center;
   justify-content:center;
   text-align:center;
+}
+.tile.narrow{
+  padding:9px;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.tile.narrow small{
+  font-size:10px;
+  line-height:1.1;
 }
 .sector-bar{border-radius:8px}
 .segment{border-radius:0}
@@ -391,6 +409,9 @@ h1{font-size:42px}
   #treemap .tile.micro{
     padding:2px;
     font-size:9px;
+  }
+  #treemap .tile.narrow{
+    padding:4px;
   }
   .sector-bar{border-radius:7px}
 }

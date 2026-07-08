@@ -1,4 +1,4 @@
-const VERSION="V10.31 PWA家庭版";
+const VERSION="V10.31.1 PWA家庭版";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
 const PRICE_CACHE_KEY="v9_price_cache";
@@ -688,7 +688,14 @@ function renderTreemap(){
   const items=treemapItems(),denom=Math.max(contributedCapital()+realizedPnl(),1);
   box.classList.remove("mobile-map");
   const rect=box.getBoundingClientRect();
-  layout(items,0,0,rect.width,rect.height).forEach(t=>{const d=document.createElement("div"),area=t.w*t.h,share=round(t.value/denom*100),textColor=t.label==="CASH"?"#07101a":"white";d.className="tile"+(area<13000?" tiny":"")+(area<6200?" micro":"");Object.assign(d.style,{left:t.x+"px",top:t.y+"px",width:t.w+"px",height:t.h+"px",background:`radial-gradient(circle at 28% 18%, ${mixColor(t.color,"#ffffff",.28)}, transparent 58%), linear-gradient(145deg, ${mixColor(t.color,"#ffffff",.04)}, ${mixColor(t.color,"#000000",.18)})`,borderColor:mixColor(t.color,"#020617",.38),color:textColor});d.title=`${t.label} ${money(t.value)} | ${share}%`;d.innerHTML=area<6200?`<div>${escapeHtml(t.label)}</div>`:`<div>${escapeHtml(t.label)}<small>${money(t.value)} | ${share}%</small></div>`;box.appendChild(d)})
+  layout(items,0,0,rect.width,rect.height).forEach(t=>{
+    const d=document.createElement("div"),area=t.w*t.h,share=round(t.value/denom*100),textColor=t.label==="CASH"?"#07101a":"white",narrow=t.w<96||t.h<76;
+    d.className="tile"+(area<13000||narrow?" tiny":"")+(area<6200||t.w<64?" micro":"")+(narrow?" narrow":"");
+    Object.assign(d.style,{left:t.x+"px",top:t.y+"px",width:t.w+"px",height:t.h+"px",background:`radial-gradient(circle at 28% 18%, ${mixColor(t.color,"#ffffff",.28)}, transparent 58%), linear-gradient(145deg, ${mixColor(t.color,"#ffffff",.04)}, ${mixColor(t.color,"#000000",.18)})`,borderColor:mixColor(t.color,"#020617",.38),color:textColor});
+    d.title=`${t.label} ${money(t.value)} | ${share}%`;
+    d.innerHTML=area<6200||t.w<64?`<div>${escapeHtml(t.label)}</div>`:narrow?`<div>${escapeHtml(t.label)}<small>${share}%</small></div>`:`<div>${escapeHtml(t.label)}<small>${money(t.value)} | ${share}%</small></div>`;
+    box.appendChild(d)
+  })
 }
 function sectorItems(){const map={};state.positions.forEach(p=>{const key=inferSector(p.symbol,p.name,p.sector);if(!map[key])map[key]={label:key,total:0,pnl:0,color:sectorBaseColor(key)};map[key].total+=num(p.costBasisUSD);map[key].pnl+=floatingPnlUSD(p)});const cash=cashBalance();if(cash>0)map["现金"]={label:"现金",total:cash,pnl:0,color:sectorBaseColor("现金")};return Object.values(map).sort((a,b)=>b.total-a.total)}
 function renderSectors(){const bar=$("sectorBar"),legend=$("sectorLegend"),total=Math.max(contributedCapital()+realizedPnl(),1);bar.innerHTML="";legend.innerHTML="";sectorItems().forEach(s=>{const pct=s.total/total*100,seg=document.createElement("div");seg.className="segment"+(pct>=10?" major":"");seg.style.width=Math.max(3,pct)+"%";seg.style.background=`linear-gradient(135deg,${mixColor(s.color,"#ffffff",.12)},${mixColor(s.color,"#000000",.08)})`;seg.textContent=`${s.label} ${round(pct)}%`;bar.appendChild(seg);legend.insertAdjacentHTML("beforeend",`<span><i class="dot" style="background:${validColor(s.color)}"></i>${escapeHtml(s.label)} ${money(s.total)} <b class="${cls(s.pnl)}">${money(s.pnl)}</b></span>`)})}
@@ -700,6 +707,15 @@ function renderPositionTable(){
   $("positionBody").innerHTML=items.length?items.map(p=>{const locks=[p.sectorLocked?"板块锁":"",p.colorLocked?"颜色锁":""].filter(Boolean).join(" / "),source=priceSourceLabel(p);return`<tr><td class="asset-cell"><strong>${escapeHtml(p.symbol)}</strong><small>${escapeHtml(p.name)} · ${escapeHtml(p.currency)}</small></td><td>${round(p.shares,4)}</td><td>${round(p.avgCost,4)} ${escapeHtml(p.currency)}</td><td>${money(p.costBasisUSD)}</td><td>${money(marketUSD(p))}</td><td class="${cls(floatingPnlUSD(p))}">${money(floatingPnlUSD(p))}</td><td><span class="quote-source ${priceSourceClass(p)}">${escapeHtml(source)}</span><small class="muted">${p.priceUpdatedAt?new Date(p.priceUpdatedAt).toLocaleString("zh-CN"):""}</small></td><td>${escapeHtml(p.sector)}${locks?`<small class="muted">${escapeHtml(locks)}</small>`:""}</td><td>${isAdminMode?`<div class="row-buttons"><button onclick="openTrade('buy','${p.id}')">买入</button><button onclick="openTrade('sell','${p.id}')">卖出</button><button onclick="editPosition('${p.id}')">编辑</button></div>`:"—"}</td></tr>`}).join(""):'<tr><td colspan="9" class="muted">没有匹配的持仓</td></tr>'
 }
 
+function transactionLabel(t){
+  if(t?.voided)return"已撤销";
+  if(t?.type==="buy")return"买入";
+  if(t?.type==="sell")return"卖出";
+  if(t?.type==="opening")return"期初持仓";
+  if(t?.type==="deposit")return"追加本金";
+  if(t?.type==="withdraw")return"提取本金";
+  return"记录";
+}
 function latestCorrectableTransaction(){return state.transactions.slice().reverse().find(t=>["buy","sell"].includes(t.type)&&!t.voided&&Object.prototype.hasOwnProperty.call(t,"positionBefore"))||null}
 function renderTransactionTable(){const q=$("transactionSearch")?.value.trim().toUpperCase()||"",type=$("transactionTypeFilter")?.value||"all",latest=latestCorrectableTransaction(),filtered=state.transactions.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).filter(t=>(!q||String(t.symbol).includes(q))&&(type==="all"||t.type===type)),pages=Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));transactionPage=Math.min(transactionPage,pages);const items=filtered.slice((transactionPage-1)*PAGE_SIZE,transactionPage*PAGE_SIZE);$("transactionBody").innerHTML=items.length?items.map(t=>`<tr class="${t.voided?"muted":""}"><td>${escapeHtml(t.date)}</td><td><span class="type-pill">${transactionLabel(t)}</span></td><td><strong>${escapeHtml(t.symbol)}</strong></td><td>${round(t.shares,4)}</td><td>${round(t.price,4)} ${escapeHtml(t.currency)}</td><td>${round(t.fee,4)} ${escapeHtml(t.currency)}</td><td>${round(t.fxRate,6)}</td><td class="${t.voided?"muted":cls(t.realizedPnlUSD)}">${t.type==="sell"?money(t.realizedPnlUSD):"—"}</td><td>${escapeHtml(t.note||"")}</td><td>${isAdminMode&&latest?.id===t.id?`<div class="correction-buttons"><button onclick="correctLastTransaction('${t.id}')">更正</button><button class="danger" onclick="undoLastTransaction('${t.id}')">撤销</button></div>`:"—"}</td></tr>`).join(""):'<tr><td colspan="10" class="muted">暂无交易记录</td></tr>';$("transactionPager").innerHTML=`<button ${transactionPage<=1?"disabled":""} onclick="transactionPage--;renderTransactionTable()">上一页</button><span>${transactionPage} / ${pages} · 共 ${filtered.length} 条</span><button ${transactionPage>=pages?"disabled":""} onclick="transactionPage++;renderTransactionTable()">下一页</button>`}function renderCashFlowTable(){$("cashFlowBody").innerHTML=state.cashFlows.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(x=>`<tr class="${x.voided?"muted":""}"><td>${escapeHtml(x.date)}</td><td>${x.voided?"已作废":x.type==="withdraw"?"提取本金":"追加本金"}</td><td class="${x.voided?"muted":x.type==="withdraw"?"red":"green"}">${x.type==="withdraw"?"-":"+"}${money(x.amountUSD)}</td><td>${escapeHtml(x.note||"")}</td><td>${x.migration||x.voided?"—":`<button class="danger" onclick="deleteCashFlow('${x.id}')">作废</button>`}</td></tr>`).join("")}
 function switchLedgerTab(tab){if(!isAdminMode&&["cashflows","backup"].includes(tab))tab="transactions";activeLedgerTab=tab;document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));["positions","transactions","cashflows","backup"].forEach(x=>$(x+"Pane").classList.toggle("hidden",x!==tab));if(tab==="backup")renderBackupList()}
@@ -886,11 +902,11 @@ function renderMapHoldingTable(){
   body.innerHTML=rows+(cash>0?`<tr><td><i style="background:${sectorBaseColor("现金")}"></i><strong>CASH</strong><small>现金</small></td><td>${money(cash)}</td><td>${round(cash/total*100)}%</td><td class="muted">—</td></tr>`:"");
 }
 
-function renderAll(){renderKpis();renderTreemap();renderSectorsV2();renderMapHoldingTable();renderChartV2();renderHoldingCardsV2();renderPositionTable();renderTransactionTable();renderCashFlowTable();renderBackupList();renderSectorAdminPanel();$("positionCount").textContent=state.positions.length;$("transactionCount").textContent=state.transactions.length;$("cashFlowCount").textContent=state.cashFlows.length;$("pageTitle").textContent=state.settings.title;document.title=state.settings.title;$("titleInput").value=state.settings.title;$("cacheInput").value=state.settings.priceCacheMinutes;if($("eurFxInput"))$("eurFxInput").value=state.fxRates.EUR||defaultState.fxRates.EUR;if($("proxyInput"))$("proxyInput").value=priceProxyUrl();$("apiKeyInput").value=marketKey();renderSyncStatus();renderDiagnostics()}
+function renderAll(){renderKpis();renderTreemap();renderSectorsV2();renderMapHoldingTable();renderChartV2();renderHoldingCardsV2();renderPositionTable();renderTransactionTable();renderCashFlowTable();renderBackupList();renderSectorAdminPanel();$("positionCount").textContent=state.positions.length;$("transactionCount").textContent=state.transactions.length;$("cashFlowCount").textContent=state.cashFlows.length;switchLedgerTab(activeLedgerTab);$("pageTitle").textContent=state.settings.title;document.title=state.settings.title;$("titleInput").value=state.settings.title;$("cacheInput").value=state.settings.priceCacheMinutes;if($("eurFxInput"))$("eurFxInput").value=state.fxRates.EUR||defaultState.fxRates.EUR;if($("proxyInput"))$("proxyInput").value=priceProxyUrl();$("apiKeyInput").value=marketKey();renderSyncStatus();renderDiagnostics()}
 function initAdminMode(){isAdminMode=new URLSearchParams(location.search).get("admin")==="1";document.querySelectorAll(".admin-only").forEach(el=>el.classList.toggle("hidden",!isAdminMode));document.body.classList.toggle("viewer-mode",!isAdminMode)}
 function canAutoRefreshPrices(){return navigator.onLine&&document.visibilityState!=="hidden"&&!!priceProxyUrl()}
 function kickAutoRefresh(force=false){
-  if(!isAdminMode||!canAutoRefreshPrices())return;
+  if(!canAutoRefreshPrices())return;
   const now=Date.now();
   if(!force&&now-lastAutoRefreshKick<RESUME_REFRESH_GAP_MS)return;
   if(!force&&priceCacheValid()){applyPriceCache();renderAll();return}
@@ -903,8 +919,8 @@ function initAutoRefreshHooks(){
   if(sharedDataTimer)clearInterval(sharedDataTimer);
   sharedDataTimer=setInterval(()=>checkSharedDataUpdate(false),SHARED_DATA_CHECK_MS);
   autoRefreshTimer=setInterval(()=>refreshMarketClock().then(()=>kickAutoRefresh(false)),AUTO_REFRESH_CHECK_MS);
-  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")checkSharedDataUpdate(true)});
-  window.addEventListener("focus",()=>checkSharedDataUpdate(true));
+  document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){checkSharedDataUpdate(true);refreshMarketClock().then(()=>kickAutoRefresh(true))}});
+  window.addEventListener("focus",()=>{checkSharedDataUpdate(true);refreshMarketClock().then(()=>kickAutoRefresh(false))});
   window.addEventListener("pageshow",()=>checkSharedDataUpdate(false));
 }
 window.addEventListener("resize",()=>{renderTreemap();renderChartV2()});
