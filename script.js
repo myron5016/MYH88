@@ -1,4 +1,4 @@
-const VERSION="V10.31.1 PWA家庭版";
+const VERSION="V10.31.2 PWA家庭版";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
 const PRICE_CACHE_KEY="v9_price_cache";
@@ -689,11 +689,12 @@ function renderTreemap(){
   box.classList.remove("mobile-map");
   const rect=box.getBoundingClientRect();
   layout(items,0,0,rect.width,rect.height).forEach(t=>{
-    const d=document.createElement("div"),area=t.w*t.h,share=round(t.value/denom*100),textColor=t.label==="CASH"?"#07101a":"white",narrow=t.w<96||t.h<76;
+    const d=document.createElement("div"),area=t.w*t.h,share=round(t.value/denom*100),narrow=t.w<102||t.h<78,compact=area<6200||t.w<66||t.h<54;
     d.className="tile"+(area<13000||narrow?" tiny":"")+(area<6200||t.w<64?" micro":"")+(narrow?" narrow":"");
-    Object.assign(d.style,{left:t.x+"px",top:t.y+"px",width:t.w+"px",height:t.h+"px",background:`radial-gradient(circle at 28% 18%, ${mixColor(t.color,"#ffffff",.28)}, transparent 58%), linear-gradient(145deg, ${mixColor(t.color,"#ffffff",.04)}, ${mixColor(t.color,"#000000",.18)})`,borderColor:mixColor(t.color,"#020617",.38),color:textColor});
+    Object.assign(d.style,{left:t.x+"px",top:t.y+"px",width:t.w+"px",height:t.h+"px",background:`radial-gradient(circle at 28% 18%, ${mixColor(t.color,"#ffffff",.28)}, transparent 58%), linear-gradient(145deg, ${mixColor(t.color,"#ffffff",.04)}, ${mixColor(t.color,"#000000",.18)})`,borderColor:mixColor(t.color,"#020617",.38),color:"white"});
     d.title=`${t.label} ${money(t.value)} | ${share}%`;
-    d.innerHTML=area<6200||t.w<64?`<div>${escapeHtml(t.label)}</div>`:narrow?`<div>${escapeHtml(t.label)}<small>${share}%</small></div>`:`<div>${escapeHtml(t.label)}<small>${money(t.value)} | ${share}%</small></div>`;
+    const meta=compact?"":narrow?`${share}%`:`${money(t.value)} | ${share}%`;
+    d.innerHTML=`<div class="tile-copy"><span class="tile-symbol">${escapeHtml(t.label)}</span>${meta?`<span class="tile-meta">${escapeHtml(meta)}</span>`:""}</div>`;
     box.appendChild(d)
   })
 }

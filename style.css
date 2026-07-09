@@ -268,42 +268,65 @@ h1{font-size:42px}
   padding:22px;
   min-width:0;
   min-height:0;
+  color:#fff!important;
+  font-family:Inter,"HarmonyOS Sans SC","Microsoft YaHei UI","Microsoft YaHei","Segoe UI",system-ui,sans-serif;
+  letter-spacing:0;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -18px 34px rgba(0,0,0,.13);
 }
 .tile:after{border-radius:3px}
-.tile>div{
+.tile-copy{
   width:100%;
   line-height:1.18;
   min-width:0;
   overflow:hidden;
   text-overflow:ellipsis;
 }
-.tile small{
-  font-size:14px;
+.tile-symbol{
+  display:block;
+  color:#fff;
+  font-size:clamp(16px,1.05vw,20px);
+  font-weight:950;
+  line-height:1.08;
+  text-shadow:0 2px 12px rgba(0,0,0,.55);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.tile-meta{
+  display:block;
+  color:rgba(255,255,255,.96);
+  font-size:clamp(12px,.78vw,15px);
   font-weight:900;
+  line-height:1.18;
+  margin-top:5px;
+  text-shadow:0 2px 12px rgba(0,0,0,.55);
   white-space:normal;
 }
 .tile.tiny{
   padding:12px;
-  font-size:13px;
 }
-.tile.tiny small{font-size:11px}
+.tile.tiny .tile-symbol{font-size:15px}
+.tile.tiny .tile-meta{font-size:12px;margin-top:4px}
 .tile.micro{
   padding:7px;
-  font-size:11px;
   align-items:center;
   justify-content:center;
   text-align:center;
 }
+.tile.micro .tile-symbol{font-size:12px}
+.tile.micro .tile-meta{display:none}
 .tile.narrow{
   padding:9px;
   align-items:center;
   justify-content:center;
   text-align:center;
 }
-.tile.narrow small{
-  font-size:10px;
-  line-height:1.1;
+.tile.narrow .tile-symbol{
+  font-size:15px;
+}
+.tile.narrow .tile-meta{
+  font-size:11px;
+  margin-top:4px;
 }
 .sector-bar{border-radius:8px}
 .segment{border-radius:0}
@@ -395,21 +418,22 @@ h1{font-size:42px}
     border-width:1px;
     border-radius:3px;
     padding:8px;
-    font-size:12px;
     line-height:1.05;
   }
-  #treemap .tile small{
+  #treemap .tile .tile-symbol{
+    font-size:12px;
+  }
+  #treemap .tile .tile-meta{
     font-size:9px;
     margin-top:3px;
   }
   #treemap .tile.tiny{
     padding:5px;
-    font-size:10px;
   }
   #treemap .tile.micro{
     padding:2px;
-    font-size:9px;
   }
+  #treemap .tile.micro .tile-symbol{font-size:9px}
   #treemap .tile.narrow{
     padding:4px;
   }
