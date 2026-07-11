@@ -6,6 +6,10 @@
 
 body.viewer-mode .admin-only{display:none!important}
 
+/* V10.32: the dashboard is now a single focused canvas, without a sidebar. */
+@media(min-width:901px){body{padding-left:0}}
+.container{max-width:1510px;margin-left:auto;margin-right:auto}
+
 .diagnostics-strip{display:flex;gap:8px;flex-wrap:wrap;margin:-12px 0 20px}.diagnostics-strip span{display:inline-flex;align-items:center;min-height:30px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:rgba(11,18,32,.72);color:#cbd5e1;font-size:12px;font-weight:850}.holding-main{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.holding-value{text-align:right}.holding-value strong{display:block;font-size:19px;white-space:nowrap}.holding-value span{display:block;font-size:12px;font-weight:900;margin-top:4px}.holding-meta{display:flex;justify-content:space-between;gap:10px;margin:12px 0 8px;color:#cbd5e1;font-size:12px;font-weight:900}.holding-progress{height:7px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.08);margin-bottom:12px}.holding-progress i{display:block;height:100%;border-radius:999px}.holding-card .grid.compact{grid-template-columns:repeat(4,1fr);gap:8px}.holding-card .grid.compact .value{font-size:13px}.tile.micro{font-size:11px}.tile.micro small{display:none}
 
 .kpis{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}.kpi{overflow:visible;min-width:0}.kpi strong{white-space:normal;overflow-wrap:anywhere;word-break:normal;line-height:1.12;font-size:clamp(18px,1.75vw,24px)}.kpi span{line-height:1.2}.segment{min-width:0;overflow:hidden;text-overflow:clip}.chart-label{font-size:15px;font-weight:800}.chart-line-label{fill:#dbe4f5;font-size:16px;font-weight:900}.chart-capital{stroke-width:3}.chart-asset{stroke-width:4}.chart-dot{r:7}
@@ -439,4 +443,7 @@ h1{font-size:42px}
   }
   .sector-bar{border-radius:7px}
 }
+
+/* V10.32 final desktop override: the retired sidebar must not reserve space. */
+@media(min-width:901px){body{padding-left:0!important}}
 

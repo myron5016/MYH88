@@ -13,21 +13,9 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=10.31.2">
+  <link rel="stylesheet" href="style.css?v=10.32">
 </head>
 <body>
-<aside class="app-sidebar" aria-label="梦想金库导航">
-  <div class="side-mark">MYH</div>
-  <nav>
-    <a href="#syncStrip" class="active">总览</a>
-    <a href="#treemap">配置地图</a>
-    <a href="#sectorBar">板块配置</a>
-    <a href="#ledgerPanel" onclick="switchLedgerTab('transactions')">交易流水</a>
-    <a href="#assetChart">收益分析</a>
-    <a href="#ledgerPanel">账本</a>
-  </nav>
-  <div class="side-foot"><span>家庭目标</span><strong>$100,000</strong></div>
-</aside>
 <main class="container">
   <header class="hero">
     <div class="hero-left">
@@ -82,10 +70,9 @@
 
   <section id="settingsPanel" class="card settings admin-only hidden">
     <label>看板标题<input id="titleInput"></label>
-    <label>行情缓存分钟<input id="cacheInput" type="number" min="5"></label>
+    <label>行情缓存分钟<input id="cacheInput" type="number" min="30"></label>
     <label>EUR/USD 手动汇率<input id="eurFxInput" type="number" min="0.000001" step="any"></label>
     <label>行情代理地址<input id="proxyInput" autocomplete="off" placeholder="https://myh88-price-proxy.xxx.workers.dev"></label>
-    <label>Twelve Data Key<input id="apiKeyInput" type="password" autocomplete="off" placeholder="保存到 GitHub 后家人共用"></label>
     <button onclick="saveSettings()">应用设置</button>
   </section>
 
@@ -299,6 +286,6 @@
   </div>
 </dialog>
 
-  <script src="script.js?v=10.31.2"></script>
+  <script src="script.js?v=10.32"></script>
 </body>
 </html>

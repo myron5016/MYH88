@@ -16,6 +16,8 @@ Do not upload:
 - `kv-fx-EUR.json`
 - `kv-quotes-all-current.json`
 - `.wrangler/`
-- `wrangler.toml` unless Worker config intentionally changed
+- `cloudflare-worker.js` and `wrangler.toml` only when the release explicitly says Worker deployment is required
 
 `data.json` is the live ledger. It should be changed only by the website admin safe-save flow, so a local code release cannot overwrite newer holdings on GitHub.
+
+V10.32 is a Worker release: upload its `cloudflare-worker.js` and `wrangler.toml`, then run `npx wrangler deploy` from the project folder. Never upload `data.json` during a code release.

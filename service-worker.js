@@ -1,6 +1,6 @@
-const CACHE_VERSION="dream-fund-v10-31-2";
-const DATA_CACHE="dream-fund-data-v10-16";
-const APP_SHELL=["./","./index.html","./style.css?v=10.31.2","./script.js?v=10.31.2","./manifest.webmanifest","./avatar.png","./app-icon.svg","./icon-192.png","./icon-512.png"];
+const CACHE_VERSION="dream-fund-v10-32";
+const DATA_CACHE="dream-fund-data-v10-32";
+const APP_SHELL=["./","./index.html","./style.css?v=10.32","./script.js?v=10.32","./manifest.webmanifest","./avatar.png","./app-icon.svg","./icon-192.png","./icon-512.png","./kv-quotes-all-current.json"];
 
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE_VERSION).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()));
@@ -18,15 +18,16 @@ self.addEventListener("message",event=>{
 });
 
 async function networkFirst(request,fallback){
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),8000);
   try{
-    const response=await fetch(request);
+    const response=await fetch(request,{signal:controller.signal});
     if(response.ok){const cache=await caches.open(DATA_CACHE);await cache.put(fallback||request,response.clone())}
     return response;
   }catch(error){
     const cached=await caches.match(fallback||request);
     if(cached)return cached;
     throw error;
-  }
+  }finally{clearTimeout(timer)}
 }
 
 self.addEventListener("fetch",event=>{
@@ -52,7 +53,7 @@ self.addEventListener("fetch",event=>{
   }
 
   event.respondWith(caches.match(request).then(cached=>cached||fetch(request).then(response=>{
-    if(response.ok){const copy=response.clone();caches.open(CACHE_VERSION).then(cache=>cache.put(request,copy))}
+    if(response.ok)event.waitUntil(caches.open(CACHE_VERSION).then(cache=>cache.put(request,response.clone())));
     return response;
   })));
 });

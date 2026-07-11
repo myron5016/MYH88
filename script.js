@@ -1,4 +1,5 @@
-const VERSION="V10.31.2 PWA家庭版";
+const VERSION="V10.32 PWA家庭版";
+const LEDGER_SCHEMA_VERSION="10.32";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
 const PRICE_CACHE_KEY="v9_price_cache";
@@ -12,16 +13,17 @@ const STATIC_QUOTES_URL="./kv-quotes-all-current.json";
 const AUTO_FX_PROXY=false;
 const AUTO_REFRESH_CHECK_MS=5*60000;
 const RESUME_REFRESH_GAP_MS=20000;
-const SHARED_DATA_CHECK_MS=60000;
+const SHARED_DATA_CHECK_MS=5*60000;
 const US_MARKET_TZ="America/New_York";
 const US_MARKET_OPEN_MIN=9*60+30;
 const US_MARKET_CLOSE_MIN=16*60;
 const US_EARLY_CLOSE_MIN=13*60;
 const US_STATIC_HOLIDAYS={"2026-01-01":"元旦","2026-01-19":"马丁路德金纪念日","2026-02-16":"总统日","2026-04-03":"耶稣受难日","2026-05-25":"阵亡将士纪念日","2026-06-19":"六月节","2026-07-03":"独立日观察休市","2026-09-07":"劳动节","2026-11-26":"感恩节","2026-12-25":"圣诞节"};
 const US_STATIC_EARLY_CLOSES={"2026-11-27":"感恩节后提前收盘","2026-12-24":"圣诞夜提前收盘"};
+Object.assign(US_STATIC_HOLIDAYS,{"2027-01-01":"元旦","2027-01-18":"马丁路德金纪念日","2027-02-15":"总统日","2027-03-26":"耶稣受难日","2027-05-31":"阵亡将士纪念日","2027-06-18":"六月节观察休市","2027-07-05":"独立日观察休市","2027-09-06":"劳动节","2027-11-25":"感恩节","2027-12-24":"圣诞节观察休市","2028-01-17":"马丁路德金纪念日","2028-02-21":"总统日","2028-04-14":"耶稣受难日","2028-05-29":"阵亡将士纪念日","2028-06-19":"六月节","2028-07-04":"独立日","2028-09-04":"劳动节","2028-11-23":"感恩节","2028-12-25":"圣诞节"});
 const TAXONOMY_VERSION="sector-color-v8";
 
-const defaultState={settings:{title:"孟一晗的梦想金库",priceCacheMinutes:30,lastPriceRefresh:0,lastPriceRefreshText:"",version:VERSION},fxRates:{USD:1,EUR:1.16,HKD:.128,JPY:.0067,GBP:1.27},positions:[],transactions:[],cashFlows:[],snapshots:[]};
+const defaultState={settings:{title:"孟一晗的梦想金库",priceCacheMinutes:30,lastPriceRefresh:0,lastPriceRefreshText:"",schemaVersion:LEDGER_SCHEMA_VERSION},fxRates:{USD:1,EUR:1.16,HKD:.128,JPY:.0067,GBP:1.27},positions:[],transactions:[],cashFlows:[],snapshots:[]};
 let state=structuredClone(defaultState);
 const legacyAdmin=readJson(localStorage.getItem("v8_admin"),{});
 let admin=readJson(sessionStorage.getItem("v9_admin"),{owner:legacyAdmin.owner||"",repo:legacyAdmin.repo||"",branch:legacyAdmin.branch||"main",token:""});
@@ -64,7 +66,8 @@ const SECTOR_ALIAS={"光通讯":"光通信","通信光":"光通信","AI":"AI基�
 function $(id){return document.getElementById(id)}
 function readJson(text,fallback){try{return JSON.parse(text)||fallback}catch{return fallback}}
 function uid(prefix="id"){return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`}
-function today(){return new Date().toISOString().slice(0,10)}
+function dateInTimeZone(timeZone="Asia/Shanghai"){const p=Object.fromEntries(new Intl.DateTimeFormat("en-CA",{timeZone,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).filter(x=>x.type!=="literal").map(x=>[x.type,x.value]));return `${p.year}-${p.month}-${p.day}`}
+function today(){return dateInTimeZone()}
 function num(v){return Number(v)||0}
 function round(v,d=2){const p=10**d;return Math.round((num(v)+Number.EPSILON)*p)/p}
 function money(v){const n=num(v),sign=n<0?"-":"";return sign+"$"+new Intl.NumberFormat("en-US",{maximumFractionDigits:2}).format(Math.abs(n))}
@@ -187,14 +190,14 @@ async function registerPwa(){
 }
 
 function normalizePosition(p){
-  p.id=p.id||uid("pos");p.symbol=String(p.symbol||"").trim().toUpperCase();p.name=String(p.name||"");p.currency=String(p.currency||"USD").toUpperCase();p.source=p.source==="manual"?"manual":"twelve";p.shares=num(p.shares);p.avgCost=num(p.avgCost);p.price=num(p.price);p.sector=inferSector(p.symbol,p.name,p.sector);p.color=validColor(p.color||autoColorForPosition(p));p.sectorLocked=Boolean(p.sectorLocked);p.colorLocked=Boolean(p.colorLocked);p.note=String(p.note||"");p.priceSource=String(p.priceSource||p.quoteSource||(p.source==="manual"?"manual":"")).toLowerCase();p.priceProvider=String(p.priceProvider||"").toLowerCase();p.priceUpdatedAt=p.priceUpdatedAt||"";
+  p.id=p.id||uid("pos");p.symbol=String(p.symbol||"").trim().toUpperCase();p.name=String(p.name||"");p.currency=String(p.currency||"USD").toUpperCase();p.source=p.source==="manual"?"manual":"twelve";p.shares=num(p.shares);p.avgCost=num(p.avgCost);p.price=num(p.price);p.sector=inferSector(p.symbol,p.name,p.sector);p.color=validColor(p.color||autoColorForPosition(p));p.sectorLocked=Boolean(p.sectorLocked);p.colorLocked=Boolean(p.colorLocked);p.note=String(p.note||"");p.priceSource=String(p.priceSource||p.quoteSource||(p.source==="manual"?"manual":"")).toLowerCase();p.priceProvider=String(p.priceProvider||"").toLowerCase();p.priceUpdatedAt=p.priceUpdatedAt||"";p.priceAsOf=p.priceAsOf||p.priceUpdatedAt||"";
   if(!Number.isFinite(Number(p.costBasisUSD)))p.costBasisUSD=p.shares*p.avgCost*fx(p.currency);else p.costBasisUSD=num(p.costBasisUSD);
   return p;
 }
 
 function migrateV8(raw){
   const migrated=structuredClone(defaultState);
-  migrated.settings={...migrated.settings,...(raw.settings||{}),version:VERSION,migratedFrom:"V8.0",migratedAt:new Date().toISOString()};
+  migrated.settings={...migrated.settings,...(raw.settings||{}),schemaVersion:LEDGER_SCHEMA_VERSION,migratedFrom:"V8.0",migratedAt:new Date().toISOString()};
   if(raw.settings?.apiKey)migrated.settings.publicMarketKey=String(raw.settings.apiKey);
   migrated.fxRates={...migrated.fxRates,...(raw.fxRates||{}),USD:1};
   const baseCapital=num(raw.settings?.totalAsset)||15000;
@@ -217,7 +220,7 @@ function normalizeState(raw){
   if(Array.isArray(raw?.data)&&!Array.isArray(raw?.positions))raw=migrateV8(raw);
   const incomingTaxonomy=raw?.settings?.taxonomyVersion||"";
   state={...structuredClone(defaultState),...(raw||{})};
-  state.settings={...defaultState.settings,...(state.settings||{}),version:VERSION};
+  state.settings={...defaultState.settings,...(state.settings||{})};
   if(state.settings.apiKey&&!state.settings.publicMarketKey)state.settings.publicMarketKey=String(state.settings.apiKey);
   state.fxRates={...defaultState.fxRates,...(state.fxRates||{}),USD:1};
   state.positions=(Array.isArray(state.positions)?state.positions:[]).map(normalizePosition).filter(p=>p.symbol&&p.shares>0);
@@ -231,13 +234,13 @@ function normalizeState(raw){
     try{rebuildCurrentPositionsFromTransactions(state.transactions)}
     catch(error){console.warn("Position rebuild skipped during normalizeState",error)}
   }
-  delete state.data;delete state.settings.totalAsset;
+  delete state.data;delete state.settings.totalAsset;delete state.settings.version;
 }
 
 async function fetchSharedText(){
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),8000);
   try{
-    const response=await fetch("data.json?ts="+Date.now(),{cache:"no-store",signal:controller.signal});
+    const response=await fetch("data.json",{cache:"no-cache",signal:controller.signal});
     if(!response.ok)throw new Error("找不到 data.json");
     return await response.text();
   }finally{
@@ -245,7 +248,7 @@ async function fetchSharedText(){
   }
 }
 function applySharedDataText(raw,reason=""){
-  const shared=JSON.parse(raw),versionChanged=shared?.settings?.version!==VERSION;normalizeState(shared);applyPriceCache();cloudState=structuredClone(state);lastSharedRaw=raw;const snapshotChanged=isAdminMode?captureSnapshot(false):false;dirty=isAdminMode&&(versionChanged||snapshotChanged);lastMutationReason=isAdminMode?(versionChanged?"账本已升级到 V10，等待首次安全保存":snapshotChanged?"今日资产快照":""):"";saveLocal();renderAll();renderSyncStatus();if(reason)$("status").textContent=reason;
+  normalizeState(JSON.parse(raw));applyPriceCache();cloudState=structuredClone(state);lastSharedRaw=raw;dirty=false;lastMutationReason="";saveLocal();renderAll();renderSyncStatus();if(reason)$("status").textContent=reason;
 }
 async function loadSharedData(autoRefresh=false){
   const status=$("status");status.textContent="正在读取 GitHub 共享数据...";
@@ -333,6 +336,7 @@ function priceSourceClass(p){
   if(label.includes("收盘"))return"source-close";
   return"source-muted";
 }
+function quoteDateLabel(p){const stamp=p.priceAsOf||p.priceUpdatedAt;if(!stamp)return"";const date=new Date(stamp);if(Number.isNaN(date.getTime()))return"";const day=new Intl.DateTimeFormat("zh-CN",{timeZone:US_MARKET_TZ,year:"numeric",month:"numeric",day:"numeric"}).format(date);if(p.priceSource==="last-close")return `${day} 收盘价`;if(p.priceSource==="static")return `${day} 静态兜底价`;return `更新于 ${date.toLocaleString("zh-CN")}`}
 function quoteSourceSummary(){
   const counts={twe:0,fin:0,manual:0,close:0,static:0,pending:0};
   state.positions.forEach(p=>{
@@ -449,9 +453,9 @@ function floatingReturn(){const c=currentCost();return c?floatingPnl()/c*100:0}
 
 function getPriceCache(){return readJson(localStorage.getItem(PRICE_CACHE_KEY),null)}
 function getFxCache(){return readJson(localStorage.getItem(FX_CACHE_KEY),null)}
-function applyPriceCache(){const pc=getPriceCache();const fc=getFxCache();if(fc?.fxRates)state.fxRates={...state.fxRates,...fc.fxRates,USD:1};if(pc?.prices)state.positions.forEach(p=>{const q=pc.prices[p.symbol];if(q&&num(q.price)>0){p.price=num(q.price);p.changePercent=num(q.changePercent);p.priceSource=q.priceSource||p.priceSource;p.priceProvider=q.priceProvider||p.priceProvider;p.priceUpdatedAt=q.priceUpdatedAt||p.priceUpdatedAt}});if(pc?.lastPriceRefresh){state.settings.lastPriceRefresh=pc.lastPriceRefresh;state.settings.lastPriceRefreshText=pc.lastPriceRefreshText||""}}
+function applyPriceCache(){const pc=getPriceCache();const fc=getFxCache();if(fc?.fxRates)state.fxRates={...state.fxRates,...fc.fxRates,USD:1};if(pc?.prices)state.positions.forEach(p=>{const q=pc.prices[p.symbol];if(q&&num(q.price)>0){p.price=num(q.price);p.changePercent=num(q.changePercent);p.priceSource=q.priceSource||p.priceSource;p.priceProvider=q.priceProvider||p.priceProvider;p.priceUpdatedAt=q.priceUpdatedAt||p.priceUpdatedAt;p.priceAsOf=q.priceAsOf||q.priceUpdatedAt||p.priceAsOf}});if(pc?.lastPriceRefresh){state.settings.lastPriceRefresh=pc.lastPriceRefresh;state.settings.lastPriceRefreshText=pc.lastPriceRefreshText||""}}
 function priceCacheValid(){const last=num(getPriceCache()?.lastPriceRefresh),mins=num(state.settings.priceCacheMinutes)||30;return last&&Date.now()-last<mins*60000}
-function savePriceCache(){const prices={};state.positions.forEach(p=>prices[p.symbol]={price:p.price,changePercent:p.changePercent||0,priceSource:p.priceSource||"",priceProvider:p.priceProvider||"",priceUpdatedAt:p.priceUpdatedAt||""});localStorage.setItem(PRICE_CACHE_KEY,JSON.stringify({lastPriceRefresh:state.settings.lastPriceRefresh,lastPriceRefreshText:state.settings.lastPriceRefreshText,prices}))}
+function savePriceCache(){const prices={};state.positions.forEach(p=>prices[p.symbol]={price:p.price,changePercent:p.changePercent||0,priceSource:p.priceSource||"",priceProvider:p.priceProvider||"",priceUpdatedAt:p.priceUpdatedAt||"",priceAsOf:p.priceAsOf||""});localStorage.setItem(PRICE_CACHE_KEY,JSON.stringify({lastPriceRefresh:state.settings.lastPriceRefresh,lastPriceRefreshText:state.settings.lastPriceRefreshText,prices}))}
 function friendlyFetchError(error){
   if(error?.name==="AbortError")return"请求超时，请检查手机网络后会自动重试";
   if(error instanceof TypeError)return"网络请求失败，可能是手机网络或微信浏览器临时拦截";
@@ -611,12 +615,12 @@ async function refreshLastClosePrices(clock=marketClockState||marketClock()){
     const items=state.positions.filter(p=>p.source==="twelve"&&p.symbol),symbols=[...new Set(items.map(p=>p.symbol))];
     if(symbols.length){
       const res=await fetchQuoteBatchResilient(symbols,"last-close"),providers=new Set();
-      items.forEach(p=>{const q=symbols.length===1?res:res[p.symbol];const provider=String(q?.source||"last-close").toLowerCase();if(provider)providers.add(provider);const price=num(q?.close||q?.price);if(price>0)p.price=price;p.changePercent=num(q?.percent_change);p.priceSource="last-close";p.priceProvider=provider;p.priceUpdatedAt=new Date().toISOString()});
+      items.forEach(p=>{const q=symbols.length===1?res:res[p.symbol];const provider=String(q?.source||"last-close").toLowerCase();if(provider)providers.add(provider);const price=num(q?.close||q?.price);if(price>0)p.price=price;p.changePercent=num(q?.percent_change);p.priceSource="last-close";p.priceProvider=provider;p.priceUpdatedAt=q?.as_of||q?.datetime||q?.last_quote_at||new Date().toISOString();p.priceAsOf=p.priceUpdatedAt});
       if(providers.size===1)lastMarketProvider=[...providers][0];else if(providers.size>1)lastMarketProvider="mixed";
       lastMarketRoute="last-close";
     }else lastMarketRoute="last-close";
     state.settings.lastPriceRefresh=Date.now();state.settings.lastPriceRefreshText=new Date().toLocaleString("zh-CN");savePriceCache();
-    if(isAdminMode){captureSnapshot(false);markDirty("休市收盘价与今日快照已更新")}else saveLocal();
+    saveLocal();
     renderAll();
     if(status)status.textContent=`${marketClockDisplay(clock)}；已使用上个交易日收盘价`;
   }catch(error){
@@ -641,11 +645,11 @@ async function doRefreshPrices(useCache=true){
     const items=state.positions.filter(p=>p.source==="twelve"&&p.symbol),symbols=[...new Set(items.map(p=>p.symbol))];
     if(symbols.length){
       const res=await fetchQuoteBatchResilient(symbols),providers=new Set();
-      items.forEach(p=>{const q=symbols.length===1?res:res[p.symbol];const provider=String(q?.source||"twelve").toLowerCase();if(provider)providers.add(provider);const price=num(q?.close||q?.price);if(price>0)p.price=price;p.changePercent=num(q?.percent_change);p.priceSource=provider==="static"?"static":provider;p.priceProvider=provider;p.priceUpdatedAt=new Date().toISOString()});
+      items.forEach(p=>{const q=symbols.length===1?res:res[p.symbol];const provider=String(q?.source||"twelve").toLowerCase();if(provider)providers.add(provider);const price=num(q?.close||q?.price);if(price>0)p.price=price;p.changePercent=num(q?.percent_change);p.priceSource=provider==="static"?"static":provider;p.priceProvider=provider;p.priceUpdatedAt=q?.as_of||q?.datetime||q?.last_quote_at||new Date().toISOString();p.priceAsOf=p.priceUpdatedAt});
       if(providers.size===1)lastMarketProvider=[...providers][0];else if(providers.size>1)lastMarketProvider="mixed";
     }
     state.settings.lastPriceRefresh=Date.now();state.settings.lastPriceRefreshText=new Date().toLocaleString("zh-CN");savePriceCache();
-    if(isAdminMode){captureSnapshot(false);markDirty("实时行情与今日快照已更新")}else saveLocal();
+    saveLocal();
     renderAll();status.textContent=lastMarketRoute==="static"?`代理行情失败，已临时使用静态缓存：${lastMarketError}`:(isAdminMode?"已刷新："+state.settings.lastPriceRefreshText+"。保存到 GitHub 后家人可见":"已刷新："+state.settings.lastPriceRefreshText+"。本次价格已缓存在本设备");
   }catch(error){lastMarketRoute="failed";applyPriceCache();renderAll();status.textContent="代理行情暂时不可用，已保留最近缓存行情："+friendlyFetchError(error);if(!useCache&&isAdminMode)alert(status.textContent)}finally{renderDiagnostics();if(button)button.disabled=false}
 }
@@ -665,6 +669,13 @@ async function checkCloudStatus(manual=false){
 async function createCloudBackup(remote){
   if(!remote?.sha)return null;const stamp=new Date().toISOString().replace(/[-:TZ.]/g,"").slice(0,17),path=`backups/data-${stamp}.json`;const result=await putGithubFile(path,remote.raw,`Backup data.json before V10 save (${stamp})`);const box=$("cloudBackupStatus");if(box)box.textContent=`已备份旧云端账本：${path}`;return{path,result}
 }
+function ledgerForCloud(){
+  const ledger=structuredClone(state);
+  ledger.settings={...ledger.settings,schemaVersion:LEDGER_SCHEMA_VERSION};
+  delete ledger.settings.version;delete ledger.settings.lastPriceRefresh;delete ledger.settings.lastPriceRefreshText;delete ledger.settings.localUpdatedAt;delete ledger.settings.publicMarketKey;delete ledger.settings.apiKey;
+  ledger.positions.forEach(p=>{if(p.source!=="manual"){delete p.price;delete p.changePercent;delete p.priceSource;delete p.priceProvider;delete p.priceUpdatedAt;delete p.priceAsOf}});
+  return ledger;
+}
 async function saveToGithub(){
   if(!navigator.onLine){alert("当前离线，不能保存到 GitHub。联网后再试，所有本地修改仍保留在本机。");return}
   saveAdminSettings(false);if(!admin.owner||!admin.repo||!admin.token){alert("请先填写 GitHub 用户名、仓库名和 Token");return}
@@ -675,7 +686,7 @@ async function saveToGithub(){
     const l=summaryOf(state),r=summaryOf(remote.data);
     if(!confirm(`即将安全保存到 GitHub：\n\n本地：${l.positions} 个持仓 / ${l.transactions} 条交易 / ${l.cashFlows} 条资金流水\n云端：${r.positions} 个持仓 / ${r.transactions} 条交易 / ${r.cashFlows} 条资金流水\n\n系统会先备份旧云端账本，再执行保存。是否继续？`)){renderSyncStatus();return}
     createBackup("安全保存 GitHub 前");$("status").textContent="正在备份旧的云端账本...";await createCloudBackup(remote);
-    state.settings.version=VERSION;state.settings.lastCloudSaveAt=new Date().toISOString();const raw=JSON.stringify(state,null,2);$("status").textContent="云端备份完成，正在保存新账本...";const result=await putGithubFile("data.json",raw,"Update baby dream fund data V10",remote.sha);
+    state.settings.lastCloudSaveAt=new Date().toISOString();const raw=JSON.stringify(ledgerForCloud(),null,2);$("status").textContent="云端备份完成，正在保存新账本...";const result=await putGithubFile("data.json",raw,"Update baby dream fund data V10",remote.sha);
     cloudSha=result.content?.sha||null;cloudState=structuredClone(state);dirty=false;lastMutationReason="";saveLocal();renderSyncStatus();$("status").textContent="安全保存完成：旧账本已备份，新账本已同步。";alert("V10 安全保存完成。旧的云端账本已经自动备份。")
   }catch(error){renderSyncStatus();$("status").textContent="保存失败："+error.message;alert($("status").textContent)}finally{button.disabled=!navigator.onLine}
 }
@@ -705,7 +716,7 @@ function renderChart(){const svg=$("assetChart"),data=state.snapshots.slice(-120
 
 function renderPositionTable(){
   const q=$("positionSearch")?.value.trim().toUpperCase()||"",items=state.positions.filter(p=>!q||p.symbol.includes(q)||p.name.toUpperCase().includes(q));
-  $("positionBody").innerHTML=items.length?items.map(p=>{const locks=[p.sectorLocked?"板块锁":"",p.colorLocked?"颜色锁":""].filter(Boolean).join(" / "),source=priceSourceLabel(p);return`<tr><td class="asset-cell"><strong>${escapeHtml(p.symbol)}</strong><small>${escapeHtml(p.name)} · ${escapeHtml(p.currency)}</small></td><td>${round(p.shares,4)}</td><td>${round(p.avgCost,4)} ${escapeHtml(p.currency)}</td><td>${money(p.costBasisUSD)}</td><td>${money(marketUSD(p))}</td><td class="${cls(floatingPnlUSD(p))}">${money(floatingPnlUSD(p))}</td><td><span class="quote-source ${priceSourceClass(p)}">${escapeHtml(source)}</span><small class="muted">${p.priceUpdatedAt?new Date(p.priceUpdatedAt).toLocaleString("zh-CN"):""}</small></td><td>${escapeHtml(p.sector)}${locks?`<small class="muted">${escapeHtml(locks)}</small>`:""}</td><td>${isAdminMode?`<div class="row-buttons"><button onclick="openTrade('buy','${p.id}')">买入</button><button onclick="openTrade('sell','${p.id}')">卖出</button><button onclick="editPosition('${p.id}')">编辑</button></div>`:"—"}</td></tr>`}).join(""):'<tr><td colspan="9" class="muted">没有匹配的持仓</td></tr>'
+  $("positionBody").innerHTML=items.length?items.map(p=>{const locks=[p.sectorLocked?"板块锁":"",p.colorLocked?"颜色锁":""].filter(Boolean).join(" / "),source=priceSourceLabel(p);return`<tr><td class="asset-cell"><strong>${escapeHtml(p.symbol)}</strong><small>${escapeHtml(p.name)} · ${escapeHtml(p.currency)}</small></td><td>${round(p.shares,4)}</td><td>${round(p.avgCost,4)} ${escapeHtml(p.currency)}</td><td>${money(p.costBasisUSD)}</td><td>${money(marketUSD(p))}</td><td class="${cls(floatingPnlUSD(p))}">${money(floatingPnlUSD(p))}</td><td><span class="quote-source ${priceSourceClass(p)}">${escapeHtml(source)}</span><small class="muted">${escapeHtml(quoteDateLabel(p))}</small></td><td>${escapeHtml(p.sector)}${locks?`<small class="muted">${escapeHtml(locks)}</small>`:""}</td><td>${isAdminMode?`<div class="row-buttons"><button onclick="openTrade('buy','${p.id}')">买入</button><button onclick="openTrade('sell','${p.id}')">卖出</button><button onclick="editPosition('${p.id}')">编辑</button></div>`:"—"}</td></tr>`}).join(""):'<tr><td colspan="9" class="muted">没有匹配的持仓</td></tr>'
 }
 
 function transactionLabel(t){
@@ -903,23 +914,23 @@ function renderMapHoldingTable(){
   body.innerHTML=rows+(cash>0?`<tr><td><i style="background:${sectorBaseColor("现金")}"></i><strong>CASH</strong><small>现金</small></td><td>${money(cash)}</td><td>${round(cash/total*100)}%</td><td class="muted">—</td></tr>`:"");
 }
 
-function renderAll(){renderKpis();renderTreemap();renderSectorsV2();renderMapHoldingTable();renderChartV2();renderHoldingCardsV2();renderPositionTable();renderTransactionTable();renderCashFlowTable();renderBackupList();renderSectorAdminPanel();$("positionCount").textContent=state.positions.length;$("transactionCount").textContent=state.transactions.length;$("cashFlowCount").textContent=state.cashFlows.length;switchLedgerTab(activeLedgerTab);$("pageTitle").textContent=state.settings.title;document.title=state.settings.title;$("titleInput").value=state.settings.title;$("cacheInput").value=state.settings.priceCacheMinutes;if($("eurFxInput"))$("eurFxInput").value=state.fxRates.EUR||defaultState.fxRates.EUR;if($("proxyInput"))$("proxyInput").value=priceProxyUrl();$("apiKeyInput").value=marketKey();renderSyncStatus();renderDiagnostics()}
+function renderAll(){renderKpis();renderTreemap();renderSectorsV2();renderMapHoldingTable();renderChartV2();renderHoldingCardsV2();renderPositionTable();renderTransactionTable();renderCashFlowTable();renderBackupList();renderSectorAdminPanel();$("positionCount").textContent=state.positions.length;$("transactionCount").textContent=state.transactions.length;$("cashFlowCount").textContent=state.cashFlows.length;switchLedgerTab(activeLedgerTab);$("pageTitle").textContent=state.settings.title;document.title=state.settings.title;$("titleInput").value=state.settings.title;$("cacheInput").value=state.settings.priceCacheMinutes;if($("eurFxInput"))$("eurFxInput").value=state.fxRates.EUR||defaultState.fxRates.EUR;if($("proxyInput"))$("proxyInput").value=priceProxyUrl();renderSyncStatus();renderDiagnostics()}
 function initAdminMode(){isAdminMode=new URLSearchParams(location.search).get("admin")==="1";document.querySelectorAll(".admin-only").forEach(el=>el.classList.toggle("hidden",!isAdminMode));document.body.classList.toggle("viewer-mode",!isAdminMode)}
 function canAutoRefreshPrices(){return navigator.onLine&&document.visibilityState!=="hidden"&&!!priceProxyUrl()}
 function kickAutoRefresh(force=false){
   if(!canAutoRefreshPrices())return;
   const now=Date.now();
   if(!force&&now-lastAutoRefreshKick<RESUME_REFRESH_GAP_MS)return;
+  if(!(marketClockState?.isOpen||marketClockState?.phase==="open")){lastAutoRefreshKick=now;refreshLastClosePrices(marketClockState||marketClock());return}
   if(!force&&priceCacheValid()){applyPriceCache();renderAll();return}
-  if(!force&&!isUsMarketOpen()){applyPriceCache();renderAll();return}
   lastAutoRefreshKick=now;
-  refreshPrices(!isUsMarketOpen());
+  refreshPrices(false);
 }
 function initAutoRefreshHooks(){
   if(autoRefreshTimer)clearInterval(autoRefreshTimer);
   if(sharedDataTimer)clearInterval(sharedDataTimer);
   sharedDataTimer=setInterval(()=>checkSharedDataUpdate(false),SHARED_DATA_CHECK_MS);
-  autoRefreshTimer=setInterval(()=>refreshMarketClock().then(()=>kickAutoRefresh(false)),AUTO_REFRESH_CHECK_MS);
+  autoRefreshTimer=setInterval(()=>{if(document.visibilityState==="visible")refreshMarketClock().then(()=>kickAutoRefresh(false))},AUTO_REFRESH_CHECK_MS);
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"){checkSharedDataUpdate(true);refreshMarketClock().then(()=>kickAutoRefresh(true))}});
   window.addEventListener("focus",()=>{checkSharedDataUpdate(true);refreshMarketClock().then(()=>kickAutoRefresh(false))});
   window.addEventListener("pageshow",()=>checkSharedDataUpdate(false));
