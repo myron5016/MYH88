@@ -2,19 +2,19 @@
   "settings": {
     "title": "孟一晗的梦想金库",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1783473579921,
-    "lastPriceRefreshText": "2026/7/8 09:19:39",
-    "version": "V10.28 PWA家庭版",
+    "lastPriceRefresh": 1783751672584,
+    "lastPriceRefreshText": "2026/7/11 14:34:32",
+    "version": "V10.31.2 PWA家庭版",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-08T01:21:09.435Z",
-    "localUpdatedAt": "2026-07-08T01:20:44.971Z",
+    "lastCloudSaveAt": "2026-07-11T06:37:31.359Z",
+    "localUpdatedAt": "2026-07-11T06:35:16.723Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
     ],
     "fxMode": "manual",
-    "taxonomyVersion": "sector-color-v6"
+    "taxonomyVersion": "sector-color-v8"
   },
   "fxRates": {
     "USD": 1,
@@ -32,14 +32,17 @@
       "source": "twelve",
       "shares": 14,
       "avgCost": 209.76343307142858,
-      "price": 194.83,
+      "price": 202.78,
       "sector": "AI基建",
-      "color": "#15c180",
+      "color": "#21cf87",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 2936.688063,
-      "changePercent": -1.39184
+      "changePercent": -0.6564765824025101,
+      "priceSource": "last-close",
+      "priceProvider": "finnhub",
+      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
     },
     {
       "id": "pos_mqnjborg_zeux56",
@@ -49,14 +52,17 @@
       "source": "twelve",
       "shares": 5,
       "avgCost": 325.04,
-      "price": 245.28999,
+      "price": 243.27,
       "sector": "光通信",
-      "color": "#0097a8",
+      "color": "#15afbb",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 1625.2,
-      "changePercent": -9.83643
+      "changePercent": 4.988994864269993,
+      "priceSource": "last-close",
+      "priceProvider": "finnhub",
+      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
     },
     {
       "id": "pos_mqnjborg_p8abix",
@@ -66,14 +72,17 @@
       "source": "twelve",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 120.95,
+      "price": 122.21,
       "sector": "光通信",
-      "color": "#00bcd1",
+      "color": "#18c5d3",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 820.34,
-      "changePercent": -12.98561
+      "changePercent": 6.7895840615169485,
+      "priceSource": "last-close",
+      "priceProvider": "finnhub",
+      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
     },
     {
       "id": "pos_mqnjborg_q3swfw",
@@ -85,12 +94,15 @@
       "avgCost": 11.685,
       "price": 7.61,
       "sector": "半导体",
-      "color": "#f7863b",
+      "color": "#fa873c",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "手动价，EUR",
       "costBasisUSD": 588.613179,
-      "changePercent": 0
+      "changePercent": 0,
+      "priceSource": "manual",
+      "priceProvider": "",
+      "priceUpdatedAt": ""
     },
     {
       "id": "pos_mqnjborg_0c6vpc",
@@ -100,14 +112,17 @@
       "source": "twelve",
       "shares": 30,
       "avgCost": 111.4,
-      "price": 100.46,
+      "price": 82.55,
       "sector": "太空",
-      "color": "#f73d69",
+      "color": "#ea466d",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 3342,
-      "changePercent": 0.38972658
+      "changePercent": -0.9598080383923182,
+      "priceSource": "last-close",
+      "priceProvider": "finnhub",
+      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
     },
     {
       "id": "pos_mqnjborg_n3b8py",
@@ -117,14 +132,17 @@
       "source": "twelve",
       "shares": 0.0007,
       "avgCost": 310.070583197254,
-      "price": 300.53,
+      "price": 323.92,
       "sector": "AI基建",
-      "color": "#5cd8a9",
+      "color": "#41d99a",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 0.217049,
-      "changePercent": -3.49689
+      "changePercent": 1.9225323306378068,
+      "priceSource": "last-close",
+      "priceProvider": "finnhub",
+      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
     },
     {
       "id": "pos_mqnjborg_pzifro",
@@ -134,14 +152,17 @@
       "source": "twelve",
       "shares": 12,
       "avgCost": 149.86249999999998,
-      "price": 162,
+      "price": 152.16,
       "sector": "太空",
-      "color": "#ff7998",
+      "color": "#f16183",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 1798.35,
-      "changePercent": 2.83103
+      "changePercent": 2.6028320971004617,
+      "priceSource": "last-close",
+      "priceProvider": "finnhub",
+      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
     },
     {
       "id": "pos_mqpb20pj_q02ooh",
@@ -151,14 +172,17 @@
       "source": "twelve",
       "shares": 2,
       "avgCost": 346.34993,
-      "price": 359.91,
+      "price": 358.89,
       "sector": "科技平台",
-      "color": "#8759ef",
+      "color": "#885af1",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 692.69986,
-      "changePercent": -0.35989807
+      "changePercent": -0.8372015915119445,
+      "priceSource": "last-close",
+      "priceProvider": "finnhub",
+      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
     },
     {
       "id": "pos_mqv9tzrw_6n81s8",
@@ -168,14 +192,17 @@
       "source": "twelve",
       "shares": 1,
       "avgCost": 810.175,
-      "price": 728.32001,
+      "price": 785.77,
       "sector": "光通信",
-      "color": "#4dd4e3",
+      "color": "#38d1dd",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 810.175,
-      "changePercent": -9.091813
+      "changePercent": 11.125724791401492,
+      "priceSource": "last-close",
+      "priceProvider": "finnhub",
+      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
     },
     {
       "id": "pos_mqz9i9o7_8b8hhc",
@@ -185,14 +212,17 @@
       "source": "twelve",
       "shares": 2,
       "avgCost": 1095.35,
-      "price": 975.56,
+      "price": 991.64,
       "sector": "AI存储",
-      "color": "#2e7ce6",
+      "color": "#3a7ff1",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 2190.7,
-      "changePercent": -5.494633239043673
+      "changePercent": 4.515177065767288,
+      "priceSource": "last-close",
+      "priceProvider": "finnhub",
+      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
     }
   ],
   "transactions": [
@@ -1027,6 +1057,13 @@
       "amountUSD": 15000,
       "note": "V8 迁移：原始梦想基金本金",
       "migration": true
+    },
+    {
+      "id": "cash_mrfzpt9u_nmvk5p",
+      "date": "2026-07-10",
+      "type": "deposit",
+      "amountUSD": 7370,
+      "note": ""
     }
   ],
   "snapshots": [
@@ -1099,6 +1136,13 @@
       "netAsset": 13807.56,
       "market": 13177.34,
       "cash": 630.23
+    },
+    {
+      "date": "2026-07-11",
+      "capital": 22370,
+      "netAsset": 20716.01,
+      "market": 12715.78,
+      "cash": 8000.23
     }
   ]
 }
