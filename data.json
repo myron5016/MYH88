@@ -2,13 +2,10 @@
   "settings": {
     "title": "孟一晗的梦想金库",
     "priceCacheMinutes": 30,
-    "lastPriceRefresh": 1783751672584,
-    "lastPriceRefreshText": "2026/7/11 14:34:32",
-    "version": "V10.31.2 PWA家庭版",
+    "schemaVersion": "10.32",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-11T06:37:31.359Z",
-    "localUpdatedAt": "2026-07-11T06:35:16.723Z",
+    "lastCloudSaveAt": "2026-07-13T15:54:38.581Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -32,17 +29,12 @@
       "source": "twelve",
       "shares": 14,
       "avgCost": 209.76343307142858,
-      "price": 202.78,
       "sector": "AI基建",
       "color": "#21cf87",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 2936.688063,
-      "changePercent": -0.6564765824025101,
-      "priceSource": "last-close",
-      "priceProvider": "finnhub",
-      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
+      "costBasisUSD": 2936.688063
     },
     {
       "id": "pos_mqnjborg_zeux56",
@@ -52,17 +44,12 @@
       "source": "twelve",
       "shares": 5,
       "avgCost": 325.04,
-      "price": 243.27,
       "sector": "光通信",
       "color": "#15afbb",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 1625.2,
-      "changePercent": 4.988994864269993,
-      "priceSource": "last-close",
-      "priceProvider": "finnhub",
-      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
+      "costBasisUSD": 1625.2
     },
     {
       "id": "pos_mqnjborg_p8abix",
@@ -72,17 +59,12 @@
       "source": "twelve",
       "shares": 4,
       "avgCost": 205.085,
-      "price": 122.21,
       "sector": "光通信",
       "color": "#18c5d3",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 820.34,
-      "changePercent": 6.7895840615169485,
-      "priceSource": "last-close",
-      "priceProvider": "finnhub",
-      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
+      "costBasisUSD": 820.34
     },
     {
       "id": "pos_mqnjborg_q3swfw",
@@ -102,7 +84,8 @@
       "changePercent": 0,
       "priceSource": "manual",
       "priceProvider": "",
-      "priceUpdatedAt": ""
+      "priceUpdatedAt": "",
+      "priceAsOf": ""
     },
     {
       "id": "pos_mqnjborg_0c6vpc",
@@ -112,17 +95,12 @@
       "source": "twelve",
       "shares": 30,
       "avgCost": 111.4,
-      "price": 82.55,
       "sector": "太空",
       "color": "#ea466d",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 3342,
-      "changePercent": -0.9598080383923182,
-      "priceSource": "last-close",
-      "priceProvider": "finnhub",
-      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
+      "costBasisUSD": 3342
     },
     {
       "id": "pos_mqnjborg_n3b8py",
@@ -132,17 +110,12 @@
       "source": "twelve",
       "shares": 0.0007,
       "avgCost": 310.070583197254,
-      "price": 323.92,
       "sector": "AI基建",
       "color": "#41d99a",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 0.217049,
-      "changePercent": 1.9225323306378068,
-      "priceSource": "last-close",
-      "priceProvider": "finnhub",
-      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
+      "costBasisUSD": 0.217049
     },
     {
       "id": "pos_mqnjborg_pzifro",
@@ -152,17 +125,12 @@
       "source": "twelve",
       "shares": 12,
       "avgCost": 149.86249999999998,
-      "price": 152.16,
       "sector": "太空",
       "color": "#f16183",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 1798.35,
-      "changePercent": 2.6028320971004617,
-      "priceSource": "last-close",
-      "priceProvider": "finnhub",
-      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
+      "costBasisUSD": 1798.35
     },
     {
       "id": "pos_mqpb20pj_q02ooh",
@@ -172,17 +140,12 @@
       "source": "twelve",
       "shares": 2,
       "avgCost": 346.34993,
-      "price": 358.89,
       "sector": "科技平台",
       "color": "#885af1",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 692.69986,
-      "changePercent": -0.8372015915119445,
-      "priceSource": "last-close",
-      "priceProvider": "finnhub",
-      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
+      "costBasisUSD": 692.69986
     },
     {
       "id": "pos_mqv9tzrw_6n81s8",
@@ -192,17 +155,12 @@
       "source": "twelve",
       "shares": 1,
       "avgCost": 810.175,
-      "price": 785.77,
       "sector": "光通信",
       "color": "#38d1dd",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 810.175,
-      "changePercent": 11.125724791401492,
-      "priceSource": "last-close",
-      "priceProvider": "finnhub",
-      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
+      "costBasisUSD": 810.175
     },
     {
       "id": "pos_mqz9i9o7_8b8hhc",
@@ -212,17 +170,27 @@
       "source": "twelve",
       "shares": 2,
       "avgCost": 1095.35,
-      "price": 991.64,
       "sector": "AI存储",
       "color": "#3a7ff1",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 2190.7,
-      "changePercent": 4.515177065767288,
-      "priceSource": "last-close",
-      "priceProvider": "finnhub",
-      "priceUpdatedAt": "2026-07-11T06:34:32.584Z"
+      "costBasisUSD": 2190.7
+    },
+    {
+      "id": "pos_mrjeihbw_e1js0w",
+      "symbol": "INTC",
+      "name": "英特尔",
+      "currency": "USD",
+      "source": "twelve",
+      "shares": 10,
+      "avgCost": 104.53399999999999,
+      "sector": "未分类",
+      "color": "#1f82c4",
+      "sectorLocked": false,
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 1045.34
     }
   ],
   "transactions": [
@@ -1047,6 +1015,27 @@
       "costBasisUSD": 298.35,
       "grossUSD": 298,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mrjeihbu_dmb06t",
+      "date": "2026-07-13",
+      "type": "buy",
+      "symbol": "INTC",
+      "name": "英特尔",
+      "shares": 10,
+      "price": 104.5,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.34,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#1f82c4",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.34,
+      "costBasisUSD": 1045.34,
+      "grossUSD": 1045,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -1143,6 +1132,13 @@
       "netAsset": 20716.01,
       "market": 12715.78,
       "cash": 8000.23
+    },
+    {
+      "date": "2026-07-13",
+      "capital": 22370,
+      "netAsset": 20191.4,
+      "market": 13236.51,
+      "cash": 6954.89
     }
   ]
 }
