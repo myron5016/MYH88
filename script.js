@@ -1,5 +1,5 @@
-const VERSION="V10.32 PWA家庭版";
-const LEDGER_SCHEMA_VERSION="10.32";
+const VERSION="V10.33 PWA家庭版";
+const LEDGER_SCHEMA_VERSION="10.33";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
 const PRICE_CACHE_KEY="v9_price_cache";
@@ -540,18 +540,15 @@ async function refreshFx(force=false){
 }
 async function fetchQuoteBatch(symbols){
   let lastError=null;
-  for(let attempt=1;attempt<=3;attempt++){
-    try{
-      const proxy=priceProxyUrl();
-      if(!proxy)throw new Error("缺少 Cloudflare Worker 行情代理地址");
-      const res=await fetchJson(`${proxy}/quotes?symbols=${encodeURIComponent(symbols.join(","))}`,{timeout:PROXY_TIMEOUT_MS});
-      if(res.code||res.status==="error")throw new Error(res.message||"Twelve Data 错误");
-      lastMarketRoute="proxy";
-      return res;
-    }catch(error){
-      lastError=error;
-      await new Promise(resolve=>setTimeout(resolve, attempt*900));
-    }
+  try{
+    const proxy=priceProxyUrl();
+    if(!proxy)throw new Error("缺少 Cloudflare Worker 行情代理地址");
+    const res=await fetchJson(`${proxy}/quotes?symbols=${encodeURIComponent(symbols.join(","))}`,{timeout:PROXY_TIMEOUT_MS});
+    if(res.code||res.status==="error")throw new Error(res.message||"行情代理错误");
+    lastMarketRoute="proxy";
+    return res;
+  }catch(error){
+    lastError=error;
   }
   throw lastError;
 }
@@ -559,24 +556,21 @@ async function fetchQuoteBatchResilient(symbols,mode="live"){
   let lastError=null;
   const proxies=priceProxyUrls();
   if(!proxies.length)throw new Error("Missing Cloudflare Worker price proxy URL");
-  for(let attempt=1;attempt<=3;attempt++){
-    for(const proxy of proxies){
-      try{
-        const modeParam=mode==="last-close"?"&mode=last-close":"";
-        const meta=await fetchJsonWithHeaders(`${proxy}/quotes?symbols=${encodeURIComponent(symbols.join(","))}${modeParam}`,{timeout:PROXY_TIMEOUT_MS});
-        const res=meta.data;
-        lastQuoteCache=meta.headers.get("X-MYH88-Cache")||"";
-        lastQuoteWarnings=meta.headers.get("X-MYH88-Warnings")||"";
-        const sourceHeader=String(meta.headers.get("X-MYH88-Source")||"").toLowerCase();
-        if(sourceHeader)lastMarketProvider=sourceHeader;
-        if(res.code||res.status==="error")throw new Error(res.message||"Quote proxy error");
-        lastMarketRoute=proxy===proxies[0]?"proxy":"fallback";
-        return res;
-      }catch(error){
-        lastError=error;
-      }
+  for(const proxy of proxies){
+    try{
+      const modeParam=mode==="last-close"?"&mode=last-close":"";
+      const meta=await fetchJsonWithHeaders(`${proxy}/quotes?symbols=${encodeURIComponent(symbols.join(","))}${modeParam}`,{timeout:PROXY_TIMEOUT_MS});
+      const res=meta.data;
+      lastQuoteCache=meta.headers.get("X-MYH88-Cache")||"";
+      lastQuoteWarnings=meta.headers.get("X-MYH88-Warnings")||"";
+      const sourceHeader=String(meta.headers.get("X-MYH88-Source")||"").toLowerCase();
+      if(sourceHeader)lastMarketProvider=sourceHeader;
+      if(res.code||res.status==="error")throw new Error(res.message||"Quote proxy error");
+      lastMarketRoute=proxy===proxies[0]?"proxy":"fallback";
+      return res;
+    }catch(error){
+      lastError=error;
     }
-    await new Promise(resolve=>setTimeout(resolve, attempt*900));
   }
   try{
     const cached=await fetchStaticQuoteCache(symbols);

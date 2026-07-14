@@ -30,6 +30,9 @@ function json(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8", ...extraHeaders } });
 }
 function noStoreJson(data, status) { return json(data, status, { "Cache-Control": "no-store" }); }
+function safeHeaderValue(value, maxLength = 240) {
+  return String(value ?? "").replace(/[\r\n\t]+/g, " ").replace(/[^\x20-\x7E]/g, " ").slice(0, maxLength).trim();
+}
 function normalizeSymbols(value) {
   return [...new Set(String(value || "").split(",").map((s) => s.trim().toUpperCase()).filter((s) => /^[A-Z0-9.-]{1,12}$/.test(s)))];
 }
@@ -59,13 +62,13 @@ async function readSharedCache(env, key) { return env.MYH88_CACHE ? env.MYH88_CA
 async function writeSharedCache(env, key, response, ttl = CACHE_SECONDS + STALE_SECONDS) {
   if (!env.MYH88_CACHE || !response.ok) return;
   const body = await response.clone().text();
-  await env.MYH88_CACHE.put(key, JSON.stringify({ cachedAt: Date.now(), contentType: response.headers.get("Content-Type") || "application/json; charset=utf-8", source: response.headers.get("X-MYH88-Source") || "", asOf: response.headers.get("X-MYH88-As-Of") || "", warnings: response.headers.get("X-MYH88-Warnings") || "", fallbackReason: response.headers.get("X-MYH88-Fallback-Reason") || "", body }), { expirationTtl: ttl }).catch((error) => console.error("KV write failed", key, error));
+  await env.MYH88_CACHE.put(key, JSON.stringify({ cachedAt: Date.now(), contentType: response.headers.get("Content-Type") || "application/json; charset=utf-8", source: safeHeaderValue(response.headers.get("X-MYH88-Source")), asOf: safeHeaderValue(response.headers.get("X-MYH88-As-Of")), warnings: safeHeaderValue(response.headers.get("X-MYH88-Warnings")), fallbackReason: safeHeaderValue(response.headers.get("X-MYH88-Fallback-Reason")), body }), { expirationTtl: ttl }).catch((error) => console.error("KV write failed", key, error));
 }
 function responseFromCached(record, cacheLabel) {
-  return new Response(record.body, { status: 200, headers: { ...corsHeaders, "Content-Type": record.contentType || "application/json; charset=utf-8", "X-MYH88-Cache": cacheLabel, "X-MYH88-Cached-At": String(record.cachedAt || ""), "X-MYH88-Source": record.source || "", "X-MYH88-As-Of": record.asOf || "", "X-MYH88-Warnings": record.warnings || "", "X-MYH88-Fallback-Reason": record.fallbackReason || "" } });
+  return new Response(record.body, { status: 200, headers: { ...corsHeaders, "Content-Type": record.contentType || "application/json; charset=utf-8", "X-MYH88-Cache": safeHeaderValue(cacheLabel), "X-MYH88-Cached-At": safeHeaderValue(record.cachedAt || ""), "X-MYH88-Source": safeHeaderValue(record.source), "X-MYH88-As-Of": safeHeaderValue(record.asOf), "X-MYH88-Warnings": safeHeaderValue(record.warnings), "X-MYH88-Fallback-Reason": safeHeaderValue(record.fallbackReason) } });
 }
 function jsonResponse(data, cacheLabel = "MISS", metadata = {}) {
-  return json(data, 200, { "X-MYH88-Cache": cacheLabel, "X-MYH88-Source": metadata.source || "", "X-MYH88-As-Of": metadata.asOf || "", ...(metadata.warnings ? { "X-MYH88-Warnings": metadata.warnings.slice(0, 240) } : {}), ...(metadata.fallbackReason ? { "X-MYH88-Fallback-Reason": metadata.fallbackReason.slice(0, 120) } : {}) });
+  return json(data, 200, { "X-MYH88-Cache": safeHeaderValue(cacheLabel), "X-MYH88-Source": safeHeaderValue(metadata.source), "X-MYH88-As-Of": safeHeaderValue(metadata.asOf), ...(metadata.warnings ? { "X-MYH88-Warnings": safeHeaderValue(metadata.warnings) } : {}), ...(metadata.fallbackReason ? { "X-MYH88-Fallback-Reason": safeHeaderValue(metadata.fallbackReason, 120) } : {}) });
 }
 async function fetchJsonUpstream(url, timeoutMs = 8000) {
   const controller = new AbortController(), timer = setTimeout(() => controller.abort("upstream timeout"), timeoutMs);
@@ -73,7 +76,7 @@ async function fetchJsonUpstream(url, timeoutMs = 8000) {
     const response = await fetch(url.toString(), { headers: { Accept: "application/json" }, signal: controller.signal, cf: { cacheTtl: CACHE_SECONDS, cacheEverything: true } });
     const text = await response.text().catch(() => ""); let data = {};
     try { data = JSON.parse(text || "{}"); } catch {}
-    if (!response.ok || data.code || data.status === "error") throw new Error(data.message || data.error || text.slice(0, 160) || `Upstream error ${response.status}`);
+    if (!response.ok || data.code || data.status === "error") throw new Error(safeHeaderValue(data.message || data.error || text.slice(0, 160) || `Upstream error ${response.status}`, 320));
     return data;
   } finally { clearTimeout(timer); }
 }
@@ -95,7 +98,7 @@ async function fetchFinnhubQuote(symbol, key) { if (!key) throw new Error("FINNH
 async function fetchTwelveQuotes(symbols, key) { if (!key || key.length < 10) throw new Error("TWELVE_DATA_KEY is missing or invalid"); const url = new URL(`${TWELVE_BASE}/quote`); url.searchParams.set("symbol", symbols.join(",")); url.searchParams.set("apikey", key); return fetchJsonUpstream(url); }
 function quoteMapFromProvider(data, symbols, source) { const quotes = {}; if (symbols.length === 1 && data && !data[symbols[0]]) quotes[symbols[0]] = { ...data, source }; for (const symbol of symbols) if (data?.[symbol] && !data[symbol].code && data[symbol].status !== "error") quotes[symbol] = { ...data[symbol], source }; return quotes; }
 async function providerBackedOff(env, provider) { const item = await readSharedCache(env, `provider:${provider}:backoff`); return item?.body ? JSON.parse(item.body) : null; }
-async function backoffProvider(env, provider, error, ctx) { if (!isQuotaError(error)) return; const response = json({ until: Date.now() + PROVIDER_BACKOFF_SECONDS * 1000, message: String(error.message || error).slice(0, 120) }); ctx.waitUntil(writeSharedCache(env, `provider:${provider}:backoff`, response, PROVIDER_BACKOFF_SECONDS)); }
+async function backoffProvider(env, provider, error) { if (!isQuotaError(error)) return; const response = json({ until: Date.now() + PROVIDER_BACKOFF_SECONDS * 1000, message: safeHeaderValue(error.message || error, 120) }); await writeSharedCache(env, `provider:${provider}:backoff`, response, PROVIDER_BACKOFF_SECONDS); }
 async function fetchFinnhubPartial(symbols, key, warnings) {
   const settled = await Promise.allSettled(symbols.map((symbol) => fetchFinnhubQuote(symbol, key)));
   const quotes = {}; settled.forEach((result, index) => { if (result.status === "fulfilled") quotes[symbols[index]] = result.value; else warnings.push(`${symbols[index]}: ${result.reason?.message || "Finnhub failed"}`); }); return quotes;
@@ -106,7 +109,7 @@ async function fetchQuotesWithFallback(symbols, env, ctx) {
   const twelveBackoff = await providerBackedOff(env, "twelve");
   if (firstEight.length && !twelveBackoff) {
     try { Object.assign(quotes, quoteMapFromProvider(await fetchTwelveQuotes(firstEight, twelveKey), firstEight, "twelve")); }
-    catch (error) { twelveReason = error.message || "Twelve failed"; warnings.push(`Twelve: ${twelveReason}`); await backoffProvider(env, "twelve", error, ctx); }
+    catch (error) { twelveReason = safeHeaderValue(error.message || "Twelve failed", 240); warnings.push(`Twelve: ${twelveReason}`); await backoffProvider(env, "twelve", error); }
   } else if (firstEight.length) { twelveReason = "Twelve temporarily backed off"; warnings.push(twelveReason); }
   const missing = [...finnhubFirst, ...firstEight.filter((symbol) => !quotes[symbol])];
   if (missing.length) Object.assign(quotes, await fetchFinnhubPartial(missing, finnhubKey, warnings));

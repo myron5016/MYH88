@@ -6,7 +6,7 @@
 
 body.viewer-mode .admin-only{display:none!important}
 
-/* V10.32: the dashboard is now a single focused canvas, without a sidebar. */
+/* V10.33: the dashboard is now a single focused canvas, without a sidebar. */
 @media(min-width:901px){body{padding-left:0}}
 .container{max-width:1510px;margin-left:auto;margin-right:auto}
 
@@ -444,6 +444,6 @@ h1{font-size:42px}
   .sector-bar{border-radius:7px}
 }
 
-/* V10.32 final desktop override: the retired sidebar must not reserve space. */
+/* V10.33 final desktop override: the retired sidebar must not reserve space. */
 @media(min-width:901px){body{padding-left:0!important}}
 

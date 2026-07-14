@@ -20,4 +20,4 @@ Do not upload:
 
 `data.json` is the live ledger. It should be changed only by the website admin safe-save flow, so a local code release cannot overwrite newer holdings on GitHub.
 
-V10.32 is a Worker release: upload its `cloudflare-worker.js` and `wrangler.toml`, then run `npx wrangler deploy` from the project folder. Never upload `data.json` during a code release.
+V10.33 is a Worker release: upload the code assets, deploy `cloudflare-worker.js` with `npx wrangler deploy`, and never upload `data.json` during a code release. This release removes duplicate quote retries, sanitizes upstream error headers, and preserves static/last-close fallback behavior.
