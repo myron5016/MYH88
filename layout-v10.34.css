@@ -27,7 +27,7 @@
 .terminal-grid{display:block!important;margin:0 0 16px}
 .terminal-grid .map-card{margin:0}
 .map-card{padding:22px}
-.map-card #treemap{height:650px;min-height:650px}
+.map-card #treemap{height:650px;min-height:650px;contain:layout paint}
 .map-side-card{display:none!important}
 .insight-grid{
   display:grid;
@@ -40,16 +40,31 @@
 .sector-overview-card .legend{margin-top:auto}
 .chart-card #assetChart{height:310px}
 .avatar{object-position:center 58%}
-.tile-copy{
+.map-card #treemap .tile{
+  align-items:center!important;
+  justify-content:center!important;
+  padding:10px!important;
+  overflow:hidden;
+}
+.map-card #treemap .tile-copy{
   position:relative!important;
   z-index:3!important;
+  display:flex;
   flex-direction:column;
+  align-items:center;
+  justify-content:center;
   gap:8px;
-  max-width:86%;
+  width:100%;
+  max-width:100%;
+  max-height:100%;
   text-align:center;
+  overflow:hidden;
 }
-.tile-text{text-align:center}
-.tile-meta{margin-top:4px}
+.map-card #treemap .tile-text{width:100%;min-width:0;text-align:center;overflow:hidden}
+.map-card #treemap .tile-symbol,
+.map-card #treemap .tile-meta{display:block;width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.map-card #treemap .tile-symbol{font-size:20px;line-height:1.1;font-weight:950}
+.map-card #treemap .tile-meta{margin-top:4px;font-size:13px;line-height:1.15;font-weight:900}
 .company-logo-card{
   position:relative;
   z-index:4!important;
@@ -94,12 +109,20 @@
 .company-logo-card.logo-fallback-active img{display:none}
 .company-logo-card.logo-fallback-active .logo-fallback{display:flex;z-index:2}
 .tile:after{z-index:0!important}
-.tile.tiny .company-logo-card{display:inline-flex;width:36px;height:36px;padding:5px;border-radius:7px}
-.tile.tiny .tile-copy{gap:5px}
-.tile.micro .company-logo-card,.tile.narrow .company-logo-card{display:none}
-.tile.micro .tile-copy,.tile.narrow .tile-copy{gap:0}
-.tile.micro .tile-text,.tile.narrow .tile-text{max-width:100%}
-.tile.micro .tile-symbol,.tile.narrow .tile-symbol{font-size:11px}
+.map-card #treemap .tile-large .company-logo-card{width:56px;height:56px}
+.map-card #treemap .tile-medium .company-logo-card{width:40px;height:40px;padding:5px;border-radius:7px}
+.map-card #treemap .tile-medium .tile-copy{gap:5px}
+.map-card #treemap .tile-medium .tile-symbol{font-size:16px}
+.map-card #treemap .tile-medium .tile-meta{font-size:12px;margin-top:3px}
+.map-card #treemap .tile-small{padding:6px!important}
+.map-card #treemap .tile-small .company-logo-card{width:28px;height:28px;padding:3px;border-radius:6px}
+.map-card #treemap .tile-small .tile-copy{gap:3px}
+.map-card #treemap .tile-small .tile-symbol{font-size:13px}
+.map-card #treemap .tile-small .tile-meta{font-size:10px;margin-top:2px}
+.map-card #treemap .tile-micro{padding:3px!important}
+.map-card #treemap .tile-micro .tile-copy{gap:0}
+.map-card #treemap .tile-micro .tile-symbol{font-size:10px}
+.map-card #treemap .tile-micro .tile-meta{font-size:8px;margin-top:1px}
 @media(max-width:1100px){
   .dashboard-status-grid{grid-template-columns:1fr}
   .dashboard-status-grid .diagnostics-strip{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -114,12 +137,12 @@
   .map-card{padding:14px}
   .map-card #treemap{height:auto;min-height:0}
   #treemap.mobile-map{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:6px}
-  #treemap.mobile-map .tile{position:relative;left:auto!important;top:auto!important;width:auto!important;height:108px!important;min-height:108px}
-  #treemap.mobile-map .tile:first-child{grid-column:1/-1;height:140px!important}
+  #treemap.mobile-map .tile{position:relative;left:auto!important;top:auto!important;width:auto!important;height:116px!important;min-height:116px;padding:8px!important}
+  #treemap.mobile-map .tile:only-child,#treemap.mobile-map .tile-dominant{grid-column:1/-1;height:138px!important}
   #treemap.mobile-map .tile-copy{gap:5px}
-  #treemap.mobile-map .company-logo-card{width:34px;height:34px;padding:4px;border-radius:7px}
-  #treemap.mobile-map .tile-symbol{font-size:13px}
-  #treemap.mobile-map .tile-meta{font-size:9px}
+  #treemap.mobile-map .company-logo-card{display:inline-flex;width:36px;height:36px;padding:4px;border-radius:7px}
+  #treemap.mobile-map .tile-symbol{font-size:14px}
+  #treemap.mobile-map .tile-meta{font-size:10px;margin-top:2px}
   .insight-grid{gap:12px;margin-bottom:12px}
   .chart-card #assetChart{height:260px}
 }

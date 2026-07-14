@@ -1,4 +1,4 @@
-const VERSION="V10.37 PWA家庭版";
+const VERSION="V10.38 PWA家庭版";
 const LEDGER_SCHEMA_VERSION="10.33";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
@@ -687,26 +687,77 @@ async function saveToGithub(){
 function saveSettings(){state.settings.title=$("titleInput").value.trim()||defaultState.settings.title;state.settings.priceCacheMinutes=Math.max(30,num($("cacheInput").value)||30);const eur=num($("eurFxInput")?.value);if(eur>0)state.fxRates.EUR=eur;state.fxRates.USD=1;localStorage.setItem(FX_CACHE_KEY,JSON.stringify({time:Date.now(),fxRates:state.fxRates,manual:true}));const proxy=$("proxyInput")?.value.trim()||"";if(proxy){localStorage.setItem("v10_price_proxy",proxy);state.settings.priceProxyUrl=proxy}else{localStorage.removeItem("v10_price_proxy");delete state.settings.priceProxyUrl}localStorage.removeItem(MARKET_KEY);delete state.settings.publicMarketKey;delete state.settings.apiKey;markDirty("看板设置已修改，汇率使用手动值，行情只通过 Cloudflare Worker 代理读取");renderAll();alert("设置已应用。汇率将使用手动值，不再调用 Twelve 汇率接口；安全保存到 GitHub 后，家人访问页面同步生效。")}
 
 function treemapItems(){const arr=state.positions.map(p=>({label:p.symbol,value:num(p.costBasisUSD),color:p.color})).filter(x=>x.value>0),cash=cashBalance();if(cash>0)arr.push({label:"CASH",value:cash,color:"#ffd84d"});return arr.sort((a,b)=>b.value-a.value)}
-function layout(items,x,y,w,h){if(!items.length)return[];if(items.length===1)return[{...items[0],x,y,w,h}];const total=items.reduce((s,i)=>s+i.value,0);let acc=0,split=0;for(let i=0;i<items.length;i++){if(acc<total/2){acc+=items[i].value;split=i+1}}split=Math.max(1,Math.min(items.length-1,split));const a=items.slice(0,split),b=items.slice(split),at=a.reduce((s,i)=>s+i.value,0);if(w>=h){const aw=w*at/total;return[...layout(a,x,y,aw,h),...layout(b,x+aw,y,w-aw,h)]}const ah=h*at/total;return[...layout(a,x,y,w,ah),...layout(b,x,y+ah,w,h-ah)]}
+function treemapVisualItems(items){
+  const total=items.reduce((sum,item)=>sum+item.value,0);
+  if(!total||items.length<2)return items.map(item=>({...item,visualValue:item.value}));
+  const floorRatio=Math.min(.028,.30/items.length),floorValue=total*floorRatio;
+  return items.map(item=>({...item,visualValue:Math.max(item.value,floorValue)})).sort((a,b)=>b.visualValue-a.visualValue||b.value-a.value||a.label.localeCompare(b.label));
+}
+function treemapWorst(row,side){
+  if(!row.length||side<=0)return Infinity;
+  const sum=row.reduce((value,item)=>value+item.area,0),max=Math.max(...row.map(item=>item.area)),min=Math.min(...row.map(item=>item.area));
+  return Math.max(side*side*max/(sum*sum),sum*sum/(side*side*min));
+}
+function treemapPlaceRow(row,rect,result){
+  const rowArea=row.reduce((value,item)=>value+item.area,0);
+  if(rect.w>=rect.h){
+    const width=rowArea/Math.max(rect.h,1);let top=rect.y;
+    row.forEach((item,index)=>{const height=index===row.length-1?rect.y+rect.h-top:item.area/Math.max(width,1);result.push({...item,x:rect.x,y:top,w:width,h:height});top+=height});
+    rect.x+=width;rect.w=Math.max(0,rect.w-width);
+  }else{
+    const height=rowArea/Math.max(rect.w,1);let left=rect.x;
+    row.forEach((item,index)=>{const width=index===row.length-1?rect.x+rect.w-left:item.area/Math.max(height,1);result.push({...item,x:left,y:rect.y,w:width,h:height});left+=width});
+    rect.y+=height;rect.h=Math.max(0,rect.h-height);
+  }
+}
+function squarifiedTreemap(items,x,y,w,h){
+  if(!items.length)return[];
+  const prepared=treemapVisualItems(items),visualTotal=prepared.reduce((sum,item)=>sum+item.visualValue,0),scale=w*h/Math.max(visualTotal,1);
+  const pending=prepared.map(item=>({...item,area:item.visualValue*scale})),rect={x,y,w,h},result=[];let row=[];
+  while(pending.length){
+    const item=pending[0],side=Math.max(1,Math.min(rect.w,rect.h));
+    if(!row.length||treemapWorst([...row,item],side)<=treemapWorst(row,side)){row.push(pending.shift())}
+    else{treemapPlaceRow(row,rect,result);row=[]}
+  }
+  if(row.length)treemapPlaceRow(row,rect,result);
+  return result;
+}
+function treemapHeight(count,width){
+  if(width<=900)return Math.min(1180,580+Math.max(0,count-8)*34);
+  return Math.min(1520,640+Math.max(0,count-10)*28);
+}
+function treemapTileSize(tile){
+  const shortSide=Math.min(tile.w,tile.h),area=tile.w*tile.h;
+  if(tile.w>=165&&tile.h>=120&&area>=24000)return "large";
+  if(shortSide>=82&&area>=11500)return "medium";
+  if(shortSide>=55&&area>=6000)return "small";
+  return "micro";
+}
 function companyLogoMarkup(label){
   const key=String(label||"").toUpperCase();
   const glyph={NVDA:"NV",MRVL:"MR",AAOI:"AO",XFAB:"XF",RKLB:"RK",VRT:"VR",SPCX:"SX",GOOGL:"G",MU:"MU",DRAM:"DR",CASH:"$"}[key]||key.slice(0,2)||".";
-  const file={NVDA:"nvda",MRVL:"mrvl",AAOI:"aaoi",XFAB:"xfab",RKLB:"rklb",VRT:"vrt",SPCX:"spcx",GOOGL:"googl",MU:"mu",DRAM:"dram",CASH:"cash"}[key]||"cash";
+  const file={NVDA:"nvda",MRVL:"mrvl",AAOI:"aaoi",XFAB:"xfab",RKLB:"rklb",VRT:"vrt",SPCX:"spcx",GOOGL:"googl",MU:"mu",DRAM:"dram",CASH:"cash"}[key];
   const safeKey=key.toLowerCase().replace(/[^a-z0-9-]/g,"")||"asset";
-  return `<span class="company-logo-card logo-${safeKey}" aria-hidden="true"><img src="logos/${file}.svg?v=10.37" alt="" onerror="this.parentElement.classList.add('logo-fallback-active')"><span class="logo-fallback">${escapeHtml(glyph)}</span></span>`;
+  if(!file)return `<span class="company-logo-card logo-${safeKey} logo-fallback-active" aria-hidden="true"><span class="logo-fallback">${escapeHtml(glyph)}</span></span>`;
+  return `<span class="company-logo-card logo-${safeKey}" aria-hidden="true"><img src="logos/${file}.svg?v=10.38" alt="" onerror="this.parentElement.classList.add('logo-fallback-active')"><span class="logo-fallback">${escapeHtml(glyph)}</span></span>`;
 }
 function renderTreemap(){
   const box=$("treemap");box.innerHTML="";
   const items=treemapItems(),denom=Math.max(contributedCapital()+realizedPnl(),1);
-  box.classList.remove("mobile-map");
-  const rect=box.getBoundingClientRect();
-  layout(items,0,0,rect.width,rect.height).forEach(t=>{
-    const d=document.createElement("div"),area=t.w*t.h,share=round(t.value/denom*100),narrow=t.w<102||t.h<78,compact=area<6200||t.w<66||t.h<54;
-    d.className="tile"+(area<13000||narrow?" tiny":"")+(area<6200||t.w<64?" micro":"")+(narrow?" narrow":"");
+  const width=box.getBoundingClientRect().width,mobile=window.matchMedia("(max-width: 640px)").matches;
+  box.classList.toggle("mobile-map",mobile);
+  if(mobile){box.style.removeProperty("height");box.style.removeProperty("min-height")}
+  else{const height=treemapHeight(items.length,width);box.style.height=`${height}px`;box.style.minHeight=`${height}px`}
+  const rect=box.getBoundingClientRect(),tiles=mobile?items.map(item=>({...item,x:0,y:0,w:rect.width/2,h:116})):squarifiedTreemap(items,0,0,rect.width,rect.height);
+  tiles.forEach(t=>{
+    const d=document.createElement("div"),share=round(t.value/denom*100),size=mobile?"medium":treemapTileSize(t),showLogo=size!=="micro";
+    d.className=`tile tile-${size}`;
+    if(mobile&&share>=35)d.classList.add("tile-dominant");
     Object.assign(d.style,{left:t.x+"px",top:t.y+"px",width:t.w+"px",height:t.h+"px",background:`radial-gradient(circle at 28% 18%, ${mixColor(t.color,"#ffffff",.28)}, transparent 58%), linear-gradient(145deg, ${mixColor(t.color,"#ffffff",.04)}, ${mixColor(t.color,"#000000",.18)})`,borderColor:mixColor(t.color,"#020617",.38),color:"white"});
     d.title=`${t.label} ${money(t.value)} | ${share}%`;
-    const meta=compact?"":narrow?`${share}%`:`${money(t.value)} | ${share}%`;
-    d.innerHTML=`<div class="tile-copy">${companyLogoMarkup(t.label)}<div class="tile-text"><span class="tile-symbol">${escapeHtml(t.label)}</span>${meta?`<span class="tile-meta">${escapeHtml(meta)}</span>`:""}</div></div>`;
+    d.setAttribute("aria-label",`${t.label}，持仓成本 ${money(t.value)}，占比 ${share}%`);
+    const meta=size==="large"?`${money(t.value)} | ${share}%`:`${share}%`;
+    d.innerHTML=`<div class="tile-copy">${showLogo?companyLogoMarkup(t.label):""}<div class="tile-text"><span class="tile-symbol">${escapeHtml(t.label)}</span><span class="tile-meta">${escapeHtml(meta)}</span></div></div>`;
     box.appendChild(d)
   })
 }
