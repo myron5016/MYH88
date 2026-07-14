@@ -5,7 +5,7 @@
     "schemaVersion": "10.32",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-14T04:14:35.101Z",
+    "lastCloudSaveAt": "2026-07-14T13:00:03.577Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -45,7 +45,7 @@
       "shares": 5,
       "avgCost": 325.04,
       "sector": "光通信",
-      "color": "#15afbb",
+      "color": "#38d1dd",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
@@ -146,21 +146,6 @@
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 692.69986
-    },
-    {
-      "id": "pos_mqv9tzrw_6n81s8",
-      "symbol": "LITE",
-      "name": "朗美通",
-      "currency": "USD",
-      "source": "twelve",
-      "shares": 1,
-      "avgCost": 810.175,
-      "sector": "光通信",
-      "color": "#38d1dd",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "",
-      "costBasisUSD": 810.175
     },
     {
       "id": "pos_mqz9i9o7_8b8hhc",
@@ -1072,6 +1057,27 @@
       "costBasisUSD": 2235.14,
       "grossUSD": 2234.7999999999997,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mrknrgne_jhynvf",
+      "date": "2026-07-14",
+      "type": "sell",
+      "symbol": "LITE",
+      "name": "朗美通",
+      "shares": 1,
+      "price": 812,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.37,
+      "note": "",
+      "source": "twelve",
+      "sector": "光通信",
+      "color": "#38d1dd",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.37,
+      "costBasisUSD": 810.175,
+      "grossUSD": 812,
+      "realizedPnlUSD": 1.455000000000041
     }
   ],
   "cashFlows": [
@@ -1179,9 +1185,9 @@
     {
       "date": "2026-07-14",
       "capital": 22370,
-      "netAsset": 20071.5,
-      "market": 15351.75,
-      "cash": 4719.75
+      "netAsset": 20172.18,
+      "market": 14640.8,
+      "cash": 5531.38
     }
   ]
 }
