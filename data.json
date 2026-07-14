@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-14T15:59:25.116Z",
+    "lastCloudSaveAt": "2026-07-14T16:00:44.444Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -83,8 +83,8 @@
       "costBasisUSD": 588.613179,
       "changePercent": 0,
       "priceSource": "manual",
-      "priceProvider": "manual",
-      "priceUpdatedAt": "2026-07-14T15:59:09.039Z",
+      "priceProvider": "",
+      "priceUpdatedAt": "",
       "priceAsOf": ""
     },
     {
@@ -101,21 +101,6 @@
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 3342
-    },
-    {
-      "id": "pos_mqnjborg_n3b8py",
-      "symbol": "VRT",
-      "name": "维谛技术",
-      "currency": "USD",
-      "source": "twelve",
-      "shares": 0.0007,
-      "avgCost": 310.070583197254,
-      "sector": "AI基建",
-      "color": "#41d99a",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "",
-      "costBasisUSD": 0.217049
     },
     {
       "id": "pos_mqnjborg_pzifro",
@@ -1084,6 +1069,27 @@
       "costBasisUSD": 1045.34,
       "grossUSD": 1069.4,
       "realizedPnlUSD": 23.680000000000064
+    },
+    {
+      "id": "tx_mrku81fl_fmvzff",
+      "date": "2026-07-15",
+      "type": "sell",
+      "symbol": "VRT",
+      "name": "维谛技术",
+      "shares": 0.0007,
+      "price": 304.73,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0,
+      "note": "",
+      "source": "twelve",
+      "sector": "AI基建",
+      "color": "#41d99a",
+      "schemaVersion": "10.6",
+      "feeUSD": 0,
+      "costBasisUSD": 0.217049,
+      "grossUSD": 0.213311,
+      "realizedPnlUSD": -0.0037379999999999913
     }
   ],
   "cashFlows": [
@@ -1194,6 +1200,13 @@
       "netAsset": 21116.57,
       "market": 14516.18,
       "cash": 6600.4
+    },
+    {
+      "date": "2026-07-15",
+      "capital": 22370,
+      "netAsset": 20806.02,
+      "market": 14205.41,
+      "cash": 6600.61
     }
   ]
 }
