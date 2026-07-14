@@ -1,4 +1,4 @@
-const VERSION="V10.33 PWA家庭版";
+const VERSION="V10.37 PWA家庭版";
 const LEDGER_SCHEMA_VERSION="10.33";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
@@ -688,6 +688,13 @@ function saveSettings(){state.settings.title=$("titleInput").value.trim()||defau
 
 function treemapItems(){const arr=state.positions.map(p=>({label:p.symbol,value:num(p.costBasisUSD),color:p.color})).filter(x=>x.value>0),cash=cashBalance();if(cash>0)arr.push({label:"CASH",value:cash,color:"#ffd84d"});return arr.sort((a,b)=>b.value-a.value)}
 function layout(items,x,y,w,h){if(!items.length)return[];if(items.length===1)return[{...items[0],x,y,w,h}];const total=items.reduce((s,i)=>s+i.value,0);let acc=0,split=0;for(let i=0;i<items.length;i++){if(acc<total/2){acc+=items[i].value;split=i+1}}split=Math.max(1,Math.min(items.length-1,split));const a=items.slice(0,split),b=items.slice(split),at=a.reduce((s,i)=>s+i.value,0);if(w>=h){const aw=w*at/total;return[...layout(a,x,y,aw,h),...layout(b,x+aw,y,w-aw,h)]}const ah=h*at/total;return[...layout(a,x,y,w,ah),...layout(b,x,y+ah,w,h-ah)]}
+function companyLogoMarkup(label){
+  const key=String(label||"").toUpperCase();
+  const glyph={NVDA:"NV",MRVL:"MR",AAOI:"AO",XFAB:"XF",RKLB:"RK",VRT:"VR",SPCX:"SX",GOOGL:"G",MU:"MU",DRAM:"DR",CASH:"$"}[key]||key.slice(0,2)||".";
+  const file={NVDA:"nvda",MRVL:"mrvl",AAOI:"aaoi",XFAB:"xfab",RKLB:"rklb",VRT:"vrt",SPCX:"spcx",GOOGL:"googl",MU:"mu",DRAM:"dram",CASH:"cash"}[key]||"cash";
+  const safeKey=key.toLowerCase().replace(/[^a-z0-9-]/g,"")||"asset";
+  return `<span class="company-logo-card logo-${safeKey}" aria-hidden="true"><img src="logos/${file}.svg?v=10.37" alt="" onerror="this.parentElement.classList.add('logo-fallback-active')"><span class="logo-fallback">${escapeHtml(glyph)}</span></span>`;
+}
 function renderTreemap(){
   const box=$("treemap");box.innerHTML="";
   const items=treemapItems(),denom=Math.max(contributedCapital()+realizedPnl(),1);
@@ -699,7 +706,7 @@ function renderTreemap(){
     Object.assign(d.style,{left:t.x+"px",top:t.y+"px",width:t.w+"px",height:t.h+"px",background:`radial-gradient(circle at 28% 18%, ${mixColor(t.color,"#ffffff",.28)}, transparent 58%), linear-gradient(145deg, ${mixColor(t.color,"#ffffff",.04)}, ${mixColor(t.color,"#000000",.18)})`,borderColor:mixColor(t.color,"#020617",.38),color:"white"});
     d.title=`${t.label} ${money(t.value)} | ${share}%`;
     const meta=compact?"":narrow?`${share}%`:`${money(t.value)} | ${share}%`;
-    d.innerHTML=`<div class="tile-copy"><span class="tile-symbol">${escapeHtml(t.label)}</span>${meta?`<span class="tile-meta">${escapeHtml(meta)}</span>`:""}</div>`;
+    d.innerHTML=`<div class="tile-copy">${companyLogoMarkup(t.label)}<div class="tile-text"><span class="tile-symbol">${escapeHtml(t.label)}</span>${meta?`<span class="tile-meta">${escapeHtml(meta)}</span>`:""}</div></div>`;
     box.appendChild(d)
   })
 }

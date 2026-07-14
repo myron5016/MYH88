@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="18" fill="#ffffff"/>
+  <path d="M22 68V40h10l12 17 12-17h10v28H55V55L44 70 33 55v13z" fill="#187a9b"/>
+  <path d="M70 40h11l8 15 8-15h11L94 68H83z" fill="#1da7a9"/>
+  <text x="64" y="97" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="2" fill="#187a9b">MRVL</text>
+</svg>

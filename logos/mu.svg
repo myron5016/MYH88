@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="18" fill="#ffffff"/>
+  <circle cx="64" cy="57" r="29" fill="#225db7"/>
+  <path d="M43 69V45h10l11 14 11-14h10v24H74V58L64 71 54 58v11z" fill="#ffffff"/>
+  <text x="64" y="108" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="700" letter-spacing="2" fill="#225db7">MICRON</text>
+</svg>

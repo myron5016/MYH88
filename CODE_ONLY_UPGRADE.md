@@ -6,6 +6,7 @@ Do upload:
 - `index.html`
 - `script.js`
 - `style.css`
+- `fresh-radar.css`
 - `service-worker.js`
 - `manifest.webmanifest`
 - icon/image assets when changed
@@ -21,3 +22,7 @@ Do not upload:
 `data.json` is the live ledger. It should be changed only by the website admin safe-save flow, so a local code release cannot overwrite newer holdings on GitHub.
 
 V10.33 is a Worker release: upload the code assets, deploy `cloudflare-worker.js` with `npx wrangler deploy`, and never upload `data.json` during a code release. This release removes duplicate quote retries, sanitizes upstream error headers, and preserves static/last-close fallback behavior.
+
+V10.34 is a visual-only release: upload `index.html`, `script.js`, `style.css`, `fresh-radar.css`, and `service-worker.js`. It keeps the V10.33 Worker and ledger schema unchanged, adds the fresh white/green radar visual system, and adds local company monogram marks inside the cost map. Do not upload `data.json`, backups, caches, or `.wrangler/`.
+
+V10.37 is a visual-only layout release. Upload `index.html`, `script.js`, `style.css`, `fresh-radar.css`, `layout-v10.34.css`, `service-worker.js`, `avatar-baby.jpg`, and the full `logos/` folder. The cost map is now a full-width standalone section, with the holdings detail moved below it. The price proxy, refresh rules, Worker, and live ledger are unchanged. Do not run `npx wrangler deploy` for this release, and do not upload `data.json`.

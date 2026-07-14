@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="18" fill="#ffffff"/>
+  <rect x="29" y="31" width="70" height="54" rx="7" fill="#2877d4"/>
+  <rect x="40" y="42" width="13" height="13" fill="#b9ddff"/><rect x="58" y="42" width="13" height="13" fill="#b9ddff"/><rect x="76" y="42" width="13" height="13" fill="#b9ddff"/>
+  <rect x="40" y="61" width="13" height="13" fill="#b9ddff"/><rect x="58" y="61" width="13" height="13" fill="#b9ddff"/><rect x="76" y="61" width="13" height="13" fill="#b9ddff"/>
+  <text x="64" y="106" text-anchor="middle" font-family="Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="2" fill="#2877d4">DRAM</text>
+</svg>

@@ -1,0 +1,125 @@
+/* V10.34 structural dashboard layout. */
+.dashboard-status-grid{
+  display:grid;
+  grid-template-columns:minmax(300px,.85fr) minmax(540px,1.6fr);
+  gap:12px;
+  align-items:stretch;
+  margin:0 0 16px;
+}
+.dashboard-status-grid .sync-strip{
+  margin:0;
+  min-height:68px;
+  border-left:4px solid var(--radar-green);
+}
+.dashboard-status-grid .diagnostics-strip{
+  margin:0;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  align-content:stretch;
+}
+.dashboard-status-grid .diagnostics-strip span{
+  min-height:68px;
+  display:flex;
+  justify-content:center;
+  text-align:center;
+  line-height:1.35;
+}
+.terminal-grid{display:block!important;margin:0 0 16px}
+.terminal-grid .map-card{margin:0}
+.map-card{padding:22px}
+.map-card #treemap{height:650px;min-height:650px}
+.map-side-card{display:none!important}
+.insight-grid{
+  display:grid;
+  grid-template-columns:minmax(360px,.78fr) minmax(0,1.22fr);
+  gap:16px;
+  margin:0 0 16px;
+}
+.insight-grid .card{height:100%;margin:0}
+.sector-overview-card{display:flex;flex-direction:column}
+.sector-overview-card .legend{margin-top:auto}
+.chart-card #assetChart{height:310px}
+.avatar{object-position:center 58%}
+.tile-copy{
+  position:relative!important;
+  z-index:3!important;
+  flex-direction:column;
+  gap:8px;
+  max-width:86%;
+  text-align:center;
+}
+.tile-text{text-align:center}
+.tile-meta{margin-top:4px}
+.company-logo-card{
+  position:relative;
+  z-index:4!important;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  flex:0 0 auto;
+  width:52px;
+  height:52px;
+  padding:7px;
+  border:1px solid rgba(255,255,255,.82);
+  border-radius:9px;
+  background:#fff;
+  box-shadow:0 6px 16px rgba(6,22,40,.2);
+  overflow:hidden;
+  isolation:isolate;
+}
+.company-logo-card img{
+  display:block!important;
+  position:absolute!important;
+  inset:7px;
+  z-index:2!important;
+  width:calc(100% - 14px)!important;
+  height:calc(100% - 14px)!important;
+  object-fit:contain;
+}
+.logo-fallback{
+  display:none;
+  position:absolute;
+  inset:0;
+  z-index:1;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  height:100%;
+  color:var(--radar-ink);
+  font-size:12px;
+  font-weight:950;
+  line-height:1;
+  letter-spacing:.02em;
+}
+.company-logo-card.logo-fallback-active img{display:none}
+.company-logo-card.logo-fallback-active .logo-fallback{display:flex;z-index:2}
+.tile:after{z-index:0!important}
+.tile.tiny .company-logo-card{display:inline-flex;width:36px;height:36px;padding:5px;border-radius:7px}
+.tile.tiny .tile-copy{gap:5px}
+.tile.micro .company-logo-card,.tile.narrow .company-logo-card{display:none}
+.tile.micro .tile-copy,.tile.narrow .tile-copy{gap:0}
+.tile.micro .tile-text,.tile.narrow .tile-text{max-width:100%}
+.tile.micro .tile-symbol,.tile.narrow .tile-symbol{font-size:11px}
+@media(max-width:1100px){
+  .dashboard-status-grid{grid-template-columns:1fr}
+  .dashboard-status-grid .diagnostics-strip{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .map-card #treemap{height:580px;min-height:580px}
+  .insight-grid{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .dashboard-status-grid{gap:8px;margin-bottom:12px}
+  .dashboard-status-grid .sync-strip{min-height:62px;border-left-width:3px}
+  .dashboard-status-grid .diagnostics-strip{grid-template-columns:1fr 1fr;gap:6px}
+  .dashboard-status-grid .diagnostics-strip span{min-height:36px;font-size:10px}
+  .map-card{padding:14px}
+  .map-card #treemap{height:auto;min-height:0}
+  #treemap.mobile-map{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:6px}
+  #treemap.mobile-map .tile{position:relative;left:auto!important;top:auto!important;width:auto!important;height:108px!important;min-height:108px}
+  #treemap.mobile-map .tile:first-child{grid-column:1/-1;height:140px!important}
+  #treemap.mobile-map .tile-copy{gap:5px}
+  #treemap.mobile-map .company-logo-card{width:34px;height:34px;padding:4px;border-radius:7px}
+  #treemap.mobile-map .tile-symbol{font-size:13px}
+  #treemap.mobile-map .tile-meta{font-size:9px}
+  .insight-grid{gap:12px;margin-bottom:12px}
+  .chart-card #assetChart{height:260px}
+}

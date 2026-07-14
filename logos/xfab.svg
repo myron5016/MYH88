@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="18" fill="#ffffff"/>
+  <path d="M27 38h18l10 13 10-13h18L65 62l20 28H67L55 74 43 90H25l20-28z" fill="#ed7a31"/>
+  <text x="64" y="109" text-anchor="middle" font-family="Arial,sans-serif" font-size="17" font-weight="700" letter-spacing="1" fill="#d75f18">X-FAB</text>
+</svg>

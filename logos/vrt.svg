@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <rect width="128" height="128" rx="18" fill="#ffffff"/>
+  <path d="M24 36h18l22 40 22-40h18L64 98z" fill="#13865c"/>
+  <path d="M52 36h24L64 58z" fill="#8cd46e"/>
+  <text x="64" y="113" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" font-weight="700" letter-spacing="3" fill="#13865c">VRT</text>
+</svg>

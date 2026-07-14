@@ -1,6 +1,6 @@
-const CACHE_VERSION="dream-fund-v10-33";
-const DATA_CACHE="dream-fund-data-v10-33";
-const APP_SHELL=["./","./index.html","./style.css?v=10.33","./script.js?v=10.33","./manifest.webmanifest","./avatar.png","./app-icon.svg","./icon-192.png","./icon-512.png","./kv-quotes-all-current.json"];
+const CACHE_VERSION="dream-fund-v10-37";
+const DATA_CACHE="dream-fund-data-v10-37";
+const APP_SHELL=["./","./index.html","./style.css?v=10.37","./fresh-radar.css?v=10.37","./layout-v10.34.css?v=10.37","./script.js?v=10.37","./manifest.webmanifest","./avatar-baby.jpg","./avatar.png","./app-icon.svg","./icon-192.png","./icon-512.png","./kv-quotes-all-current.json","./logos/rklb.svg","./logos/nvda.svg","./logos/mrvl.svg","./logos/aaoi.svg","./logos/xfab.svg","./logos/vrt.svg","./logos/spcx.svg","./logos/googl.svg","./logos/mu.svg","./logos/dram.svg","./logos/cash.svg"];
 
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE_VERSION).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()));

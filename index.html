@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
-  <meta name="color-scheme" content="dark">
-  <meta name="theme-color" content="#111827">
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f4f5ee">
   <meta name="application-name" content="梦想金库">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,13 +13,15 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=10.33">
+  <link rel="stylesheet" href="style.css?v=10.37">
+  <link rel="stylesheet" href="fresh-radar.css?v=10.37">
+  <link rel="stylesheet" href="layout-v10.34.css?v=10.37">
 </head>
 <body>
 <main class="container">
   <header class="hero">
     <div class="hero-left">
-      <img src="avatar.png" class="avatar" alt="小宝贝头像">
+      <img src="avatar-baby.jpg" class="avatar" alt="小宝贝头像">
       <div>
         <div class="hero-badge">♥ Family Dream Fund · V10 PWA家庭版</div>
         <h1 id="pageTitle">孟一晗的梦想金库</h1>
@@ -32,6 +34,7 @@
     </div>
   </header>
 
+  <div class="dashboard-status-grid">
   <section id="syncStrip" class="sync-strip">
     <span id="syncDot" class="sync-dot checking"></span>
     <div><strong id="syncLabel">正在核对云端数据</strong><small id="syncDetail">请稍候…</small></div>
@@ -45,6 +48,7 @@
     <span id="marketClockStatus">美股：计算中</span>
     <span id="cloudFreshStatus">账本：正在检测</span>
   </section>
+  </div>
 
   <section id="updateBanner" class="update-banner hidden">
     <div><strong>梦想金库有新版本</strong><small>更新不会影响账本数据</small></div>
@@ -135,16 +139,19 @@
     </aside>
   </section>
 
-  <section class="card">
+  <section class="insight-grid">
+  <section class="card sector-overview-card">
     <div class="section-head"><div><h2>成本板块配置</h2><p class="section-note">与本金配置地图使用相同口径</p></div></div>
     <div id="sectorBar" class="sector-bar"></div>
     <div id="sectorLegend" class="legend"></div>
   </section>
 
-  <section class="card">
+  <section class="card chart-card">
     <div class="section-head"><div><h2>资产成长记录</h2><p class="section-note">每天自动留下一次资产快照</p></div><button class="admin-only hidden" onclick="captureSnapshot(true)">记录今日快照</button></div>
     <div id="chartEmpty" class="empty hidden">积累两个交易日后，这里会出现资产成长曲线</div>
     <svg id="assetChart" role="img" aria-label="资产成长曲线"></svg>
+  </section>
+
   </section>
 
   <section class="card holdings-view">
@@ -286,6 +293,6 @@
   </div>
 </dialog>
 
-  <script src="script.js?v=10.33"></script>
+<script src="script.js?v=10.37"></script>
 </body>
 </html>
