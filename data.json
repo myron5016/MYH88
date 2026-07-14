@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-14T16:00:44.444Z",
+    "lastCloudSaveAt": "2026-07-14T16:55:40.488Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -108,14 +108,14 @@
       "name": "Space X",
       "currency": "USD",
       "source": "twelve",
-      "shares": 12,
-      "avgCost": 149.86249999999998,
+      "shares": 17,
+      "avgCost": 146.68764705882353,
       "sector": "太空",
       "color": "#f16183",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 1798.35
+      "costBasisUSD": 2493.69
     },
     {
       "id": "pos_mqpb20pj_q02ooh",
@@ -1090,6 +1090,27 @@
       "costBasisUSD": 0.217049,
       "grossUSD": 0.213311,
       "realizedPnlUSD": -0.0037379999999999913
+    },
+    {
+      "id": "tx_mrkw6so9_bh7gl8",
+      "date": "2026-07-15",
+      "type": "buy",
+      "symbol": "SPCX",
+      "name": "Space X",
+      "shares": 5,
+      "price": 139,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.34,
+      "note": "",
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#f16183",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.34,
+      "costBasisUSD": 695.34,
+      "grossUSD": 695,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -1204,9 +1225,9 @@
     {
       "date": "2026-07-15",
       "capital": 22370,
-      "netAsset": 20806.02,
-      "market": 14205.41,
-      "cash": 6600.61
+      "netAsset": 20773.06,
+      "market": 14867.79,
+      "cash": 5905.27
     }
   ]
 }
