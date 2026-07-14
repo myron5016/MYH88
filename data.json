@@ -2,10 +2,10 @@
   "settings": {
     "title": "孟一晗的梦想金库",
     "priceCacheMinutes": 30,
-    "schemaVersion": "10.32",
+    "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-14T13:37:26.842Z",
+    "lastCloudSaveAt": "2026-07-14T15:59:25.116Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -83,8 +83,8 @@
       "costBasisUSD": 588.613179,
       "changePercent": 0,
       "priceSource": "manual",
-      "priceProvider": "",
-      "priceUpdatedAt": "",
+      "priceProvider": "manual",
+      "priceUpdatedAt": "2026-07-14T15:59:09.039Z",
       "priceAsOf": ""
     },
     {
@@ -287,7 +287,7 @@
       "migration": true,
       "source": "manual",
       "sector": "半导体",
-      "color": "#f7863b",
+      "color": "#fa873c",
       "schemaVersion": "10.6"
     },
     {
