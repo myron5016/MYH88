@@ -1,4 +1,4 @@
-const VERSION="V10.38 PWA家庭版";
+const VERSION="V10.39 PWA家庭版";
 const LEDGER_SCHEMA_VERSION="10.33";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
@@ -739,7 +739,7 @@ function companyLogoMarkup(label){
   const file={NVDA:"nvda",MRVL:"mrvl",AAOI:"aaoi",XFAB:"xfab",RKLB:"rklb",VRT:"vrt",SPCX:"spcx",GOOGL:"googl",MU:"mu",DRAM:"dram",CASH:"cash"}[key];
   const safeKey=key.toLowerCase().replace(/[^a-z0-9-]/g,"")||"asset";
   if(!file)return `<span class="company-logo-card logo-${safeKey} logo-fallback-active" aria-hidden="true"><span class="logo-fallback">${escapeHtml(glyph)}</span></span>`;
-  return `<span class="company-logo-card logo-${safeKey}" aria-hidden="true"><img src="logos/${file}.svg?v=10.38" alt="" onerror="this.parentElement.classList.add('logo-fallback-active')"><span class="logo-fallback">${escapeHtml(glyph)}</span></span>`;
+  return `<span class="company-logo-card logo-${safeKey}" aria-hidden="true"><img src="logos/${file}.svg?v=10.39" alt="" onerror="this.parentElement.classList.add('logo-fallback-active')"><span class="logo-fallback">${escapeHtml(glyph)}</span></span>`;
 }
 function renderTreemap(){
   const box=$("treemap");box.innerHTML="";
@@ -750,13 +750,14 @@ function renderTreemap(){
   else{const height=treemapHeight(items.length,width);box.style.height=`${height}px`;box.style.minHeight=`${height}px`}
   const rect=box.getBoundingClientRect(),tiles=mobile?items.map(item=>({...item,x:0,y:0,w:rect.width/2,h:116})):squarifiedTreemap(items,0,0,rect.width,rect.height);
   tiles.forEach(t=>{
-    const d=document.createElement("div"),share=round(t.value/denom*100),size=mobile?"medium":treemapTileSize(t),showLogo=size!=="micro";
+    const d=document.createElement("div"),share=round(t.value/denom*100),size=mobile?"medium":treemapTileSize(t),showLogo=size!=="micro",wideCompact=!mobile&&t.w>=180&&t.h>=82&&t.h<175&&t.w/t.h>=1.5;
     d.className=`tile tile-${size}`;
+    if(wideCompact)d.classList.add("tile-wide-compact");
     if(mobile&&share>=35)d.classList.add("tile-dominant");
     Object.assign(d.style,{left:t.x+"px",top:t.y+"px",width:t.w+"px",height:t.h+"px",background:`radial-gradient(circle at 28% 18%, ${mixColor(t.color,"#ffffff",.28)}, transparent 58%), linear-gradient(145deg, ${mixColor(t.color,"#ffffff",.04)}, ${mixColor(t.color,"#000000",.18)})`,borderColor:mixColor(t.color,"#020617",.38),color:"white"});
     d.title=`${t.label} ${money(t.value)} | ${share}%`;
     d.setAttribute("aria-label",`${t.label}，持仓成本 ${money(t.value)}，占比 ${share}%`);
-    const meta=size==="large"?`${money(t.value)} | ${share}%`:`${share}%`;
+    const meta=size==="large"||wideCompact?`${money(t.value)} | ${share}%`:`${share}%`;
     d.innerHTML=`<div class="tile-copy">${showLogo?companyLogoMarkup(t.label):""}<div class="tile-text"><span class="tile-symbol">${escapeHtml(t.label)}</span><span class="tile-meta">${escapeHtml(meta)}</span></div></div>`;
     box.appendChild(d)
   })

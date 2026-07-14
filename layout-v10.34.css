@@ -123,6 +123,14 @@
 .map-card #treemap .tile-micro .tile-copy{gap:0}
 .map-card #treemap .tile-micro .tile-symbol{font-size:10px}
 .map-card #treemap .tile-micro .tile-meta{font-size:8px;margin-top:1px}
+.map-card #treemap .tile-wide-compact{padding:10px 14px!important}
+.map-card #treemap .tile-wide-compact .tile-copy{flex-direction:row;gap:11px;width:100%;max-height:100%;text-align:left}
+.map-card #treemap .tile-wide-compact .company-logo-card{width:44px;height:44px;padding:5px;border-radius:8px}
+.map-card #treemap .tile-wide-compact .tile-text{flex:1;width:auto;text-align:left}
+.map-card #treemap .tile-wide-compact .tile-symbol,
+.map-card #treemap .tile-wide-compact .tile-meta{text-align:left}
+.map-card #treemap .tile-wide-compact .tile-symbol{font-size:17px}
+.map-card #treemap .tile-wide-compact .tile-meta{font-size:11px;margin-top:3px}
 @media(max-width:1100px){
   .dashboard-status-grid{grid-template-columns:1fr}
   .dashboard-status-grid .diagnostics-strip{grid-template-columns:repeat(4,minmax(0,1fr))}
