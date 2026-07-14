@@ -5,7 +5,7 @@
     "schemaVersion": "10.32",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-14T13:00:03.577Z",
+    "lastCloudSaveAt": "2026-07-14T13:37:26.842Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -161,21 +161,6 @@
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 2190.7
-    },
-    {
-      "id": "pos_mrjeihbw_e1js0w",
-      "symbol": "INTC",
-      "name": "英特尔",
-      "currency": "USD",
-      "source": "twelve",
-      "shares": 10,
-      "avgCost": 104.53399999999999,
-      "sector": "未分类",
-      "color": "#627288",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "",
-      "costBasisUSD": 1045.34
     },
     {
       "id": "pos_mrk4zjss_bygrzh",
@@ -1078,6 +1063,27 @@
       "costBasisUSD": 810.175,
       "grossUSD": 812,
       "realizedPnlUSD": 1.455000000000041
+    },
+    {
+      "id": "tx_mrkp3wsx_tygprw",
+      "date": "2026-07-14",
+      "type": "sell",
+      "symbol": "INTC",
+      "name": "英特尔",
+      "shares": 10,
+      "price": 106.94,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.38,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.38,
+      "costBasisUSD": 1045.34,
+      "grossUSD": 1069.4,
+      "realizedPnlUSD": 23.680000000000064
     }
   ],
   "cashFlows": [
@@ -1185,9 +1191,9 @@
     {
       "date": "2026-07-14",
       "capital": 22370,
-      "netAsset": 20172.18,
-      "market": 14640.8,
-      "cash": 5531.38
+      "netAsset": 21116.57,
+      "market": 14516.18,
+      "cash": 6600.4
     }
   ]
 }
