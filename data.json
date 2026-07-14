@@ -5,7 +5,7 @@
     "schemaVersion": "10.32",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-13T15:54:38.581Z",
+    "lastCloudSaveAt": "2026-07-14T04:14:35.101Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -171,7 +171,7 @@
       "shares": 2,
       "avgCost": 1095.35,
       "sector": "AI存储",
-      "color": "#3a7ff1",
+      "color": "#5694f7",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
@@ -186,11 +186,26 @@
       "shares": 10,
       "avgCost": 104.53399999999999,
       "sector": "未分类",
-      "color": "#1f82c4",
+      "color": "#627288",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 1045.34
+    },
+    {
+      "id": "pos_mrk4zjss_bygrzh",
+      "symbol": "DRAM",
+      "name": "储存ETF",
+      "currency": "USD",
+      "source": "twelve",
+      "shares": 40,
+      "avgCost": 55.878499999999995,
+      "sector": "AI存储",
+      "color": "#3a7ff1",
+      "sectorLocked": false,
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 2235.14
     }
   ],
   "transactions": [
@@ -1036,6 +1051,27 @@
       "costBasisUSD": 1045.34,
       "grossUSD": 1045,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mrk4zjsn_2hmx3h",
+      "date": "2026-07-14",
+      "type": "buy",
+      "symbol": "DRAM",
+      "name": "储存ETF",
+      "shares": 40,
+      "price": 55.87,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.34,
+      "note": "",
+      "source": "twelve",
+      "sector": "AI存储",
+      "color": "#1e488a",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.34,
+      "costBasisUSD": 2235.14,
+      "grossUSD": 2234.7999999999997,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -1139,6 +1175,13 @@
       "netAsset": 20191.4,
       "market": 13236.51,
       "cash": 6954.89
+    },
+    {
+      "date": "2026-07-14",
+      "capital": 22370,
+      "netAsset": 20071.5,
+      "market": 15351.75,
+      "cash": 4719.75
     }
   ]
 }
