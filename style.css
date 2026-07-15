@@ -447,3 +447,4 @@ h1{font-size:42px}
 /* V10.33 final desktop override: the retired sidebar must not reserve space. */
 @media(min-width:901px){body{padding-left:0!important}}
 
+.admin-login-dialog{border-color:rgba(56,189,248,.45);box-shadow:0 30px 120px rgba(0,0,0,.72),0 0 0 1px rgba(56,189,248,.12)}.auth-error{min-height:20px;margin:10px 0 0;color:#fca5a5;font-size:13px;font-weight:800}

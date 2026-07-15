@@ -13,9 +13,9 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=10.39">
-  <link rel="stylesheet" href="fresh-radar.css?v=10.39">
-  <link rel="stylesheet" href="layout-v10.34.css?v=10.39">
+  <link rel="stylesheet" href="style.css?v=10.45">
+  <link rel="stylesheet" href="fresh-radar.css?v=10.45">
+  <link rel="stylesheet" href="layout-v10.34.css?v=10.45">
 </head>
 <body>
 <main class="container">
@@ -68,6 +68,7 @@
       <div class="buttons">
         <button onclick="saveAdminSettings()">保存本次会话设置</button>
         <button id="githubSaveButton" class="primary" onclick="saveToGithub()">安全保存到 GitHub</button>
+        <button type="button" onclick="logoutAdmin()">退出管理员</button>
       </div>
     </details>
   </section>
@@ -293,6 +294,16 @@
   </div>
 </dialog>
 
-<script src="script.js?v=10.39"></script>
+<dialog id="adminLoginDialog" class="modal small-modal admin-login-dialog">
+  <form method="dialog" onsubmit="verifyAdminLogin(event)">
+    <div class="modal-head"><h2>管理员入口</h2></div>
+    <p class="note">请输入管理员密码后才能编辑持仓、交易流水和保存 GitHub。</p>
+    <label>管理员密码<input id="adminPassword" type="password" autocomplete="current-password" autofocus required></label>
+    <p id="adminLoginError" class="auth-error" role="alert"></p>
+    <div class="modal-actions"><button type="button" onclick="location.href=location.pathname">返回看板</button><button class="primary" type="submit">进入管理</button></div>
+  </form>
+</dialog>
+
+<script src="script.js?v=10.45"></script>
 </body>
 </html>
