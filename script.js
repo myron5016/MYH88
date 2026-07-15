@@ -1,4 +1,4 @@
-const VERSION="V10.45 PWA家庭版";
+const VERSION="V10.46 PWA家庭版";
 const LEDGER_SCHEMA_VERSION="10.33";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
@@ -22,8 +22,8 @@ const US_STATIC_HOLIDAYS={"2026-01-01":"元旦","2026-01-19":"马丁路德金纪
 const US_STATIC_EARLY_CLOSES={"2026-11-27":"感恩节后提前收盘","2026-12-24":"圣诞夜提前收盘"};
 Object.assign(US_STATIC_HOLIDAYS,{"2027-01-01":"元旦","2027-01-18":"马丁路德金纪念日","2027-02-15":"总统日","2027-03-26":"耶稣受难日","2027-05-31":"阵亡将士纪念日","2027-06-18":"六月节观察休市","2027-07-05":"独立日观察休市","2027-09-06":"劳动节","2027-11-25":"感恩节","2027-12-24":"圣诞节观察休市","2028-01-17":"马丁路德金纪念日","2028-02-21":"总统日","2028-04-14":"耶稣受难日","2028-05-29":"阵亡将士纪念日","2028-06-19":"六月节","2028-07-04":"独立日","2028-09-04":"劳动节","2028-11-23":"感恩节","2028-12-25":"圣诞节"});
 const TAXONOMY_VERSION="sector-color-v10";
-const ADMIN_PASSWORD_HASH="b8b11888bbf9a25f07c1833675101eb54ac50419b1d38f21d811377eca4e492f";
-const ADMIN_AUTH_KEY="myh88_admin_auth";
+const ADMIN_PASSWORD_HASH="e9cf0653c1f1de4720a1984d6b8f1f7caef8207edf46a7d7fdc4950522df12f1";
+const ADMIN_AUTH_KEY="myh88_admin_auth_v1046";
 const ADMIN_AUTH_TTL_MS=12*60*60*1000;
 
 const defaultState={settings:{title:"孟一晗的梦想金库",priceCacheMinutes:30,lastPriceRefresh:0,lastPriceRefreshText:"",schemaVersion:LEDGER_SCHEMA_VERSION},fxRates:{USD:1,EUR:1.16,HKD:.128,JPY:.0067,GBP:1.27},positions:[],transactions:[],cashFlows:[],snapshots:[]};
