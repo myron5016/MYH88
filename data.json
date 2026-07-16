@@ -5,13 +5,13 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-14T16:55:40.488Z",
+    "lastCloudSaveAt": "2026-07-16T06:57:22.885Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
     ],
     "fxMode": "manual",
-    "taxonomyVersion": "sector-color-v8"
+    "taxonomyVersion": "sector-color-v10"
   },
   "fxRates": {
     "USD": 1,
@@ -76,7 +76,7 @@
       "avgCost": 11.685,
       "price": 7.61,
       "sector": "半导体",
-      "color": "#fa873c",
+      "color": "#ffa66c",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "手动价，EUR",
@@ -108,14 +108,14 @@
       "name": "Space X",
       "currency": "USD",
       "source": "twelve",
-      "shares": 17,
-      "avgCost": 146.68764705882353,
+      "shares": 22,
+      "avgCost": 144.0468181818182,
       "sector": "太空",
       "color": "#f16183",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 2493.69
+      "costBasisUSD": 3169.03
     },
     {
       "id": "pos_mqpb20pj_q02ooh",
@@ -140,8 +140,8 @@
       "source": "twelve",
       "shares": 2,
       "avgCost": 1095.35,
-      "sector": "AI存储",
-      "color": "#5694f7",
+      "sector": "半导体",
+      "color": "#ff9a58",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
@@ -155,12 +155,27 @@
       "source": "twelve",
       "shares": 40,
       "avgCost": 55.878499999999995,
-      "sector": "AI存储",
-      "color": "#3a7ff1",
+      "sector": "半导体",
+      "color": "#fa873c",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
       "costBasisUSD": 2235.14
+    },
+    {
+      "id": "pos_mrn5990q_67mkqb",
+      "symbol": "TSM",
+      "name": "台积电",
+      "currency": "USD",
+      "source": "twelve",
+      "shares": 4,
+      "avgCost": 413.0875,
+      "sector": "半导体",
+      "color": "#de7835",
+      "sectorLocked": false,
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 1652.35
     }
   ],
   "transactions": [
@@ -183,7 +198,7 @@
       "migration": true,
       "sector": "AI基建",
       "source": "twelve",
-      "color": "#51ac0c",
+      "color": "#21cf87",
       "schemaVersion": "10.6"
     },
     {
@@ -204,7 +219,7 @@
       "note": "V8 迁移：期初持仓",
       "migration": true,
       "sector": "光通信",
-      "color": "#0097a8",
+      "color": "#38d1dd",
       "source": "twelve",
       "schemaVersion": "10.6"
     },
@@ -226,7 +241,7 @@
       "note": "V8 迁移：期初持仓",
       "migration": true,
       "sector": "光通信",
-      "color": "#00bcd1",
+      "color": "#18c5d3",
       "source": "twelve",
       "schemaVersion": "10.6"
     },
@@ -272,7 +287,7 @@
       "migration": true,
       "source": "manual",
       "sector": "半导体",
-      "color": "#fa873c",
+      "color": "#ffa66c",
       "schemaVersion": "10.6"
     },
     {
@@ -317,7 +332,7 @@
       "migration": true,
       "sector": "太空",
       "source": "twelve",
-      "color": "#c01b34",
+      "color": "#ea466d",
       "schemaVersion": "10.6"
     },
     {
@@ -428,9 +443,9 @@
       "realizedPnlUSD": 110,
       "note": "V8 已结算记录",
       "migration": true,
-      "sector": "AI基建",
+      "sector": "半导体",
       "source": "twelve",
-      "color": "#0062ff",
+      "color": "#ff9a58",
       "schemaVersion": "10.6",
       "closedHistory": true
     },
@@ -476,7 +491,7 @@
       "migration": true,
       "sector": "太空",
       "source": "twelve",
-      "color": "#c01b34",
+      "color": "#ea466d",
       "schemaVersion": "10.6",
       "closedHistory": true
     },
@@ -499,7 +514,7 @@
       "migration": true,
       "source": "twelve",
       "sector": "太空",
-      "color": "#ff7998",
+      "color": "#f16183",
       "schemaVersion": "10.6"
     },
     {
@@ -521,7 +536,7 @@
       "migration": true,
       "source": "twelve",
       "sector": "太空",
-      "color": "#ff7998",
+      "color": "#f16183",
       "schemaVersion": "10.6",
       "closedHistory": true
     },
@@ -543,7 +558,7 @@
       "note": " 部分卖出",
       "migration": true,
       "sector": "光通信",
-      "color": "#0097a8",
+      "color": "#38d1dd",
       "source": "twelve",
       "schemaVersion": "10.6",
       "closedHistory": true
@@ -590,7 +605,7 @@
       "positionBefore": null,
       "schemaVersion": "10.6",
       "sector": "科技平台",
-      "color": "#8759ef",
+      "color": "#885af1",
       "source": "twelve"
     },
     {
@@ -720,7 +735,7 @@
       },
       "schemaVersion": "10.6",
       "sector": "科技平台",
-      "color": "#8759ef",
+      "color": "#885af1",
       "source": "twelve"
     },
     {
@@ -761,7 +776,7 @@
       "schemaVersion": "10.6",
       "sector": "AI基建",
       "source": "twelve",
-      "color": "#51ac0c"
+      "color": "#21cf87"
     },
     {
       "id": "tx_mqv9tzrw_3o68hy",
@@ -843,9 +858,9 @@
       "note": "",
       "positionBefore": null,
       "schemaVersion": "10.6",
-      "sector": "AI基建",
+      "sector": "半导体",
       "source": "twelve",
-      "color": "#0062ff"
+      "color": "#ff9a58"
     },
     {
       "id": "tx_mqzowpji_t0yuji",
@@ -885,7 +900,7 @@
       "schemaVersion": "10.6",
       "sector": "AI基建",
       "source": "twelve",
-      "color": "#51ac0c"
+      "color": "#21cf87"
     },
     {
       "id": "tx_mqzox7zr_hkqh8d",
@@ -936,8 +951,8 @@
       "fee": 0.35,
       "note": "",
       "source": "twelve",
-      "sector": "AI存储",
-      "color": "#2e7ce6",
+      "sector": "半导体",
+      "color": "#ff9a58",
       "schemaVersion": "10.6",
       "feeUSD": 0.35,
       "costBasisUSD": 1080.35,
@@ -979,7 +994,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#ff7998",
+      "color": "#f16183",
       "schemaVersion": "10.6",
       "feeUSD": 0.35,
       "costBasisUSD": 298.35,
@@ -1020,8 +1035,8 @@
       "fee": 0.34,
       "note": "",
       "source": "twelve",
-      "sector": "AI存储",
-      "color": "#1e488a",
+      "sector": "半导体",
+      "color": "#fa873c",
       "schemaVersion": "10.6",
       "feeUSD": 0.34,
       "costBasisUSD": 2235.14,
@@ -1110,6 +1125,48 @@
       "feeUSD": 0.34,
       "costBasisUSD": 695.34,
       "grossUSD": 695,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mrn5990l_4wl2t3",
+      "date": "2026-07-16",
+      "type": "buy",
+      "symbol": "TSM",
+      "name": "台积电",
+      "shares": 4,
+      "price": 413,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.35,
+      "note": "",
+      "source": "twelve",
+      "sector": "半导体",
+      "color": "#de7835",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.35,
+      "costBasisUSD": 1652.35,
+      "grossUSD": 1652,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mrn5mw3z_1vftc9",
+      "date": "2026-07-15",
+      "type": "buy",
+      "symbol": "SPCX",
+      "name": "Space X",
+      "shares": 5,
+      "price": 135,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.34,
+      "note": "",
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#f16183",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.34,
+      "costBasisUSD": 675.34,
+      "grossUSD": 675,
       "realizedPnlUSD": 0
     }
   ],
@@ -1228,6 +1285,13 @@
       "netAsset": 20773.06,
       "market": 14867.79,
       "cash": 5905.27
+    },
+    {
+      "date": "2026-07-16",
+      "capital": 22370,
+      "netAsset": 21281.85,
+      "market": 17704.27,
+      "cash": 3577.58
     }
   ]
 }
