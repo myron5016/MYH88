@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-16T06:57:22.885Z",
+    "lastCloudSaveAt": "2026-07-17T16:04:55.854Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -1168,6 +1168,48 @@
       "costBasisUSD": 675.34,
       "grossUSD": 675,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mrp4nrxj_9lhesd",
+      "date": "2026-07-17",
+      "type": "buy",
+      "symbol": "SKHX",
+      "name": "海力士2倍做多",
+      "shares": 400,
+      "price": 14.737,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 2.67,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "10.6",
+      "feeUSD": 2.67,
+      "costBasisUSD": 5897.47,
+      "grossUSD": 5894.8,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mrp4ooi0_l6atu1",
+      "date": "2026-07-18",
+      "type": "sell",
+      "symbol": "SKHX",
+      "name": "海力士2倍做多",
+      "shares": 400,
+      "price": 15.2,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 1.05,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "10.6",
+      "feeUSD": 1.05,
+      "costBasisUSD": 5897.47,
+      "grossUSD": 6080,
+      "realizedPnlUSD": 181.47999999999956
     }
   ],
   "cashFlows": [
@@ -1292,6 +1334,13 @@
       "netAsset": 21281.85,
       "market": 17704.27,
       "cash": 3577.58
+    },
+    {
+      "date": "2026-07-18",
+      "capital": 22370,
+      "netAsset": 19384.09,
+      "market": 15625.03,
+      "cash": 3759.06
     }
   ]
 }
