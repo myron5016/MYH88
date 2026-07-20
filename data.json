@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-17T16:04:55.854Z",
+    "lastCloudSaveAt": "2026-07-20T14:15:19.679Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -108,14 +108,14 @@
       "name": "Space X",
       "currency": "USD",
       "source": "twelve",
-      "shares": 22,
-      "avgCost": 144.0468181818182,
+      "shares": 27,
+      "avgCost": 140.16185185185188,
       "sector": "太空",
       "color": "#f16183",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 3169.03
+      "costBasisUSD": 3784.37
     },
     {
       "id": "pos_mqpb20pj_q02ooh",
@@ -1210,6 +1210,69 @@
       "costBasisUSD": 5897.47,
       "grossUSD": 6080,
       "realizedPnlUSD": 181.47999999999956
+    },
+    {
+      "id": "tx_mrta51lq_p5xhvg",
+      "date": "2026-07-20",
+      "type": "buy",
+      "symbol": "SPCX",
+      "name": "Space X",
+      "shares": 5,
+      "price": 123,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.34,
+      "note": "",
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#f16183",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.34,
+      "costBasisUSD": 615.34,
+      "grossUSD": 615,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mrtb2lf5_rjjzfr",
+      "date": "2026-07-20",
+      "type": "buy",
+      "symbol": "SNDQ",
+      "name": "闪迪2倍做空",
+      "shares": 1000,
+      "price": 3.8,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 1.91,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "10.6",
+      "feeUSD": 1.91,
+      "costBasisUSD": 3801.91,
+      "grossUSD": 3800,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mrtb3bbh_elv2qk",
+      "date": "2026-07-20",
+      "type": "sell",
+      "symbol": "SNDQ",
+      "name": "闪迪2倍做空",
+      "shares": 1000,
+      "price": 3.92,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 2.38,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "10.6",
+      "feeUSD": 2.38,
+      "costBasisUSD": 3801.91,
+      "grossUSD": 3920,
+      "realizedPnlUSD": 115.71000000000004
     }
   ],
   "cashFlows": [
@@ -1341,6 +1404,13 @@
       "netAsset": 19384.09,
       "market": 15625.03,
       "cash": 3759.06
+    },
+    {
+      "date": "2026-07-20",
+      "capital": 22370,
+      "netAsset": 19620.13,
+      "market": 16360.7,
+      "cash": 3259.43
     }
   ]
 }
