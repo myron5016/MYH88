@@ -742,13 +742,29 @@ function treemapTileSize(tile){
   if(shortSide>=55&&area>=6000)return "small";
   return "micro";
 }
+const COMPANY_LOGO_ASSETS=Object.freeze({NVDA:"nvda.svg",RKLB:"rklb.svg",SPCX:"spcx.svg",CASH:"cash.svg"});
+const COMPANY_LOGO_DOMAINS=Object.freeze({
+  AAOI:"appliedoptoelectronics.com",DRAM:"skhynix.com",GOOGL:"google.com",MRVL:"marvell.com",
+  MU:"micron.com",TSM:"tsmc.com",TSLA:"tesla.com",SKHY:"skhynix.com",SOXL:"direxion.com",
+  VOO:"vanguard.com",QQQM:"invesco.com",IBKR:"interactivebrokers.com",VRT:"vertiv.com",XFAB:"xfab.com"
+});
+const COMPANY_LOGO_GLYPHS=Object.freeze({
+  NVDA:"NV",MRVL:"MR",AAOI:"AO",XFAB:"XF",RKLB:"RK",VRT:"VR",SPCX:"SX",GOOGL:"G",MU:"MU",
+  DRAM:"DR",TSM:"TSM",TSLA:"TS",SKHY:"SK",SOXL:"SO",VOO:"VO",QQQM:"QQ",IBKR:"IB",CASH:"$"
+});
 function companyLogoMarkup(label){
-  const key=String(label||"").toUpperCase();
-  const glyph={NVDA:"NV",MRVL:"MR",AAOI:"AO",XFAB:"XF",RKLB:"RK",VRT:"VR",SPCX:"SX",GOOGL:"G",MU:"MU",DRAM:"DR",CASH:"$"}[key]||key.slice(0,2)||".";
-  const file={NVDA:"nvda",MRVL:"mrvl",AAOI:"aaoi",XFAB:"xfab",RKLB:"rklb",VRT:"vrt",SPCX:"spcx",GOOGL:"googl",MU:"mu",DRAM:"dram",CASH:"cash"}[key];
+  const key=String(label||"").toUpperCase().trim();
+  const glyph=COMPANY_LOGO_GLYPHS[key]||key.slice(0,2)||".";
+  const asset=COMPANY_LOGO_ASSETS[key];
+  const domain=COMPANY_LOGO_DOMAINS[key];
+  const localSrc=asset?`logos/${asset}?v=10.47`:"";
+  const officialSrc=domain?`https://www.google.com/s2/favicons?domain=${domain}&sz=128`:"";
+  const alternateSrc=domain?`https://icons.duckduckgo.com/ip3/${domain}.ico`:"";
   const safeKey=key.toLowerCase().replace(/[^a-z0-9-]/g,"")||"asset";
-  if(!file)return `<span class="company-logo-card logo-${safeKey} logo-fallback-active" aria-hidden="true"><span class="logo-fallback">${escapeHtml(glyph)}</span></span>`;
-  return `<span class="company-logo-card logo-${safeKey}" aria-hidden="true"><img src="logos/${file}.svg?v=10.45" alt="" onerror="this.parentElement.classList.add('logo-fallback-active')"><span class="logo-fallback">${escapeHtml(glyph)}</span></span>`;
+  if(!localSrc&&!officialSrc)return `<span class="company-logo-card logo-${safeKey} logo-fallback-active" aria-hidden="true"><span class="logo-fallback">${escapeHtml(glyph)}</span></span>`;
+  const alternateAttr=alternateSrc?` data-alternate-src="${escapeHtml(alternateSrc)}"`:"";
+  const onerror="if(this.dataset.fallbackIndex!==\"1\"&&this.dataset.alternateSrc){this.dataset.fallbackIndex=\"1\";this.src=this.dataset.alternateSrc}else{this.parentElement.classList.add(\"logo-fallback-active\")}";
+  return `<span class="company-logo-card logo-${safeKey}" aria-hidden="true"><img src="${escapeHtml(localSrc||officialSrc)}"${alternateAttr} alt="" onerror="${onerror}"><span class="logo-fallback">${escapeHtml(glyph)}</span></span>`;
 }
 function renderTreemap(){
   const box=$("treemap");box.innerHTML="";
