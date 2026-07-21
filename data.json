@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-20T14:15:19.679Z",
+    "lastCloudSaveAt": "2026-07-21T05:33:27.907Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -76,7 +76,7 @@
       "avgCost": 11.685,
       "price": 7.61,
       "sector": "半导体",
-      "color": "#ffa66c",
+      "color": "#ff9a58",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "手动价，EUR",
@@ -141,41 +141,11 @@
       "shares": 2,
       "avgCost": 1095.35,
       "sector": "半导体",
-      "color": "#ff9a58",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "",
-      "costBasisUSD": 2190.7
-    },
-    {
-      "id": "pos_mrk4zjss_bygrzh",
-      "symbol": "DRAM",
-      "name": "储存ETF",
-      "currency": "USD",
-      "source": "twelve",
-      "shares": 40,
-      "avgCost": 55.878499999999995,
-      "sector": "半导体",
       "color": "#fa873c",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 2235.14
-    },
-    {
-      "id": "pos_mrn5990q_67mkqb",
-      "symbol": "TSM",
-      "name": "台积电",
-      "currency": "USD",
-      "source": "twelve",
-      "shares": 4,
-      "avgCost": 413.0875,
-      "sector": "半导体",
-      "color": "#de7835",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "",
-      "costBasisUSD": 1652.35
+      "costBasisUSD": 2190.7
     }
   ],
   "transactions": [
@@ -287,7 +257,7 @@
       "migration": true,
       "source": "manual",
       "sector": "半导体",
-      "color": "#ffa66c",
+      "color": "#ff9a58",
       "schemaVersion": "10.6"
     },
     {
@@ -445,7 +415,7 @@
       "migration": true,
       "sector": "半导体",
       "source": "twelve",
-      "color": "#ff9a58",
+      "color": "#fa873c",
       "schemaVersion": "10.6",
       "closedHistory": true
     },
@@ -860,7 +830,7 @@
       "schemaVersion": "10.6",
       "sector": "半导体",
       "source": "twelve",
-      "color": "#ff9a58"
+      "color": "#fa873c"
     },
     {
       "id": "tx_mqzowpji_t0yuji",
@@ -952,7 +922,7 @@
       "note": "",
       "source": "twelve",
       "sector": "半导体",
-      "color": "#ff9a58",
+      "color": "#fa873c",
       "schemaVersion": "10.6",
       "feeUSD": 0.35,
       "costBasisUSD": 1080.35,
@@ -1141,7 +1111,7 @@
       "note": "",
       "source": "twelve",
       "sector": "半导体",
-      "color": "#de7835",
+      "color": "#ff9a58",
       "schemaVersion": "10.6",
       "feeUSD": 0.35,
       "costBasisUSD": 1652.35,
@@ -1273,6 +1243,48 @@
       "costBasisUSD": 3801.91,
       "grossUSD": 3920,
       "realizedPnlUSD": 115.71000000000004
+    },
+    {
+      "id": "tx_mru75n0c_jl75ws",
+      "date": "2026-07-21",
+      "type": "sell",
+      "symbol": "DRAM",
+      "name": "储存ETF",
+      "shares": 40,
+      "price": 56,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.39,
+      "note": "",
+      "source": "twelve",
+      "sector": "半导体",
+      "color": "#fa873c",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.39,
+      "costBasisUSD": 2235.14,
+      "grossUSD": 2240,
+      "realizedPnlUSD": 4.470000000000255
+    },
+    {
+      "id": "tx_mru767zr_dqu7d0",
+      "date": "2026-07-21",
+      "type": "sell",
+      "symbol": "TSM",
+      "name": "台积电",
+      "shares": 4,
+      "price": 409.5,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.38,
+      "note": "",
+      "source": "twelve",
+      "sector": "半导体",
+      "color": "#ff9a58",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.38,
+      "costBasisUSD": 1652.35,
+      "grossUSD": 1638,
+      "realizedPnlUSD": -14.730000000000018
     }
   ],
   "cashFlows": [
@@ -1411,6 +1423,13 @@
       "netAsset": 19620.13,
       "market": 16360.7,
       "cash": 3259.43
+    },
+    {
+      "date": "2026-07-21",
+      "capital": 22370,
+      "netAsset": 19394.61,
+      "market": 12257.95,
+      "cash": 7136.66
     }
   ]
 }
