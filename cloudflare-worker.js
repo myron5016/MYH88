@@ -1,5 +1,8 @@
+const WORKER_VERSION = "10.47";
+const WORKER_BUILT_AT = "2026-07-23T05:30:00.000Z";
 const CACHE_SECONDS = 30 * 60;
 const STALE_SECONDS = 6 * 60 * 60;
+const LAST_CLOSE_CACHE_SECONDS = 8 * 24 * 60 * 60;
 const MARKET_CLOCK_CACHE_SECONDS = 15 * 60;
 const PORTFOLIO_CACHE_SECONDS = 5 * 60;
 const PROVIDER_BACKOFF_SECONDS = 30 * 60;
@@ -12,6 +15,7 @@ const US_MARKET_OPEN_MIN = 9 * 60 + 30;
 const US_MARKET_CLOSE_MIN = 16 * 60;
 const US_EARLY_CLOSE_MIN = 13 * 60;
 const FALLBACK_PORTFOLIO_SYMBOLS = ["NVDA", "MRVL", "AAOI", "XFAB", "RKLB", "VRT", "SPCX", "GOOGL", "LITE", "MU"];
+const DEFAULT_TWELVE_PRIORITY = ["NVDA", "RKLB", "SPCX", "GOOGL", "MU", "MRVL", "AAOI", "TSLA"];
 const US_STATIC_HOLIDAYS = {
   "2026-01-01": "New Year's Day", "2026-01-19": "Martin Luther King Jr. Day", "2026-02-16": "Presidents' Day", "2026-04-03": "Good Friday", "2026-05-25": "Memorial Day", "2026-06-19": "Juneteenth", "2026-07-03": "Independence Day observed", "2026-09-07": "Labor Day", "2026-11-26": "Thanksgiving Day", "2026-12-25": "Christmas Day",
   "2027-01-01": "New Year's Day", "2027-01-18": "Martin Luther King Jr. Day", "2027-02-15": "Presidents' Day", "2027-03-26": "Good Friday", "2027-05-31": "Memorial Day", "2027-06-18": "Juneteenth observed", "2027-07-05": "Independence Day observed", "2027-09-06": "Labor Day", "2027-11-25": "Thanksgiving Day", "2027-12-24": "Christmas Day observed",
@@ -35,6 +39,23 @@ function safeHeaderValue(value, maxLength = 240) {
 }
 function normalizeSymbols(value) {
   return [...new Set(String(value || "").split(",").map((s) => s.trim().toUpperCase()).filter((s) => /^[A-Z0-9.-]{1,12}$/.test(s)))];
+}
+function buildProviderPlan(symbols, priority = [], limit = TWELVE_BATCH_LIMIT) {
+  const available = normalizeSymbols(symbols.join(","));
+  const preferred = normalizeSymbols(priority.join(",")).filter((symbol) => available.includes(symbol));
+  const twelve = preferred.slice(0, limit);
+  for (const symbol of available) {
+    if (twelve.length >= limit) break;
+    if (!twelve.includes(symbol)) twelve.push(symbol);
+  }
+  return { twelve, finnhub: available.filter((symbol) => !twelve.includes(symbol)) };
+}
+function configuredTwelvePriority(env) {
+  return normalizeSymbols(env.TWELVE_PRIORITY_SYMBOLS || DEFAULT_TWELVE_PRIORITY.join(","));
+}
+function quoteCacheKey(symbol, mode = "live", asOf = "") {
+  const ticker = normalizeSymbols(symbol)[0] || "";
+  return mode === "last-close" ? `quote:last-close:${asOf}:${ticker}` : `quote:live:${ticker}`;
 }
 function nyParts(date = new Date()) {
   const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: US_MARKET_TZ, weekday: "short", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(date).filter((x) => x.type !== "literal").map((x) => [x.type, x.value]));
@@ -99,41 +120,94 @@ async function fetchTwelveQuotes(symbols, key) { if (!key || key.length < 10) th
 function quoteMapFromProvider(data, symbols, source) { const quotes = {}; if (symbols.length === 1 && data && !data[symbols[0]]) quotes[symbols[0]] = { ...data, source }; for (const symbol of symbols) if (data?.[symbol] && !data[symbol].code && data[symbol].status !== "error") quotes[symbol] = { ...data[symbol], source }; return quotes; }
 async function providerBackedOff(env, provider) { const item = await readSharedCache(env, `provider:${provider}:backoff`); return item?.body ? JSON.parse(item.body) : null; }
 async function backoffProvider(env, provider, error) { if (!isQuotaError(error)) return; const response = json({ until: Date.now() + PROVIDER_BACKOFF_SECONDS * 1000, message: safeHeaderValue(error.message || error, 120) }); await writeSharedCache(env, `provider:${provider}:backoff`, response, PROVIDER_BACKOFF_SECONDS); }
-async function fetchFinnhubPartial(symbols, key, warnings) {
-  const settled = await Promise.allSettled(symbols.map((symbol) => fetchFinnhubQuote(symbol, key)));
-  const quotes = {}; settled.forEach((result, index) => { if (result.status === "fulfilled") quotes[symbols[index]] = result.value; else warnings.push(`${symbols[index]}: ${result.reason?.message || "Finnhub failed"}`); }); return quotes;
+async function fetchFinnhubPartial(symbols, key) {
+  const quotes = {}, errors = [];
+  for (let offset = 0; offset < symbols.length; offset += 3) {
+    const batch = symbols.slice(offset, offset + 3);
+    const settled = await Promise.allSettled(batch.map((symbol) => fetchFinnhubQuote(symbol, key)));
+    settled.forEach((result, index) => {
+      const symbol = batch[index];
+      if (result.status === "fulfilled") quotes[symbol] = result.value;
+      else errors.push(`${symbol}: ${result.reason?.message || "Finnhub failed"}`);
+    });
+  }
+  return { quotes, errors };
 }
-async function fetchQuotesWithFallback(symbols, env, ctx) {
+async function fetchQuotesWithFallback(symbols, env, routingPlan) {
   const twelveKey = String(env.TWELVE_DATA_KEY || "").trim(), finnhubKey = String(env.FINNHUB_API_KEY || "").trim(), warnings = [], quotes = {};
-  const firstEight = symbols.slice(0, TWELVE_BATCH_LIMIT), finnhubFirst = symbols.slice(TWELVE_BATCH_LIMIT); let twelveReason = "";
+  const twelveFirst = symbols.filter((symbol) => routingPlan.twelve.includes(symbol));
+  const finnhubFirst = symbols.filter((symbol) => routingPlan.finnhub.includes(symbol));
+  let twelveReason = "";
   const twelveBackoff = await providerBackedOff(env, "twelve");
-  if (firstEight.length && !twelveBackoff) {
-    try { Object.assign(quotes, quoteMapFromProvider(await fetchTwelveQuotes(firstEight, twelveKey), firstEight, "twelve")); }
+  if (twelveFirst.length && !twelveBackoff) {
+    try { Object.assign(quotes, quoteMapFromProvider(await fetchTwelveQuotes(twelveFirst, twelveKey), twelveFirst, "twelve")); }
     catch (error) { twelveReason = safeHeaderValue(error.message || "Twelve failed", 240); warnings.push(`Twelve: ${twelveReason}`); await backoffProvider(env, "twelve", error); }
-  } else if (firstEight.length) { twelveReason = "Twelve temporarily backed off"; warnings.push(twelveReason); }
-  const missing = [...finnhubFirst, ...firstEight.filter((symbol) => !quotes[symbol])];
-  if (missing.length) Object.assign(quotes, await fetchFinnhubPartial(missing, finnhubKey, warnings));
+  } else if (twelveFirst.length) { twelveReason = "Twelve temporarily backed off"; warnings.push(twelveReason); }
+  const missing = [...finnhubFirst, ...twelveFirst.filter((symbol) => !quotes[symbol])];
+  const finnhubBackoff = await providerBackedOff(env, "finnhub");
+  if (missing.length && !finnhubBackoff) {
+    const result = await fetchFinnhubPartial(missing, finnhubKey);
+    Object.assign(quotes, result.quotes);
+    warnings.push(...result.errors);
+    if (result.errors.some((message) => isQuotaError(message))) await backoffProvider(env, "finnhub", new Error(result.errors.join("; ")));
+  } else if (missing.length) warnings.push("Finnhub temporarily backed off");
   if (!Object.keys(quotes).length) throw new Error(warnings.join("; ") || "No usable quotes");
   const sources = new Set(Object.values(quotes).map((quote) => quote.source));
   return { quotes, source: sources.size > 1 ? "mixed" : sources.has("twelve") ? "twelve" : "finnhub", warnings, fallbackReason: twelveReason };
 }
 async function limitMiss(env, key) { return env.MYH88_QUOTE_LIMITER ? env.MYH88_QUOTE_LIMITER.limit({ key }) : { success: true }; }
 async function fetchQuotesWithCache(request, env, ctx, canonicalSymbols, requestedSymbols, mode) {
-  const isLastClose = mode === "last-close", asOf = isLastClose ? previousTradingDate() : "", cacheName = `${isLastClose ? `last-close:${asOf}` : "quotes"}:${canonicalSymbols.join(",")}`;
-  const maxAge = isLastClose ? 36 * 60 * 60 : CACHE_SECONDS, ttl = maxAge + STALE_SECONDS, shared = await readSharedCache(env, cacheName);
-  const pick = (response) => { if (requestedSymbols.length === canonicalSymbols.length) return response; return response.json().then((all) => json(Object.fromEntries(requestedSymbols.filter((s) => all[s]).map((s) => [s, all[s]])), 200, Object.fromEntries(response.headers))); };
-  if (shared?.body && Date.now() - Number(shared.cachedAt || 0) < maxAge * 1000) return pick(responseFromCached(shared, isLastClose ? "HIT-LAST-CLOSE" : "HIT-KV"));
-  const cacheKey = new Request(new URL(`/cache/${cacheName}`, request.url)); const edge = await caches.default.match(cacheKey);
-  if (edge) return pick(new Response(edge.body, { status: edge.status, headers: { ...Object.fromEntries(edge.headers), "X-MYH88-Cache": "HIT-EDGE" } }));
-  const limit = await limitMiss(env, cacheName);
-  if (!limit.success) { if (shared?.body) return pick(responseFromCached(shared, "STALE-RATE-LIMIT")); log("quote_rate_limited", { cacheName }); return noStoreJson({ error: "Quote refresh is temporarily busy. Please retry shortly." }, 429); }
+  const isLastClose = mode === "last-close", asOf = isLastClose ? previousTradingDate() : "";
+  const maxAge = isLastClose ? LAST_CLOSE_CACHE_SECONDS : CACHE_SECONDS;
+  const ttl = isLastClose ? LAST_CLOSE_CACHE_SECONDS * 2 : CACHE_SECONDS + STALE_SECONDS;
+  const records = await Promise.all(requestedSymbols.map(async (symbol) => {
+    const key = quoteCacheKey(symbol, mode, asOf), record = await readSharedCache(env, key);
+    let quote = null;
+    try { quote = record?.body ? JSON.parse(record.body) : null; } catch {}
+    const fresh = Boolean(quote && Date.now() - Number(record.cachedAt || 0) < maxAge * 1000);
+    return { symbol, key, record, quote, fresh };
+  }));
+  const body = Object.fromEntries(records.filter((item) => item.fresh).map((item) => [item.symbol, item.quote]));
+  const missing = records.filter((item) => !item.fresh).map((item) => item.symbol);
+  if (!missing.length) {
+    const sources = new Set(Object.values(body).map((quote) => quote.source).filter(Boolean));
+    const source = sources.size > 1 ? "mixed" : [...sources][0] || "cache";
+    return jsonResponse(body, isLastClose ? "HIT-LAST-CLOSE-PER-SYMBOL" : "HIT-KV-PER-SYMBOL", { source, asOf });
+  }
+  const limit = await limitMiss(env, `quotes:${mode}`);
+  if (!limit.success) {
+    const stale = records.filter((item) => !item.fresh && item.quote);
+    stale.forEach((item) => { body[item.symbol] = item.quote; });
+    if (Object.keys(body).length === requestedSymbols.length) return jsonResponse(body, "STALE-RATE-LIMIT", { source: "mixed", asOf, warnings: "Refresh rate limited; per-symbol stale cache used" });
+    log("quote_rate_limited", { mode, missing: missing.join(",") });
+    return noStoreJson({ error: "Quote refresh is temporarily busy. Please retry shortly." }, 429);
+  }
   try {
-    const result = await fetchQuotesWithFallback(canonicalSymbols, env, ctx), body = Object.fromEntries(canonicalSymbols.filter((s) => result.quotes[s]).map((s) => [s, result.quotes[s]]));
-    const response = jsonResponse(body, `MISS-${result.source.toUpperCase()}${isLastClose ? "-LAST-CLOSE" : ""}`, { source: result.source, asOf, warnings: result.warnings.join(" | "), fallbackReason: result.fallbackReason });
+    const routingPlan = buildProviderPlan(canonicalSymbols, configuredTwelvePriority(env), TWELVE_BATCH_LIMIT);
+    const result = await fetchQuotesWithFallback(missing, env, routingPlan);
+    Object.assign(body, result.quotes);
+    const unresolved = records.filter((item) => !body[item.symbol] && item.quote);
+    unresolved.forEach((item) => { body[item.symbol] = item.quote; });
+    if (!Object.keys(body).length) throw new Error("No usable quotes");
+    const cacheLabel = unresolved.length ? `PARTIAL-STALE-${result.source.toUpperCase()}` : `MISS-${result.source.toUpperCase()}`;
+    const response = jsonResponse(body, `${cacheLabel}${isLastClose ? "-LAST-CLOSE" : ""}`, { source: result.source, asOf, warnings: result.warnings.join(" | "), fallbackReason: result.fallbackReason });
     response.headers.set("Cache-Control", `public, max-age=${maxAge}, stale-while-revalidate=${ttl}`);
-    ctx.waitUntil(Promise.all([writeSharedCache(env, cacheName, response.clone(), ttl), caches.default.put(cacheKey, response.clone())]));
-    log("quote_refresh", { cacheName, source: result.source, count: Object.keys(body).length, mode }); return pick(response);
-  } catch (error) { log("quote_refresh_failed", { cacheName, message: error.message }); if (shared?.body) return pick(responseFromCached(shared, "STALE-KV")); return noStoreJson({ error: error.message || "Quote request failed" }, 502); }
+    const writes = Object.entries(result.quotes).map(([symbol, quote]) => writeSharedCache(
+      env,
+      quoteCacheKey(symbol, mode, asOf),
+      jsonResponse(quote, "STORE-PER-SYMBOL", { source: quote.source, asOf }),
+      ttl,
+    ));
+    ctx.waitUntil(Promise.all(writes));
+    log("quote_refresh", { source: result.source, fetched: Object.keys(result.quotes).join(","), served: Object.keys(body).length, mode });
+    return response;
+  } catch (error) {
+    const stale = records.filter((item) => item.quote);
+    stale.forEach((item) => { body[item.symbol] = item.quote; });
+    log("quote_refresh_failed", { mode, missing: missing.join(","), message: error.message });
+    if (Object.keys(body).length) return jsonResponse(body, "STALE-KV-PER-SYMBOL", { source: "mixed", asOf, warnings: error.message });
+    return noStoreJson({ error: error.message || "Quote request failed" }, 502);
+  }
 }
 async function fetchMarketClockWithCache(env, ctx) {
   const key = "market-clock:US", shared = await readSharedCache(env, key);
@@ -147,7 +221,26 @@ export default {
     const url = new URL(request.url), path = url.pathname.replace(/\/+$/, "") || "/";
     try {
       if (path === "/") {
-        const portfolio = await livePortfolioSymbols(env); return json({ ok: true, service: "MYH88 price proxy", cacheSeconds: CACHE_SECONDS, staleSeconds: STALE_SECONDS, sharedCache: Boolean(env.MYH88_CACHE), providers: { twelve: Boolean(String(env.TWELVE_DATA_KEY || "").trim()), finnhub: Boolean(String(env.FINNHUB_API_KEY || "").trim()) }, rateLimitConfigured: Boolean(env.MYH88_QUOTE_LIMITER), portfolioSymbols: portfolio.length, fxMode: "manual" });
+        const portfolio = await livePortfolioSymbols(env);
+        const routing = buildProviderPlan(portfolio, configuredTwelvePriority(env), TWELVE_BATCH_LIMIT);
+        const [twelveBackoff, finnhubBackoff] = await Promise.all([providerBackedOff(env, "twelve"), providerBackedOff(env, "finnhub")]);
+        return json({
+          ok: true,
+          service: "MYH88 price proxy",
+          version: WORKER_VERSION,
+          builtAt: WORKER_BUILT_AT,
+          cacheMode: "per-symbol",
+          cacheSeconds: CACHE_SECONDS,
+          staleSeconds: STALE_SECONDS,
+          lastCloseCacheSeconds: LAST_CLOSE_CACHE_SECONDS,
+          sharedCache: Boolean(env.MYH88_CACHE),
+          providers: { twelve: Boolean(String(env.TWELVE_DATA_KEY || "").trim()), finnhub: Boolean(String(env.FINNHUB_API_KEY || "").trim()) },
+          providerBackoff: { twelve: twelveBackoff || null, finnhub: finnhubBackoff || null },
+          routing,
+          rateLimitConfigured: Boolean(env.MYH88_QUOTE_LIMITER),
+          portfolioSymbols: portfolio.length,
+          fxMode: "manual",
+        });
       }
       if (path === "/market-clock") return fetchMarketClockWithCache(env, ctx);
       if (path === "/fx") return noStoreJson({ error: "FX proxy is disabled. Exchange rates are managed manually in the ledger." }, 404);
@@ -160,3 +253,5 @@ export default {
     } catch (error) { log("worker_error", { path, message: error.message || String(error) }); return noStoreJson({ error: error.message || "Proxy failed" }, 502); }
   },
 };
+
+export { buildProviderPlan, localMarketClock, previousTradingDate, quoteCacheKey };
