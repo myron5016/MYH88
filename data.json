@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-22T10:53:13.279Z",
+    "lastCloudSaveAt": "2026-07-23T00:41:52.006Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -74,7 +74,7 @@
       "source": "manual",
       "shares": 44,
       "avgCost": 11.685,
-      "price": 7.61,
+      "price": 7.45,
       "sector": "半导体",
       "color": "#ff9a58",
       "sectorLocked": false,
@@ -83,8 +83,8 @@
       "costBasisUSD": 588.613179,
       "changePercent": 0,
       "priceSource": "manual",
-      "priceProvider": "",
-      "priceUpdatedAt": "",
+      "priceProvider": "manual",
+      "priceUpdatedAt": "2026-07-23T00:41:03.972Z",
       "priceAsOf": ""
     },
     {
@@ -108,14 +108,14 @@
       "name": "Space X",
       "currency": "USD",
       "source": "twelve",
-      "shares": 27,
-      "avgCost": 140.16185185185188,
+      "shares": 32,
+      "avgCost": 136.55343750000003,
       "sector": "太空",
       "color": "#f16183",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 3784.37
+      "costBasisUSD": 4369.71
     },
     {
       "id": "pos_mqpb20pj_q02ooh",
@@ -123,14 +123,14 @@
       "name": "谷歌",
       "currency": "USD",
       "source": "twelve",
-      "shares": 2,
-      "avgCost": 346.34993,
+      "shares": 14,
+      "avgCost": 343.83784714285713,
       "sector": "科技平台",
       "color": "#885af1",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 692.69986
+      "costBasisUSD": 4813.72986
     },
     {
       "id": "pos_mqz9i9o7_8b8hhc",
@@ -1306,6 +1306,90 @@
       "costBasisUSD": 1095.35,
       "grossUSD": 980,
       "realizedPnlUSD": -115.71999999999991
+    },
+    {
+      "id": "tx_mrws7fnz_ce2h4f",
+      "date": "2026-07-22",
+      "type": "buy",
+      "symbol": "SPCX",
+      "name": "Space X",
+      "shares": 5,
+      "price": 117,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.34,
+      "note": "",
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#f16183",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.34,
+      "costBasisUSD": 585.34,
+      "grossUSD": 585,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mrws9015_4o4xb5",
+      "date": "2026-07-23",
+      "type": "buy",
+      "symbol": "GOOGL",
+      "name": "谷歌",
+      "shares": 5,
+      "price": 346,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.34,
+      "note": "",
+      "source": "twelve",
+      "sector": "科技平台",
+      "color": "#885af1",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.34,
+      "costBasisUSD": 1730.34,
+      "grossUSD": 1730,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mrws9rcy_rqkl8e",
+      "date": "2026-07-23",
+      "type": "buy",
+      "symbol": "GOOGL",
+      "name": "谷歌",
+      "shares": 2,
+      "price": 345,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.35,
+      "note": "",
+      "source": "twelve",
+      "sector": "科技平台",
+      "color": "#885af1",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.35,
+      "costBasisUSD": 690.35,
+      "grossUSD": 690,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mrwsacgk_xi32ic",
+      "date": "2026-07-23",
+      "type": "buy",
+      "symbol": "GOOGL",
+      "name": "谷歌",
+      "shares": 5,
+      "price": 340,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.34,
+      "note": "",
+      "source": "twelve",
+      "sector": "科技平台",
+      "color": "#885af1",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.34,
+      "costBasisUSD": 1700.34,
+      "grossUSD": 1700,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -1458,6 +1542,13 @@
       "netAsset": 19985.62,
       "market": 11869.33,
       "cash": 8116.29
+    },
+    {
+      "date": "2026-07-23",
+      "capital": 22370,
+      "netAsset": 19787.55,
+      "market": 16377.63,
+      "cash": 3409.92
     }
   ]
 }
