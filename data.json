@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-23T03:58:27.062Z",
+    "lastCloudSaveAt": "2026-07-23T10:03:48.570Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -123,14 +123,14 @@
       "name": "谷歌",
       "currency": "USD",
       "source": "twelve",
-      "shares": 14,
-      "avgCost": 343.83784714285713,
+      "shares": 19,
+      "avgCost": 340.2142031578947,
       "sector": "科技平台",
       "color": "#885af1",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 4813.72986
+      "costBasisUSD": 6464.06986
     },
     {
       "id": "pos_mqz9i9o7_8b8hhc",
@@ -1432,6 +1432,27 @@
       "costBasisUSD": 5751.55,
       "grossUSD": 6000,
       "realizedPnlUSD": 246.6899999999996
+    },
+    {
+      "id": "tx_mrxcf5b8_ut9erb",
+      "date": "2026-07-23",
+      "type": "buy",
+      "symbol": "GOOGL",
+      "name": "谷歌",
+      "shares": 5,
+      "price": 330,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.34,
+      "note": "",
+      "source": "twelve",
+      "sector": "科技平台",
+      "color": "#885af1",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.34,
+      "costBasisUSD": 1650.34,
+      "grossUSD": 1650,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -1588,9 +1609,9 @@
     {
       "date": "2026-07-23",
       "capital": 22370,
-      "netAsset": 20026.2,
-      "market": 16369.59,
-      "cash": 3656.61
+      "netAsset": 20086.31,
+      "market": 18080.04,
+      "cash": 2006.27
     }
   ]
 }
