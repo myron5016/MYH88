@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-05T08:30:29.668Z",
+    "lastCloudSaveAt": "2026-08-05T09:55:27.569Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -379,14 +379,14 @@
       "name": "2倍做多SpaceX",
       "currency": "USD",
       "source": "twelve",
-      "shares": 500,
-      "avgCost": 6.3021,
+      "shares": 750,
+      "avgCost": 6.203613333333333,
       "sector": "太空",
       "color": "#f16183",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 3151.05,
+      "costBasisUSD": 4652.71,
       "lots": [
         {
           "lotId": "tx_msfttw3q_667rfu",
@@ -401,6 +401,20 @@
           "remainingCostBasisNative": 3151.05,
           "currency": "USD",
           "price": 6.3
+        },
+        {
+          "lotId": "tx_msfwutp7_5b1cbo",
+          "buyTransactionId": "tx_msfwutp7_5b1cbo",
+          "date": "2026-08-05",
+          "order": 58,
+          "shares": 250,
+          "remainingShares": 250,
+          "costBasisUSD": 1501.66,
+          "remainingCostBasisUSD": 1501.66,
+          "costBasisNative": 1501.66,
+          "remainingCostBasisNative": 1501.66,
+          "currency": "USD",
+          "price": 6
         }
       ]
     }
@@ -1889,6 +1903,28 @@
       "costBasisNative": 3151.05,
       "grossUSD": 3150,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_msfwutp7_5b1cbo",
+      "date": "2026-08-05",
+      "type": "buy",
+      "symbol": "SPCH",
+      "name": "2倍做多SpaceX",
+      "shares": 250,
+      "price": 6,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 1.66,
+      "note": "",
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#f16183",
+      "schemaVersion": "10.48",
+      "feeUSD": 1.66,
+      "costBasisUSD": 1501.66,
+      "costBasisNative": 1501.66,
+      "grossUSD": 1500,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -2052,9 +2088,9 @@
     {
       "date": "2026-08-05",
       "capital": 22370,
-      "netAsset": 21281.65,
-      "market": 16892.23,
-      "cash": 4389.42
+      "netAsset": 22479.99,
+      "market": 19592.23,
+      "cash": 2887.76
     }
   ]
 }
