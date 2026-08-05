@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-07-23T10:03:48.570Z",
+    "lastCloudSaveAt": "2026-08-05T05:29:36.508Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -27,14 +27,14 @@
       "name": "英伟达",
       "currency": "USD",
       "source": "twelve",
-      "shares": 14,
+      "shares": 4,
       "avgCost": 209.76343307142858,
       "sector": "AI基建",
       "color": "#21cf87",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 2936.688063
+      "costBasisUSD": 839.053732
     },
     {
       "id": "pos_mqnjborg_zeux56",
@@ -123,14 +123,14 @@
       "name": "谷歌",
       "currency": "USD",
       "source": "twelve",
-      "shares": 19,
+      "shares": 10,
       "avgCost": 340.2142031578947,
       "sector": "科技平台",
       "color": "#885af1",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 6464.06986
+      "costBasisUSD": 3402.142032
     },
     {
       "id": "pos_mqz9i9o7_8b8hhc",
@@ -1453,6 +1453,48 @@
       "costBasisUSD": 1650.34,
       "grossUSD": 1650,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_msfn30lh_3ppat2",
+      "date": "2026-08-05",
+      "type": "sell",
+      "symbol": "NVDA",
+      "name": "英伟达",
+      "shares": 10,
+      "price": 216,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.39,
+      "note": "",
+      "source": "twelve",
+      "sector": "AI基建",
+      "color": "#21cf87",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.39,
+      "costBasisUSD": 2097.6343307142856,
+      "grossUSD": 2160,
+      "realizedPnlUSD": 61.9756692857145
+    },
+    {
+      "id": "tx_msfnafqw_2tktxa",
+      "date": "2026-08-03",
+      "type": "sell",
+      "symbol": "GOOGL",
+      "name": "谷歌",
+      "shares": 9,
+      "price": 375,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.41,
+      "note": "",
+      "source": "twelve",
+      "sector": "科技平台",
+      "color": "#885af1",
+      "schemaVersion": "10.6",
+      "feeUSD": 0.41,
+      "costBasisUSD": 3061.9278284210523,
+      "grossUSD": 3375,
+      "realizedPnlUSD": 312.6621715789479
     }
   ],
   "cashFlows": [
@@ -1612,6 +1654,13 @@
       "netAsset": 20086.31,
       "market": 18080.04,
       "cash": 2006.27
+    },
+    {
+      "date": "2026-08-05",
+      "capital": 22370,
+      "netAsset": 21317.08,
+      "market": 13776.61,
+      "cash": 7540.47
     }
   ]
 }
