@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-05T05:29:36.508Z",
+    "lastCloudSaveAt": "2026-08-05T05:31:52.714Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -15,7 +15,7 @@
   },
   "fxRates": {
     "USD": 1,
-    "EUR": 1.14143,
+    "EUR": 1.15,
     "HKD": 0.128,
     "JPY": 0.0067,
     "GBP": 1.27
@@ -74,7 +74,7 @@
       "source": "manual",
       "shares": 44,
       "avgCost": 11.685,
-      "price": 7.45,
+      "price": 6.715,
       "sector": "半导体",
       "color": "#ff9a58",
       "sectorLocked": false,
@@ -83,8 +83,8 @@
       "costBasisUSD": 588.613179,
       "changePercent": 0,
       "priceSource": "manual",
-      "priceProvider": "",
-      "priceUpdatedAt": "",
+      "priceProvider": "manual",
+      "priceUpdatedAt": "2026-08-05T05:30:10.945Z",
       "priceAsOf": ""
     },
     {
