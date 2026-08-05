@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-05T05:31:52.714Z",
+    "lastCloudSaveAt": "2026-08-05T07:36:36.139Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -28,13 +28,43 @@
       "currency": "USD",
       "source": "twelve",
       "shares": 4,
-      "avgCost": 209.76343307142858,
+      "avgCost": 196.17201575,
       "sector": "AI基建",
       "color": "#21cf87",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 839.053732
+      "costBasisUSD": 784.688063,
+      "lots": [
+        {
+          "lotId": "tx_mqszfh6h_n9zn35",
+          "buyTransactionId": "tx_mqszfh6h_n9zn35",
+          "date": "2026-06-24",
+          "order": 23,
+          "shares": 2,
+          "remainingShares": 2,
+          "costBasisUSD": 402.348063,
+          "remainingCostBasisUSD": 402.348063,
+          "costBasisNative": 402.348063,
+          "remainingCostBasisNative": 402.348063,
+          "currency": "USD",
+          "price": 201
+        },
+        {
+          "lotId": "tx_mqzowpji_t0yuji",
+          "buyTransactionId": "tx_mqzowpji_t0yuji",
+          "date": "2026-06-29",
+          "order": 27,
+          "shares": 2,
+          "remainingShares": 2,
+          "costBasisUSD": 382.34,
+          "remainingCostBasisUSD": 382.34,
+          "costBasisNative": 382.34,
+          "remainingCostBasisNative": 382.34,
+          "currency": "USD",
+          "price": 191
+        }
+      ]
     },
     {
       "id": "pos_mqnjborg_zeux56",
@@ -49,7 +79,23 @@
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 1625.2
+      "costBasisUSD": 1625.2,
+      "lots": [
+        {
+          "lotId": "tx_mqnjborg_yfihv6",
+          "buyTransactionId": "tx_mqnjborg_yfihv6",
+          "date": "2026-06-21",
+          "order": 1,
+          "shares": 5,
+          "remainingShares": 5,
+          "costBasisUSD": 1625.2,
+          "remainingCostBasisUSD": 1625.2,
+          "costBasisNative": 1625.2,
+          "remainingCostBasisNative": 1625.2,
+          "currency": "USD",
+          "price": 325.04
+        }
+      ]
     },
     {
       "id": "pos_mqnjborg_p8abix",
@@ -64,7 +110,23 @@
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 820.34
+      "costBasisUSD": 820.34,
+      "lots": [
+        {
+          "lotId": "tx_mqnjborg_9zvalh",
+          "buyTransactionId": "tx_mqnjborg_9zvalh",
+          "date": "2026-06-21",
+          "order": 2,
+          "shares": 4,
+          "remainingShares": 4,
+          "costBasisUSD": 820.34,
+          "remainingCostBasisUSD": 820.34,
+          "costBasisNative": 820.34,
+          "remainingCostBasisNative": 820.34,
+          "currency": "USD",
+          "price": 205.085
+        }
+      ]
     },
     {
       "id": "pos_mqnjborg_q3swfw",
@@ -82,9 +144,25 @@
       "note": "手动价，EUR",
       "costBasisUSD": 588.613179,
       "changePercent": 0,
+      "lots": [
+        {
+          "lotId": "tx_mqnjborg_dndtbg",
+          "buyTransactionId": "tx_mqnjborg_dndtbg",
+          "date": "2026-06-21",
+          "order": 4,
+          "shares": 44,
+          "remainingShares": 44,
+          "costBasisUSD": 588.613179,
+          "remainingCostBasisUSD": 588.613179,
+          "costBasisNative": 514.14,
+          "remainingCostBasisNative": 514.14,
+          "currency": "EUR",
+          "price": 11.685
+        }
+      ],
       "priceSource": "manual",
-      "priceProvider": "manual",
-      "priceUpdatedAt": "2026-08-05T05:30:10.945Z",
+      "priceProvider": "",
+      "priceUpdatedAt": "",
       "priceAsOf": ""
     },
     {
@@ -100,7 +178,23 @@
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 3342
+      "costBasisUSD": 3342,
+      "lots": [
+        {
+          "lotId": "tx_mqnjborg_b6vxv2",
+          "buyTransactionId": "tx_mqnjborg_b6vxv2",
+          "date": "2026-06-21",
+          "order": 6,
+          "shares": 30,
+          "remainingShares": 30,
+          "costBasisUSD": 3342,
+          "remainingCostBasisUSD": 3342,
+          "costBasisNative": 3342,
+          "remainingCostBasisNative": 3342,
+          "currency": "USD",
+          "price": 111.4
+        }
+      ]
     },
     {
       "id": "pos_mqnjborg_pzifro",
@@ -109,13 +203,99 @@
       "currency": "USD",
       "source": "twelve",
       "shares": 32,
-      "avgCost": 136.55343750000003,
+      "avgCost": 136.5534375,
       "sector": "太空",
       "color": "#f16183",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 4369.71
+      "costBasisUSD": 4369.71,
+      "lots": [
+        {
+          "lotId": "tx_mqnjborg_1jspyf",
+          "buyTransactionId": "tx_mqnjborg_1jspyf",
+          "date": "2026-06-21",
+          "order": 14,
+          "shares": 10,
+          "remainingShares": 10,
+          "costBasisUSD": 1500,
+          "remainingCostBasisUSD": 1500,
+          "costBasisNative": 1500,
+          "remainingCostBasisNative": 1500,
+          "currency": "USD",
+          "price": 150
+        },
+        {
+          "lotId": "tx_mrbe5rqe_vhdot4",
+          "buyTransactionId": "tx_mrbe5rqe_vhdot4",
+          "date": "2026-07-08",
+          "order": 31,
+          "shares": 2,
+          "remainingShares": 2,
+          "costBasisUSD": 298.35,
+          "remainingCostBasisUSD": 298.35,
+          "costBasisNative": 298.35,
+          "remainingCostBasisNative": 298.35,
+          "currency": "USD",
+          "price": 149
+        },
+        {
+          "lotId": "tx_mrkw6so9_bh7gl8",
+          "buyTransactionId": "tx_mrkw6so9_bh7gl8",
+          "date": "2026-07-15",
+          "order": 37,
+          "shares": 5,
+          "remainingShares": 5,
+          "costBasisUSD": 695.34,
+          "remainingCostBasisUSD": 695.34,
+          "costBasisNative": 695.34,
+          "remainingCostBasisNative": 695.34,
+          "currency": "USD",
+          "price": 139
+        },
+        {
+          "lotId": "tx_mrn5mw3z_1vftc9",
+          "buyTransactionId": "tx_mrn5mw3z_1vftc9",
+          "date": "2026-07-15",
+          "order": 39,
+          "shares": 5,
+          "remainingShares": 5,
+          "costBasisUSD": 675.34,
+          "remainingCostBasisUSD": 675.34,
+          "costBasisNative": 675.34,
+          "remainingCostBasisNative": 675.34,
+          "currency": "USD",
+          "price": 135
+        },
+        {
+          "lotId": "tx_mrta51lq_p5xhvg",
+          "buyTransactionId": "tx_mrta51lq_p5xhvg",
+          "date": "2026-07-20",
+          "order": 42,
+          "shares": 5,
+          "remainingShares": 5,
+          "costBasisUSD": 615.34,
+          "remainingCostBasisUSD": 615.34,
+          "costBasisNative": 615.34,
+          "remainingCostBasisNative": 615.34,
+          "currency": "USD",
+          "price": 123
+        },
+        {
+          "lotId": "tx_mrws7fnz_ce2h4f",
+          "buyTransactionId": "tx_mrws7fnz_ce2h4f",
+          "date": "2026-07-22",
+          "order": 48,
+          "shares": 5,
+          "remainingShares": 5,
+          "costBasisUSD": 585.34,
+          "remainingCostBasisUSD": 585.34,
+          "costBasisNative": 585.34,
+          "remainingCostBasisNative": 585.34,
+          "currency": "USD",
+          "price": 117
+        }
+      ]
     },
     {
       "id": "pos_mqpb20pj_q02ooh",
@@ -124,13 +304,43 @@
       "currency": "USD",
       "source": "twelve",
       "shares": 10,
-      "avgCost": 340.2142031578947,
+      "avgCost": 335.068,
       "sector": "科技平台",
       "color": "#885af1",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 3402.142032
+      "costBasisUSD": 3350.68,
+      "lots": [
+        {
+          "lotId": "tx_mrwsacgk_xi32ic",
+          "buyTransactionId": "tx_mrwsacgk_xi32ic",
+          "date": "2026-07-23",
+          "order": 51,
+          "shares": 5,
+          "remainingShares": 5,
+          "costBasisUSD": 1700.34,
+          "remainingCostBasisUSD": 1700.34,
+          "costBasisNative": 1700.34,
+          "remainingCostBasisNative": 1700.34,
+          "currency": "USD",
+          "price": 340
+        },
+        {
+          "lotId": "tx_mrxcf5b8_ut9erb",
+          "buyTransactionId": "tx_mrxcf5b8_ut9erb",
+          "date": "2026-07-23",
+          "order": 54,
+          "shares": 5,
+          "remainingShares": 5,
+          "costBasisUSD": 1650.34,
+          "remainingCostBasisUSD": 1650.34,
+          "costBasisNative": 1650.34,
+          "remainingCostBasisNative": 1650.34,
+          "currency": "USD",
+          "price": 330
+        }
+      ]
     },
     {
       "id": "pos_mqz9i9o7_8b8hhc",
@@ -139,13 +349,29 @@
       "currency": "USD",
       "source": "twelve",
       "shares": 1,
-      "avgCost": 1095.35,
+      "avgCost": 1080.35,
       "sector": "半导体",
       "color": "#fa873c",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 1095.35
+      "costBasisUSD": 1080.35,
+      "lots": [
+        {
+          "lotId": "tx_mr3ji5kj_m8ogzy",
+          "buyTransactionId": "tx_mr3ji5kj_m8ogzy",
+          "date": "2026-07-01",
+          "order": 29,
+          "shares": 1,
+          "remainingShares": 1,
+          "costBasisUSD": 1080.35,
+          "remainingCostBasisUSD": 1080.35,
+          "costBasisNative": 1080.35,
+          "remainingCostBasisNative": 1080.35,
+          "currency": "USD",
+          "price": 1080
+        }
+      ]
     }
   ],
   "transactions": [
@@ -169,7 +395,8 @@
       "sector": "AI基建",
       "source": "twelve",
       "color": "#21cf87",
-      "schemaVersion": "10.6"
+      "schemaVersion": "10.6",
+      "costBasisNative": 2152
     },
     {
       "id": "tx_mqnjborg_yfihv6",
@@ -191,7 +418,8 @@
       "sector": "光通信",
       "color": "#38d1dd",
       "source": "twelve",
-      "schemaVersion": "10.6"
+      "schemaVersion": "10.6",
+      "costBasisNative": 1625.2
     },
     {
       "id": "tx_mqnjborg_9zvalh",
@@ -213,7 +441,8 @@
       "sector": "光通信",
       "color": "#18c5d3",
       "source": "twelve",
-      "schemaVersion": "10.6"
+      "schemaVersion": "10.6",
+      "costBasisNative": 820.34
     },
     {
       "id": "tx_mqnjborg_l6didq",
@@ -258,7 +487,8 @@
       "source": "manual",
       "sector": "半导体",
       "color": "#ff9a58",
-      "schemaVersion": "10.6"
+      "schemaVersion": "10.6",
+      "costBasisNative": 514.14
     },
     {
       "id": "tx_mqnjborg_ymji54",
@@ -303,7 +533,8 @@
       "sector": "太空",
       "source": "twelve",
       "color": "#ea466d",
-      "schemaVersion": "10.6"
+      "schemaVersion": "10.6",
+      "costBasisNative": 3342
     },
     {
       "id": "tx_mqnjborg_ju1ddv",
@@ -325,7 +556,8 @@
       "sector": "AI基建",
       "color": "#5cd8a9",
       "source": "twelve",
-      "schemaVersion": "10.6"
+      "schemaVersion": "10.6",
+      "costBasisNative": 930.21
     },
     {
       "id": "tx_mqnjborg_382ae8",
@@ -485,7 +717,8 @@
       "source": "twelve",
       "sector": "太空",
       "color": "#f16183",
-      "schemaVersion": "10.6"
+      "schemaVersion": "10.6",
+      "costBasisNative": 1500
     },
     {
       "id": "tx_mqnjborg_uy5123",
@@ -576,7 +809,8 @@
       "schemaVersion": "10.6",
       "sector": "科技平台",
       "color": "#885af1",
-      "source": "twelve"
+      "source": "twelve",
+      "costBasisNative": 350.35
     },
     {
       "id": "tx_mqpb3vqg_npglti",
@@ -598,7 +832,8 @@
       "schemaVersion": "10.6",
       "sector": "未分类",
       "color": "#8b5cf6",
-      "source": "twelve"
+      "source": "twelve",
+      "costBasisNative": 3030.34
     },
     {
       "id": "tx_mqpj1itm_sd0nbc",
@@ -634,7 +869,8 @@
       "schemaVersion": "10.6",
       "sector": "未分类",
       "color": "#8b5cf6",
-      "source": "twelve"
+      "source": "twelve",
+      "costBasisNative": 909.102
     },
     {
       "id": "tx_mqszbo4r_u58i8w",
@@ -670,7 +906,8 @@
       "schemaVersion": "10.6",
       "sector": "未分类",
       "color": "#8b5cf6",
-      "source": "twelve"
+      "source": "twelve",
+      "costBasisNative": 2121.238
     },
     {
       "id": "tx_mqsze5ls_d0n46e",
@@ -706,7 +943,8 @@
       "schemaVersion": "10.6",
       "sector": "科技平台",
       "color": "#885af1",
-      "source": "twelve"
+      "source": "twelve",
+      "costBasisNative": 342.34986
     },
     {
       "id": "tx_mqszfh6h_n9zn35",
@@ -746,7 +984,8 @@
       "schemaVersion": "10.6",
       "sector": "AI基建",
       "source": "twelve",
-      "color": "#21cf87"
+      "color": "#21cf87",
+      "costBasisNative": 402.348063
     },
     {
       "id": "tx_mqv9tzrw_3o68hy",
@@ -768,7 +1007,8 @@
       "schemaVersion": "10.6",
       "sector": "光通信",
       "source": "twelve",
-      "color": "#b9d00b"
+      "color": "#b9d00b",
+      "costBasisNative": 1620.35
     },
     {
       "id": "tx_mqv9ux94_se7c1h",
@@ -808,7 +1048,8 @@
       "schemaVersion": "10.6",
       "sector": "AI基建",
       "color": "#5cd8a9",
-      "source": "twelve"
+      "source": "twelve",
+      "costBasisNative": 0.218799
     },
     {
       "id": "tx_mqz9i9o7_tgjwo5",
@@ -830,7 +1071,8 @@
       "schemaVersion": "10.6",
       "sector": "半导体",
       "source": "twelve",
-      "color": "#fa873c"
+      "color": "#fa873c",
+      "costBasisNative": 1110.35
     },
     {
       "id": "tx_mqzowpji_t0yuji",
@@ -870,7 +1112,8 @@
       "schemaVersion": "10.6",
       "sector": "AI基建",
       "source": "twelve",
-      "color": "#21cf87"
+      "color": "#21cf87",
+      "costBasisNative": 382.34
     },
     {
       "id": "tx_mqzox7zr_hkqh8d",
@@ -906,7 +1149,8 @@
       "schemaVersion": "10.6",
       "sector": "光通信",
       "source": "twelve",
-      "color": "#b9d00b"
+      "color": "#b9d00b",
+      "costBasisNative": 810.175
     },
     {
       "id": "tx_mr3ji5kj_m8ogzy",
@@ -927,7 +1171,8 @@
       "feeUSD": 0.35,
       "costBasisUSD": 1080.35,
       "grossUSD": 1080,
-      "realizedPnlUSD": 0
+      "realizedPnlUSD": 0,
+      "costBasisNative": 1080.35
     },
     {
       "id": "tx_mr9dc6cx_uemrnl",
@@ -946,9 +1191,10 @@
       "color": "#5cd8a9",
       "schemaVersion": "10.6",
       "feeUSD": 0.36,
-      "costBasisUSD": 930.211749591762,
+      "costBasisUSD": 930.21174959,
       "grossUSD": 981,
-      "realizedPnlUSD": 50.428250408238
+      "realizedPnlUSD": 50.42825041000003,
+      "costBasisNative": 930.21174959
     },
     {
       "id": "tx_mrbe5rqe_vhdot4",
@@ -969,7 +1215,8 @@
       "feeUSD": 0.35,
       "costBasisUSD": 298.35,
       "grossUSD": 298,
-      "realizedPnlUSD": 0
+      "realizedPnlUSD": 0,
+      "costBasisNative": 298.35
     },
     {
       "id": "tx_mrjeihbu_dmb06t",
@@ -990,7 +1237,8 @@
       "feeUSD": 0.34,
       "costBasisUSD": 1045.34,
       "grossUSD": 1045,
-      "realizedPnlUSD": 0
+      "realizedPnlUSD": 0,
+      "costBasisNative": 1045.34
     },
     {
       "id": "tx_mrk4zjsn_2hmx3h",
@@ -1011,7 +1259,8 @@
       "feeUSD": 0.34,
       "costBasisUSD": 2235.14,
       "grossUSD": 2234.7999999999997,
-      "realizedPnlUSD": 0
+      "realizedPnlUSD": 0,
+      "costBasisNative": 2235.14
     },
     {
       "id": "tx_mrknrgne_jhynvf",
@@ -1032,7 +1281,8 @@
       "feeUSD": 0.37,
       "costBasisUSD": 810.175,
       "grossUSD": 812,
-      "realizedPnlUSD": 1.455000000000041
+      "realizedPnlUSD": 1.455000000000041,
+      "costBasisNative": 810.175
     },
     {
       "id": "tx_mrkp3wsx_tygprw",
@@ -1053,7 +1303,8 @@
       "feeUSD": 0.38,
       "costBasisUSD": 1045.34,
       "grossUSD": 1069.4,
-      "realizedPnlUSD": 23.680000000000064
+      "realizedPnlUSD": 23.680000000000064,
+      "costBasisNative": 1045.34
     },
     {
       "id": "tx_mrku81fl_fmvzff",
@@ -1072,9 +1323,10 @@
       "color": "#41d99a",
       "schemaVersion": "10.6",
       "feeUSD": 0,
-      "costBasisUSD": 0.217049,
+      "costBasisUSD": 0.21704941,
       "grossUSD": 0.213311,
-      "realizedPnlUSD": -0.0037379999999999913
+      "realizedPnlUSD": -0.0037384099999999976,
+      "costBasisNative": 0.21704941
     },
     {
       "id": "tx_mrkw6so9_bh7gl8",
@@ -1095,7 +1347,8 @@
       "feeUSD": 0.34,
       "costBasisUSD": 695.34,
       "grossUSD": 695,
-      "realizedPnlUSD": 0
+      "realizedPnlUSD": 0,
+      "costBasisNative": 695.34
     },
     {
       "id": "tx_mrn5990l_4wl2t3",
@@ -1116,7 +1369,8 @@
       "feeUSD": 0.35,
       "costBasisUSD": 1652.35,
       "grossUSD": 1652,
-      "realizedPnlUSD": 0
+      "realizedPnlUSD": 0,
+      "costBasisNative": 1652.35
     },
     {
       "id": "tx_mrn5mw3z_1vftc9",
@@ -1137,7 +1391,8 @@
       "feeUSD": 0.34,
       "costBasisUSD": 675.34,
       "grossUSD": 675,
-      "realizedPnlUSD": 0
+      "realizedPnlUSD": 0,
+      "costBasisNative": 675.34
     },
     {
       "id": "tx_mrp4nrxj_9lhesd",
@@ -1158,7 +1413,8 @@
       "feeUSD": 2.67,
       "costBasisUSD": 5897.47,
       "grossUSD": 5894.8,
-      "realizedPnlUSD": 0
+      "realizedPnlUSD": 0,
+      "costBasisNative": 5897.47
     },
     {
       "id": "tx_mrp4ooi0_l6atu1",
@@ -1179,7 +1435,8 @@
       "feeUSD": 1.05,
       "costBasisUSD": 5897.47,
       "grossUSD": 6080,
-      "realizedPnlUSD": 181.47999999999956
+      "realizedPnlUSD": 181.47999999999956,
+      "costBasisNative": 5897.47
     },
     {
       "id": "tx_mrta51lq_p5xhvg",
@@ -1200,7 +1457,8 @@
       "feeUSD": 0.34,
       "costBasisUSD": 615.34,
       "grossUSD": 615,
-      "realizedPnlUSD": 0
+      "realizedPnlUSD": 0,
+      "costBasisNative": 615.34
     },
     {
       "id": "tx_mrtb2lf5_rjjzfr",
@@ -1221,7 +1479,8 @@
       "feeUSD": 1.91,
       "costBasisUSD": 3801.91,
       "grossUSD": 3800,
-      "realizedPnlUSD": 0
+      "realizedPnlUSD": 0,
+      "costBasisNative": 3801.91
     },
     {
       "id": "tx_mrtb3bbh_elv2qk",
@@ -1242,7 +1501,8 @@
       "feeUSD": 2.38,
       "costBasisUSD": 3801.91,
       "grossUSD": 3920,
-      "realizedPnlUSD": 115.71000000000004
+      "realizedPnlUSD": 115.71000000000004,
+      "costBasisNative": 3801.91
     },
     {
       "id": "tx_mru75n0c_jl75ws",
@@ -1263,7 +1523,8 @@
       "feeUSD": 0.39,
       "costBasisUSD": 2235.14,
       "grossUSD": 2240,
-      "realizedPnlUSD": 4.470000000000255
+      "realizedPnlUSD": 4.470000000000255,
+      "costBasisNative": 2235.14
     },
     {
       "id": "tx_mru767zr_dqu7d0",
@@ -1284,7 +1545,8 @@
       "feeUSD": 0.38,
       "costBasisUSD": 1652.35,
       "grossUSD": 1638,
-      "realizedPnlUSD": -14.730000000000018
+      "realizedPnlUSD": -14.730000000000018,
+      "costBasisNative": 1652.35
     },
     {
       "id": "tx_mrvyij4t_e8ebaz",
@@ -1301,11 +1563,25 @@
       "source": "twelve",
       "sector": "半导体",
       "color": "#fa873c",
-      "schemaVersion": "10.6",
+      "schemaVersion": "10.48",
       "feeUSD": 0.37,
-      "costBasisUSD": 1095.35,
+      "costBasisUSD": 1110.35,
       "grossUSD": 980,
-      "realizedPnlUSD": -115.71999999999991
+      "realizedPnlUSD": -130.7199999999999,
+      "costBasisNative": 1110.35,
+      "lotMethod": "fifo",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mqz9i9o7_tgjwo5",
+          "buyTransactionId": "tx_mqz9i9o7_tgjwo5",
+          "date": "2026-06-29",
+          "shares": 1,
+          "unitCostUSD": 1110.35,
+          "unitCostNative": 1110.35,
+          "costBasisUSD": 1110.35,
+          "costBasisNative": 1110.35
+        }
+      ]
     },
     {
       "id": "tx_mrws7fnz_ce2h4f",
@@ -1326,7 +1602,8 @@
       "feeUSD": 0.34,
       "costBasisUSD": 585.34,
       "grossUSD": 585,
-      "realizedPnlUSD": 0
+      "realizedPnlUSD": 0,
+      "costBasisNative": 585.34
     },
     {
       "id": "tx_mrws9015_4o4xb5",
@@ -1347,7 +1624,8 @@
       "feeUSD": 0.34,
       "costBasisUSD": 1730.34,
       "grossUSD": 1730,
-      "realizedPnlUSD": 0
+      "realizedPnlUSD": 0,
+      "costBasisNative": 1730.34
     },
     {
       "id": "tx_mrws9rcy_rqkl8e",
@@ -1368,7 +1646,8 @@
       "feeUSD": 0.35,
       "costBasisUSD": 690.35,
       "grossUSD": 690,
-      "realizedPnlUSD": 0
+      "realizedPnlUSD": 0,
+      "costBasisNative": 690.35
     },
     {
       "id": "tx_mrwsacgk_xi32ic",
@@ -1389,7 +1668,8 @@
       "feeUSD": 0.34,
       "costBasisUSD": 1700.34,
       "grossUSD": 1700,
-      "realizedPnlUSD": 0
+      "realizedPnlUSD": 0,
+      "costBasisNative": 1700.34
     },
     {
       "id": "tx_mrwzdany_629yy0",
@@ -1410,7 +1690,8 @@
       "feeUSD": 1.55,
       "costBasisUSD": 5751.55,
       "grossUSD": 5750,
-      "realizedPnlUSD": 0
+      "realizedPnlUSD": 0,
+      "costBasisNative": 5751.55
     },
     {
       "id": "tx_mrwzdsfs_0u2s7n",
@@ -1431,7 +1712,8 @@
       "feeUSD": 1.76,
       "costBasisUSD": 5751.55,
       "grossUSD": 6000,
-      "realizedPnlUSD": 246.6899999999996
+      "realizedPnlUSD": 246.6899999999996,
+      "costBasisNative": 5751.55
     },
     {
       "id": "tx_mrxcf5b8_ut9erb",
@@ -1452,7 +1734,8 @@
       "feeUSD": 0.34,
       "costBasisUSD": 1650.34,
       "grossUSD": 1650,
-      "realizedPnlUSD": 0
+      "realizedPnlUSD": 0,
+      "costBasisNative": 1650.34
     },
     {
       "id": "tx_msfn30lh_3ppat2",
@@ -1469,11 +1752,25 @@
       "source": "twelve",
       "sector": "AI基建",
       "color": "#21cf87",
-      "schemaVersion": "10.6",
+      "schemaVersion": "10.48",
       "feeUSD": 0.39,
-      "costBasisUSD": 2097.6343307142856,
+      "costBasisUSD": 2152,
       "grossUSD": 2160,
-      "realizedPnlUSD": 61.9756692857145
+      "realizedPnlUSD": 7.610000000000127,
+      "costBasisNative": 2152,
+      "lotMethod": "fifo",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mqnjborg_y94m0h",
+          "buyTransactionId": "tx_mqnjborg_y94m0h",
+          "date": "2026-06-21",
+          "shares": 10,
+          "unitCostUSD": 215.2,
+          "unitCostNative": 215.2,
+          "costBasisUSD": 2152,
+          "costBasisNative": 2152
+        }
+      ]
     },
     {
       "id": "tx_msfnafqw_2tktxa",
@@ -1490,11 +1787,55 @@
       "source": "twelve",
       "sector": "科技平台",
       "color": "#885af1",
-      "schemaVersion": "10.6",
+      "schemaVersion": "10.48",
       "feeUSD": 0.41,
-      "costBasisUSD": 3061.9278284210523,
+      "costBasisUSD": 3113.38986,
       "grossUSD": 3375,
-      "realizedPnlUSD": 312.6621715789479
+      "realizedPnlUSD": 261.2001399999999,
+      "costBasisNative": 3113.38986,
+      "lotMethod": "fifo",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mqpb20pj_4jkp7j",
+          "buyTransactionId": "tx_mqpb20pj_4jkp7j",
+          "date": "2026-06-22",
+          "shares": 1,
+          "unitCostUSD": 350.35,
+          "unitCostNative": 350.35,
+          "costBasisUSD": 350.35,
+          "costBasisNative": 350.35
+        },
+        {
+          "lotId": "tx_mqsze5ls_d0n46e",
+          "buyTransactionId": "tx_mqsze5ls_d0n46e",
+          "date": "2026-06-25",
+          "shares": 1,
+          "unitCostUSD": 342.34986,
+          "unitCostNative": 342.34986,
+          "costBasisUSD": 342.34986,
+          "costBasisNative": 342.34986
+        },
+        {
+          "lotId": "tx_mrws9015_4o4xb5",
+          "buyTransactionId": "tx_mrws9015_4o4xb5",
+          "date": "2026-07-23",
+          "shares": 5,
+          "unitCostUSD": 346.068,
+          "unitCostNative": 346.068,
+          "costBasisUSD": 1730.34,
+          "costBasisNative": 1730.34
+        },
+        {
+          "lotId": "tx_mrws9rcy_rqkl8e",
+          "buyTransactionId": "tx_mrws9rcy_rqkl8e",
+          "date": "2026-07-23",
+          "shares": 2,
+          "unitCostUSD": 345.175,
+          "unitCostNative": 345.175,
+          "costBasisUSD": 690.35,
+          "costBasisNative": 690.35
+        }
+      ]
     }
   ],
   "cashFlows": [
@@ -1658,8 +1999,8 @@
     {
       "date": "2026-08-05",
       "capital": 22370,
-      "netAsset": 21317.08,
-      "market": 13776.61,
+      "netAsset": 21282.7,
+      "market": 13742.23,
       "cash": 7540.47
     }
   ]
