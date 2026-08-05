@@ -51,7 +51,7 @@ function renderMarketAdminPanel(){
     ["手动资产",manual.length?manual.join(", "):"无","手动资产不消耗行情 API"],
     ["EUR/USD",round(state.fxRates.EUR||defaultState.fxRates.EUR,6),"手动汇率，不请求 TWE 汇率接口"],
     ["Worker",health.ok===undefined?"未检测":yesNo(health.ok),`V${health.version||"?"} / TWE ${twelveConfigured?"已配":"未配"} / FIN ${finnhubConfigured?"已配":"未配"} / KV ${health.sharedCache?"已启用":"未启用"} / ${checked}`],
-    ["行情分配",health.routing?`TWE ${health.routing.twelve?.length||0} / FIN ${health.routing.finnhub?.length||0}`:"等待检测",health.routing?`TWE：${health.routing.twelve?.join(", ")||"无"}；FIN：${health.routing.finnhub?.join(", ")||"无"}`:"V10.47 使用固定优先级和逐股缓存"],
+    ["行情分配",health.routing?`TWE ${health.routing.twelve?.length||0} / FIN ${health.routing.finnhub?.length||0}`:"等待检测",health.routing?`TWE：${health.routing.twelve?.join(", ")||"无"}；FIN：${health.routing.finnhub?.join(", ")||"无"}`:"固定优先级和逐股缓存"],
     ["部署指纹",deploymentFingerprint().mismatch?"版本不一致":"版本一致",deploymentFingerprint().label],
     ["最近刷新",last,lastQuoteWarnings?`警告：${lastQuoteWarnings}`:"暂无行情警告"]
   ].map(([title,value,detail])=>`<div class="market-admin-item"><span>${escapeHtml(title)}</span><strong>${escapeHtml(value)}</strong><small>${escapeHtml(detail)}</small></div>`).join("");

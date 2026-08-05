@@ -1,5 +1,5 @@
-const VERSION="V10.47 PWA家庭版";
-const RELEASE="10.47";
+const VERSION="V10.48 PWA家庭版";
+const RELEASE="10.48";
 const LEDGER_SCHEMA_VERSION="10.33";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
@@ -56,7 +56,7 @@ let lastQuoteCache="";
 let lastQuoteWarnings="";
 let tradeSectorAuto=true;
 let tradeColorAuto=true;
-let buildMeta={release:RELEASE,version:VERSION,serviceWorker:RELEASE,worker:RELEASE};
+let buildMeta={release:RELEASE,version:VERSION,serviceWorker:RELEASE,worker:"10.47"};
 let serviceWorkerVersion="";
 
 const SECTOR_RULES=[

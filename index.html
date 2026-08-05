@@ -13,9 +13,10 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=10.47">
-  <link rel="stylesheet" href="fresh-radar.css?v=10.47">
-  <link rel="stylesheet" href="layout-v10.34.css?v=10.47">
+  <link rel="stylesheet" href="style.css?v=10.48">
+  <link rel="stylesheet" href="fresh-radar.css?v=10.48">
+  <link rel="stylesheet" href="layout-v10.34.css?v=10.48">
+  <link rel="stylesheet" href="lot-v10.48.css?v=10.48">
 </head>
 <body>
 <main class="container">
@@ -229,6 +230,20 @@
       <label id="colorLabel">颜色<input id="tradeColor" type="color" value="#38bdf8"></label>
       <label class="wide">备注<input id="tradeNote"></label>
     </div>
+    <section id="tradeLotPanel" class="lot-panel hidden">
+      <div class="lot-panel-head">
+        <div><strong>卖出批次</strong><small>按实际成交批次扣减成本，可补录历史卖出</small></div>
+        <label>成本方式<select id="tradeLotMethod">
+          <option value="specific">指定批次</option>
+          <option value="highest">最高成本优先</option>
+          <option value="fifo">先进先出</option>
+          <option value="lifo">后进先出</option>
+          <option value="average">历史平均成本</option>
+        </select></label>
+      </div>
+      <div id="tradeLotSummary" class="lot-summary"></div>
+      <div id="tradeLotList" class="lot-list"></div>
+    </section>
     <div id="tradePreview" class="preview"></div>
     <div class="modal-actions"><button type="button" onclick="tradeDialog.close()">取消</button><button class="primary" type="submit">确认记账</button></div>
   </form>
@@ -304,10 +319,11 @@
   </form>
 </dialog>
 
-<script src="myh88-core.js?v=10.47"></script>
-<script src="script.part1.js?v=10.47"></script>
-<script src="script.part2.js?v=10.47"></script>
-<script src="script.part3.js?v=10.47"></script>
-<script src="script.part4.js?v=10.47"></script>
+<script src="myh88-core.js?v=10.48"></script>
+<script src="script.part1.js?v=10.48"></script>
+<script src="script.part2.js?v=10.48"></script>
+<script src="script.part3.js?v=10.48"></script>
+<script src="script.part4.js?v=10.48"></script>
+<script src="script.part5.js?v=10.48"></script>
 </body>
 </html>
