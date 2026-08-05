@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-05T07:36:36.139Z",
+    "lastCloudSaveAt": "2026-08-05T08:30:29.668Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -205,7 +205,7 @@
       "shares": 32,
       "avgCost": 136.5534375,
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
@@ -370,6 +370,37 @@
           "remainingCostBasisNative": 1080.35,
           "currency": "USD",
           "price": 1080
+        }
+      ]
+    },
+    {
+      "id": "pos_msfttw3y_rlmlu9",
+      "symbol": "SPCH",
+      "name": "2倍做多SpaceX",
+      "currency": "USD",
+      "source": "twelve",
+      "shares": 500,
+      "avgCost": 6.3021,
+      "sector": "太空",
+      "color": "#f16183",
+      "sectorLocked": false,
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 3151.05,
+      "lots": [
+        {
+          "lotId": "tx_msfttw3q_667rfu",
+          "buyTransactionId": "tx_msfttw3q_667rfu",
+          "date": "2026-08-05",
+          "order": 57,
+          "shares": 500,
+          "remainingShares": 500,
+          "costBasisUSD": 3151.05,
+          "remainingCostBasisUSD": 3151.05,
+          "costBasisNative": 3151.05,
+          "remainingCostBasisNative": 3151.05,
+          "currency": "USD",
+          "price": 6.3
         }
       ]
     }
@@ -716,7 +747,7 @@
       "migration": true,
       "source": "twelve",
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "schemaVersion": "10.6",
       "costBasisNative": 1500
     },
@@ -739,7 +770,7 @@
       "migration": true,
       "source": "twelve",
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "schemaVersion": "10.6",
       "closedHistory": true
     },
@@ -1210,7 +1241,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "schemaVersion": "10.6",
       "feeUSD": 0.35,
       "costBasisUSD": 298.35,
@@ -1342,7 +1373,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "schemaVersion": "10.6",
       "feeUSD": 0.34,
       "costBasisUSD": 695.34,
@@ -1386,7 +1417,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "schemaVersion": "10.6",
       "feeUSD": 0.34,
       "costBasisUSD": 675.34,
@@ -1452,7 +1483,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "schemaVersion": "10.6",
       "feeUSD": 0.34,
       "costBasisUSD": 615.34,
@@ -1597,7 +1628,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "schemaVersion": "10.6",
       "feeUSD": 0.34,
       "costBasisUSD": 585.34,
@@ -1836,6 +1867,28 @@
           "costBasisNative": 690.35
         }
       ]
+    },
+    {
+      "id": "tx_msfttw3q_667rfu",
+      "date": "2026-08-05",
+      "type": "buy",
+      "symbol": "SPCH",
+      "name": "2倍做多SpaceX",
+      "shares": 500,
+      "price": 6.3,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 1.05,
+      "note": "",
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#f16183",
+      "schemaVersion": "10.48",
+      "feeUSD": 1.05,
+      "costBasisUSD": 3151.05,
+      "costBasisNative": 3151.05,
+      "grossUSD": 3150,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -1999,9 +2052,9 @@
     {
       "date": "2026-08-05",
       "capital": 22370,
-      "netAsset": 21282.7,
-      "market": 13742.23,
-      "cash": 7540.47
+      "netAsset": 21281.65,
+      "market": 16892.23,
+      "cash": 4389.42
     }
   ]
 }
