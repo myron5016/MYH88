@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-05T09:55:27.569Z",
+    "lastCloudSaveAt": "2026-08-06T00:58:00.608Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -379,14 +379,14 @@
       "name": "2倍做多SpaceX",
       "currency": "USD",
       "source": "twelve",
-      "shares": 750,
-      "avgCost": 6.203613333333333,
+      "shares": 1000,
+      "avgCost": 6.07823,
       "sector": "太空",
       "color": "#f16183",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 4652.71,
+      "costBasisUSD": 6078.23,
       "lots": [
         {
           "lotId": "tx_msfttw3q_667rfu",
@@ -415,6 +415,20 @@
           "remainingCostBasisNative": 1501.66,
           "currency": "USD",
           "price": 6
+        },
+        {
+          "lotId": "tx_msgt1vzd_apvi4y",
+          "buyTransactionId": "tx_msgt1vzd_apvi4y",
+          "date": "2026-08-06",
+          "order": 59,
+          "shares": 250,
+          "remainingShares": 250,
+          "costBasisUSD": 1425.52,
+          "remainingCostBasisUSD": 1425.52,
+          "costBasisNative": 1425.52,
+          "remainingCostBasisNative": 1425.52,
+          "currency": "USD",
+          "price": 5.7
         }
       ]
     }
@@ -1925,6 +1939,85 @@
       "costBasisNative": 1501.66,
       "grossUSD": 1500,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_msgt1vzd_apvi4y",
+      "date": "2026-08-06",
+      "type": "buy",
+      "symbol": "SPCH",
+      "name": "2倍做多SpaceX",
+      "shares": 250,
+      "price": 5.7,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.52,
+      "note": "",
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#f16183",
+      "schemaVersion": "10.48",
+      "feeUSD": 0.52,
+      "costBasisUSD": 1425.52,
+      "costBasisNative": 1425.52,
+      "grossUSD": 1425,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_msgt30fh_kn29kh",
+      "date": "2026-08-06",
+      "type": "buy",
+      "symbol": "SNDQ",
+      "name": "2倍做空闪迪",
+      "shares": 200,
+      "price": 22.3,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.42,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "10.48",
+      "feeUSD": 0.42,
+      "costBasisUSD": 4460.42,
+      "costBasisNative": 4460.42,
+      "grossUSD": 4460,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_msgt3l6j_hfb3zg",
+      "date": "2026-08-06",
+      "type": "sell",
+      "symbol": "SNDQ",
+      "name": "2倍做空闪迪",
+      "shares": 200,
+      "price": 27,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.57,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "10.48",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_msgt30fh_kn29kh",
+          "buyTransactionId": "tx_msgt30fh_kn29kh",
+          "date": "2026-08-06",
+          "shares": 200,
+          "unitCostUSD": 22.3021,
+          "unitCostNative": 22.3021,
+          "costBasisUSD": 4460.42,
+          "costBasisNative": 4460.42
+        }
+      ],
+      "feeUSD": 0.57,
+      "costBasisUSD": 4460.42,
+      "costBasisNative": 4460.42,
+      "grossUSD": 5400,
+      "realizedPnlUSD": 939.0100000000002
     }
   ],
   "cashFlows": [
@@ -2091,6 +2184,13 @@
       "netAsset": 22479.99,
       "market": 19592.23,
       "cash": 2887.76
+    },
+    {
+      "date": "2026-08-06",
+      "capital": 22370,
+      "netAsset": 21058.75,
+      "market": 18657.5,
+      "cash": 2401.25
     }
   ]
 }
