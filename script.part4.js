@@ -52,7 +52,15 @@ function renderSectorsV2(){const bar=$("sectorBar"),legend=$("sectorLegend"),tot
 const RETURN_VIEWS=["all","month","year"];
 let activeReturnView="all",returnScrollTimer=null;
 function returnDateLabel(date){const parts=String(date||"").split("-");return parts.length===3?`${num(parts[1])}/${num(parts[2])}`:String(date||"")}
-function returnRangeLabel(series){if(!series.points.length)return"暂无快照";const prefix=series.baselineDate?`${returnDateLabel(series.baselineDate)} 基准 · `:"";return`${prefix}${returnDateLabel(series.startDate)} 至 ${returnDateLabel(series.endDate)}`}
+function returnRangeLabel(series){
+  if(!series.points.length)return"暂无快照";
+  if(series.period==="all")return`${returnDateLabel(series.startDate)} 至 ${returnDateLabel(series.endDate)}`;
+  const range=`${returnDateLabel(series.periodStart||series.startDate)} 至 ${returnDateLabel(series.endDate)}`;
+  if(series.baselineDate)return`${range} · ${returnDateLabel(series.baselineDate)} 收盘为基准`;
+  if(!series.baselineComplete&&series.dataStart)return`${range} · 数据从 ${returnDateLabel(series.dataStart)} 起`;
+  if(series.dataStart&&series.dataStart>series.periodStart)return`${range} · 账本始于 ${returnDateLabel(series.dataStart)}`;
+  return range;
+}
 function drawReturnChart(svg,series){
   const empty=$("returnEmpty-"+series.period),points=series.points;
   if(points.length<2){svg.classList.add("hidden");empty.classList.remove("hidden");return}

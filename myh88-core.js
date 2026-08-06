@@ -293,6 +293,11 @@
     return "";
   }
 
+  function utcDayNumber(date) {
+    const [year, month, day] = String(date || "").split("-").map(Number);
+    return Date.UTC(year, month - 1, day) / 86400000;
+  }
+
   function buildReturnSeries(snapshots = [], period = "all") {
     const validPeriods = new Set(["all", "month", "year"]);
     const selectedPeriod = validPeriods.has(period) ? period : "all";
@@ -315,8 +320,14 @@
     if (firstInPeriod < 0) {
       return { period: selectedPeriod, points: [], returnPct: 0, pnlUSD: 0, startDate: periodStart, endDate: latest.date, baselineDate: "" };
     }
-    const baselineIndex = firstInPeriod > 0 ? firstInPeriod - 1 : -1;
-    const baseline = baselineIndex >= 0 ? sorted[baselineIndex] : null;
+    const baselineCandidate = firstInPeriod > 0 ? sorted[firstInPeriod - 1] : null;
+    const baselineGapDays = baselineCandidate && periodStart
+      ? utcDayNumber(periodStart) - utcDayNumber(baselineCandidate.date)
+      : 0;
+    const baseline = baselineCandidate && baselineGapDays >= 0 && baselineGapDays <= 7
+      ? baselineCandidate
+      : null;
+    const hasPriorHistory = firstInPeriod > 0;
     let previous = baseline;
     let wealth = 1;
     const points = baseline ? [{ date: baseline.date, value: baseline.netAsset, returnPct: 0, baseline: true }] : [];
@@ -324,7 +335,9 @@
     for (let index = firstInPeriod; index < sorted.length; index += 1) {
       const current = sorted[index];
       if (!previous) {
-        wealth = current.capital > 0 ? current.netAsset / current.capital : 1;
+        wealth = hasPriorHistory && selectedPeriod !== "all"
+          ? 1
+          : current.capital > 0 ? current.netAsset / current.capital : 1;
       } else if (previous.netAsset > 0) {
         const externalFlow = current.capital - previous.capital;
         wealth *= (current.netAsset - externalFlow) / previous.netAsset;
@@ -337,8 +350,9 @@
       previous = current;
     }
 
-    const pnlUSD = baseline
-      ? latest.netAsset - baseline.netAsset - (latest.capital - baseline.capital)
+    const comparison = baseline || (hasPriorHistory && selectedPeriod !== "all" ? sorted[firstInPeriod] : null);
+    const pnlUSD = comparison
+      ? latest.netAsset - comparison.netAsset - (latest.capital - comparison.capital)
       : latest.netAsset - latest.capital;
     return {
       period: selectedPeriod,
@@ -348,6 +362,9 @@
       startDate: sorted[firstInPeriod]?.date || periodStart,
       endDate: latest.date,
       baselineDate: baseline?.date || "",
+      periodStart,
+      dataStart: sorted[firstInPeriod]?.date || "",
+      baselineComplete: selectedPeriod === "all" || Boolean(baseline) || !hasPriorHistory,
     };
   }
 

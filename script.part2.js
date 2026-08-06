@@ -274,7 +274,7 @@ async function refreshLastClosePrices(clock=marketClockState||marketClock()){
       lastMarketRoute="last-close";
     }else lastMarketRoute="last-close";
     state.settings.lastPriceRefresh=Date.now();state.settings.lastPriceRefreshText=new Date().toLocaleString("zh-CN");savePriceCache();
-    saveLocal();
+    captureSnapshot(false);
     renderAll();
     if(status)status.textContent=`${marketClockDisplay(clock)}；已使用上个交易日收盘价`;
   }catch(error){
@@ -303,7 +303,7 @@ async function doRefreshPrices(useCache=true){
       if(providers.size===1)lastMarketProvider=[...providers][0];else if(providers.size>1)lastMarketProvider="mixed";
     }
     state.settings.lastPriceRefresh=Date.now();state.settings.lastPriceRefreshText=new Date().toLocaleString("zh-CN");savePriceCache();
-    saveLocal();
+    if(lastMarketRoute!=="static")captureSnapshot(false);else saveLocal();
     renderAll();status.textContent=lastMarketRoute==="static"?`代理行情失败，已临时使用静态缓存：${lastMarketError}`:(isAdminMode?"已刷新："+state.settings.lastPriceRefreshText+"。保存到 GitHub 后家人可见":"已刷新："+state.settings.lastPriceRefreshText+"。本次价格已缓存在本设备");
   }catch(error){lastMarketRoute="failed";applyPriceCache();renderAll();status.textContent="代理行情暂时不可用，已保留最近缓存行情："+friendlyFetchError(error);if(!useCache&&isAdminMode)alert(status.textContent)}finally{renderDiagnostics();if(button)button.disabled=false}
 }

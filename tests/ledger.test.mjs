@@ -76,4 +76,21 @@ test("本月收益率以上月最后快照作为比较基准", () => {
   assert.ok(Math.abs(series.returnPct - 2) < 1e-9);
   assert.equal(series.pnlUSD, 220);
   assert.equal(series.baselineDate, "2026-07-31");
+  assert.equal(series.baselineComplete, true);
+});
+
+test("本月不会把距离月初太久的旧快照当成基准", () => {
+  const series = buildReturnSeries([
+    { date: "2026-07-23", capital: 22370, netAsset: 20086.31 },
+    { date: "2026-08-05", capital: 22370, netAsset: 22479.99 },
+    { date: "2026-08-06", capital: 22370, netAsset: 21058.75 },
+  ], "month");
+  assert.deepEqual(series.points.map((point) => point.date), ["2026-08-05", "2026-08-06"]);
+  assert.equal(series.points[0].returnPct, 0);
+  assert.equal(series.baselineDate, "");
+  assert.equal(series.baselineComplete, false);
+  assert.equal(series.periodStart, "2026-08-01");
+  assert.equal(series.dataStart, "2026-08-05");
+  assert.ok(Math.abs(series.returnPct - (-6.322244805269051)) < 1e-9);
+  assert.ok(Math.abs(series.pnlUSD - (-1421.24)) < 1e-9);
 });
