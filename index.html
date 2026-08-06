@@ -13,12 +13,12 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=10.53">
-  <link rel="stylesheet" href="fresh-radar.css?v=10.53">
-  <link rel="stylesheet" href="layout-v10.34.css?v=10.53">
-  <link rel="stylesheet" href="lot-v10.48.css?v=10.53">
-  <link rel="stylesheet" href="returns-v10.49.css?v=10.53">
-  <link rel="stylesheet" href="dca-v10.53.css?v=10.53.1">
+  <link rel="stylesheet" href="style.css?v=10.54">
+  <link rel="stylesheet" href="fresh-radar.css?v=10.54">
+  <link rel="stylesheet" href="layout-v10.34.css?v=10.54">
+  <link rel="stylesheet" href="lot-v10.48.css?v=10.54">
+  <link rel="stylesheet" href="returns-v10.49.css?v=10.54">
+  <link rel="stylesheet" href="dca-v10.53.css?v=10.54">
 </head>
 <body>
 <main class="container">
@@ -124,35 +124,6 @@
     <div class="kpi"><span>累计总盈亏</span><strong id="kpiPnl">$0 / 0%</strong></div>
   </section>
 
-  <section id="dcaZone" class="card dca-zone">
-    <div class="section-head dca-head">
-      <div>
-        <span class="dca-eyebrow">LONG-TERM CORE</span>
-        <h2>长期定投专区</h2>
-        <p class="section-note">VOO 打底、QQQM 增长；独立于主动仓位与梦想金库主账本</p>
-      </div>
-      <div class="dca-head-actions">
-        <span id="dcaMonthStatus" class="dca-status pending">等待计划</span>
-        <button class="primary admin-only hidden" type="button" onclick="openDcaEntry()">＋ 记录定投</button>
-      </div>
-    </div>
-    <div class="dca-layout">
-      <div class="dca-progress-panel">
-        <div class="dca-progress-title"><div><small id="dcaMonthTitle">本月定投</small><strong id="dcaProgressValue">$0 / $500</strong></div><b id="dcaProgressPercent">0%</b></div>
-        <div class="dca-progress-track"><i id="dcaProgressBar"></i></div>
-        <div class="dca-plan-split"><span><i class="voo-dot"></i>VOO <b>60%</b></span><span><i class="qqqm-dot"></i>QQQM <b>40%</b></span></div>
-        <div class="dca-streak"><span>每月计划 <b>$500</b></span><span id="dcaStreak">连续完成 0 期</span></div>
-      </div>
-      <div id="dcaFundGrid" class="dca-fund-grid"></div>
-    </div>
-    <div class="dca-summary">
-      <span>定投成本 <b id="dcaTotalCost">$0</b></span>
-      <span>当前市值 <b id="dcaTotalValue">$0</b></span>
-      <span>累计收益 <b id="dcaTotalPnl">$0 / 0%</b></span>
-      <details class="dca-history"><summary>查看定投记录</summary><div id="dcaHistoryList" class="dca-history-list"></div></details>
-    </div>
-  </section>
-
   <section class="terminal-grid">
     <div class="card map-card">
       <div class="section-head">
@@ -248,6 +219,34 @@
         <div><h3>本地恢复点</h3><p class="note">最多保留最近10份，只保存在当前浏览器。</p><div id="backupList"></div></div>
         <div><h3>GitHub 云端备份</h3><p class="note">每次安全保存前，V9.1 会先把旧的云端 data.json 复制到 backups 文件夹；备份失败时不会覆盖主账本。</p><div id="cloudBackupStatus" class="cloud-backup-status">尚未执行本次会话的云端备份</div></div>
       </div>
+    </div>
+  </section>
+
+  <section id="dcaZone" class="card dca-zone">
+    <div class="section-head dca-head">
+      <div>
+        <span class="dca-eyebrow">LONG-TERM CORE</span>
+        <h2>长期定投专区</h2>
+        <p class="section-note">VOO 打底、QQQM 增长；独立于主动仓位与梦想金库主账本</p>
+      </div>
+      <div class="dca-head-actions">
+        <button class="primary admin-only hidden" type="button" onclick="openDcaEntry()">＋ 登记本月定投</button>
+      </div>
+    </div>
+    <div class="dca-layout">
+      <div class="dca-progress-panel">
+        <div class="dca-progress-title"><div><small id="dcaMonthTitle">本月定投</small><strong id="dcaProgressValue">$0 / $500</strong></div><b id="dcaProgressPercent">0%</b></div>
+        <div class="dca-progress-track"><i id="dcaProgressBar"></i></div>
+        <div class="dca-plan-split"><span><i class="voo-dot"></i>VOO <b>60%</b></span><span><i class="qqqm-dot"></i>QQQM <b>40%</b></span></div>
+        <div class="dca-streak"><span>每月计划 <b>$500</b></span><span id="dcaStreak">连续完成 0 期</span></div>
+      </div>
+      <div id="dcaFundGrid" class="dca-fund-grid"></div>
+    </div>
+    <div class="dca-summary">
+      <span>定投成本 <b id="dcaTotalCost">$0</b></span>
+      <span>当前市值 <b id="dcaTotalValue">$0</b></span>
+      <span>累计收益 <b id="dcaTotalPnl">$0 / 0%</b></span>
+      <details class="dca-history"><summary>查看定投记录</summary><div id="dcaHistoryList" class="dca-history-list"></div></details>
     </div>
   </section>
 
@@ -381,12 +380,12 @@
   </form>
 </dialog>
 
-<script src="myh88-core.js?v=10.53"></script>
-<script src="script.part1.js?v=10.53"></script>
-<script src="script.part2.js?v=10.53"></script>
-<script src="script.part3.js?v=10.53"></script>
-<script src="script.part4.js?v=10.53"></script>
-<script src="script.part5.js?v=10.53"></script>
-<script src="script.part6.js?v=10.53"></script>
+<script src="myh88-core.js?v=10.54"></script>
+<script src="script.part1.js?v=10.54"></script>
+<script src="script.part2.js?v=10.54"></script>
+<script src="script.part3.js?v=10.54"></script>
+<script src="script.part4.js?v=10.54"></script>
+<script src="script.part5.js?v=10.54"></script>
+<script src="script.part6.js?v=10.54"></script>
 </body>
 </html>

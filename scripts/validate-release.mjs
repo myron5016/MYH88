@@ -12,16 +12,18 @@ const files = Object.fromEntries(await Promise.all(
 ));
 const frontendSource = scriptParts.map((name) => files[name]).join("");
 
-assert.equal(meta.release, "10.53");
+assert.equal(meta.release, "10.54");
 for (const name of scriptParts) {
-  assert.match(files["index.html"], new RegExp(`${name.replace(".", "\\.")}\\?v=10\\.53`));
+  assert.match(files["index.html"], new RegExp(`${name.replace(".", "\\.")}\\?v=10\\.54`));
   assert.ok((await stat(resolve(root, name))).size < 30_000, `${name} exceeds direct-publish limit`);
 }
-assert.match(files["index.html"], /myh88-core\.js\?v=10\.53/);
-assert.match(files["index.html"], /returns-v10\.49\.css\?v=10\.53/);
-assert.match(files["index.html"], /dca-v10\.53\.css\?v=10\.53\.1/);
+assert.match(files["index.html"], /myh88-core\.js\?v=10\.54/);
+assert.match(files["index.html"], /returns-v10\.49\.css\?v=10\.54/);
+assert.match(files["index.html"], /dca-v10\.53\.css\?v=10\.54/);
 assert.doesNotMatch(files["index.html"], /资产成长记录/);
-assert.match(frontendSource, /const VERSION="V10\.53 PWA家庭版"/);
-assert.match(files["service-worker.js"], /const RELEASE="10\.53"/);
+assert.doesNotMatch(files["index.html"], /dcaMonthStatus|还差 \$/);
+assert.ok(files["index.html"].indexOf('id="dcaZone"') > files["index.html"].indexOf('id="ledgerPanel"'), "Recurring investment zone must stay below the Dream Fund ledger");
+assert.match(frontendSource, /const VERSION="V10\.54 PWA家庭版"/);
+assert.match(files["service-worker.js"], /const RELEASE="10\.54"/);
 assert.match(files["cloudflare-worker.js"], new RegExp(`const WORKER_VERSION = "${meta.worker.replace(".", "\\.")}"`));
-console.log("Release fingerprint is consistent: 10.53 (Worker 10.52 unchanged)");
+console.log("Release fingerprint is consistent: 10.54 (Worker 10.52 unchanged)");

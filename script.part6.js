@@ -53,10 +53,8 @@ function dcaQuoteLabel(fund){
 }
 function renderDcaZone(){
   const zone=$("dcaZone");if(!zone||!state.dcaPlan)return;
-  const result=dcaMetrics(),remaining=Math.max(0,result.monthlyBudgetUSD-result.monthlyInvestedUSD),complete=result.monthlyProgressPct>=98;
+  const result=dcaMetrics();
   $("dcaMonthTitle").textContent=dcaMonthLabel(result.monthKey);
-  $("dcaMonthStatus").textContent=complete?"本月已完成":remaining?`还差 ${money(remaining)}`:"等待计划";
-  $("dcaMonthStatus").className=`dca-status ${complete?"complete":"pending"}`;
   $("dcaProgressValue").textContent=`${money(result.monthlyInvestedUSD)} / ${money(result.monthlyBudgetUSD)}`;
   $("dcaProgressBar").style.width=`${result.monthlyProgressPct}%`;
   $("dcaProgressPercent").textContent=`${round(result.monthlyProgressPct,1)}%`;
