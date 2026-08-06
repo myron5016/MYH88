@@ -1,7 +1,7 @@
 {
-  "release": "11.0",
-  "version": "V11.0 持仓驾驶舱版",
-  "serviceWorker": "11.0",
+  "release": "11.1",
+  "version": "V11.1 驾驶舱重构版",
+  "serviceWorker": "11.1",
   "worker": "10.52",
   "ledgerSchema": "10.48",
   "channel": "stable",
