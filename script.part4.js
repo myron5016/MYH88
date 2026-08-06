@@ -83,8 +83,13 @@ function drawReturnChart(svg,series){
   svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
   svg.innerHTML=`<defs><linearGradient id="${gradientId}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${tone}" stop-opacity=".28"/><stop offset="1" stop-color="${tone}" stop-opacity=".02"/></linearGradient></defs>${grid}<line class="return-zero" x1="${pad.l}" y1="${zeroY}" x2="${W-pad.r}" y2="${zeroY}"/><path class="return-area" fill="url(#${gradientId})" d="${area}"/><path class="return-line" stroke="${tone}" d="${line}"/><circle class="return-last-dot" fill="${tone}" cx="${x(points.length-1)}" cy="${y(points.at(-1).returnPct)}" r="5"/><text class="return-date-label" x="${pad.l}" y="${H-7}">${escapeHtml(returnDateLabel(points[0].date))}</text><text class="return-date-label" text-anchor="end" x="${W-pad.r}" y="${H-7}">${escapeHtml(returnDateLabel(points.at(-1).date))}</text>`;
 }
+function activeReturnSnapshots(){
+  const metrics=ledgerMetrics(),date=today(),live={scope:"active",date,capital:round(metrics.contributedCapital),netAsset:round(metrics.netAsset),market:round(metrics.marketTotal),cash:round(metrics.cashBalance)};
+  return state.snapshots.filter(item=>(!item.scope||item.scope==="active")&&String(item.date)!==date).concat(live)
+}
 function renderReturnDashboard(){
-  RETURN_VIEWS.forEach(view=>{const series=MYH88Core.buildReturnSeries(state.snapshots,view),value=$("returnValue-"+view),pnl=$("returnPnl-"+view);value.textContent=`${series.returnPct>0?"+":""}${round(series.returnPct)}%`;value.className=cls(series.returnPct);pnl.textContent=`区间盈亏 ${money(series.pnlUSD)}`;pnl.className=cls(series.pnlUSD);$("returnRange-"+view).textContent=returnRangeLabel(series);drawReturnChart($("returnChart-"+view),series)})
+  const snapshots=activeReturnSnapshots();
+  RETURN_VIEWS.forEach(view=>{const series=MYH88Core.buildReturnSeries(snapshots,view),value=$("returnValue-"+view),pnl=$("returnPnl-"+view);value.textContent=`${series.returnPct>0?"+":""}${round(series.returnPct)}%`;value.className=cls(series.returnPct);pnl.textContent=`个股区间盈亏 ${money(series.pnlUSD)}`;pnl.className=cls(series.pnlUSD);$("returnRange-"+view).textContent=returnRangeLabel(series);drawReturnChart($("returnChart-"+view),series)})
 }
 function syncReturnNavigation(view){activeReturnView=view;document.querySelectorAll(".return-tab").forEach(button=>{const active=button.dataset.returnView===view;button.classList.toggle("active",active);button.setAttribute("aria-selected",String(active))});document.querySelectorAll(".return-dots i").forEach((dot,index)=>dot.classList.toggle("active",RETURN_VIEWS[index]===view))}
 function selectReturnView(view,behavior="smooth"){const carousel=$("returnCarousel"),index=RETURN_VIEWS.indexOf(view);if(!carousel||index<0)return;syncReturnNavigation(view);carousel.scrollTo({left:index*carousel.clientWidth,behavior})}

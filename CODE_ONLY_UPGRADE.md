@@ -40,3 +40,5 @@ V10.52 reconstructs the first US trading day's closing net asset value from the 
 V10.53 adds an independent VOO/QQQM recurring-investment zone seeded from the owner's confirmed IBKR lots. Recurring contributions, progress, and returns are stored under `dcaPlan` and never alter the active portfolio's cash, treemap, or return calculations. The existing Worker is unchanged, so this release does not require `npx wrangler deploy`.
 
 V10.54 moves the recurring-investment zone below the complete Dream Fund ledger and removes the top-right monthly remainder badge. Actual VOO/QQQM purchases are recorded once through the admin-only recurring-investment entry; they remain separate from the active portfolio ledger. The Worker and live `data.json` are unchanged.
+
+V10.55 separates performance reporting into two independent scopes. The upper chart is explicitly the active-stock return curve and always reconciles its latest point to the Dream Fund ledger; recurring-investment records and snapshots are excluded. The VOO/QQQM zone now owns its own return percentage, profit or loss, and history curve under `dcaPlan.snapshots`. The Worker and live `data.json` are unchanged.

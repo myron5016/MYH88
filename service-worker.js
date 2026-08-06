@@ -1,7 +1,7 @@
-const RELEASE="10.54";
-const CACHE_VERSION="dream-fund-v10-54";
+const RELEASE="10.55";
+const CACHE_VERSION="dream-fund-v10-55";
 const DATA_CACHE="dream-fund-data-v10-47";
-const APP_SHELL=["./","./index.html","./style.css?v=10.54","./fresh-radar.css?v=10.54","./layout-v10.34.css?v=10.54","./lot-v10.48.css?v=10.54","./returns-v10.49.css?v=10.54","./dca-v10.53.css?v=10.54","./myh88-core.js?v=10.54","./script.part1.js?v=10.54","./script.part2.js?v=10.54","./script.part3.js?v=10.54","./script.part4.js?v=10.54","./script.part5.js?v=10.54","./script.part6.js?v=10.54","./build-meta.json","./manifest.webmanifest","./avatar-baby.jpg","./avatar.png","./app-icon.svg","./icon-192.png","./icon-512.png","./kv-quotes-all-current.json","./logos/rklb.svg","./logos/nvda.svg","./logos/mrvl.svg","./logos/aaoi.svg","./logos/xfab.svg","./logos/vrt.svg","./logos/spcx.svg","./logos/googl.svg","./logos/mu.svg","./logos/dram.svg","./logos/cash.svg"];
+const APP_SHELL=["./","./index.html","./style.css?v=10.55","./fresh-radar.css?v=10.55","./layout-v10.34.css?v=10.55","./lot-v10.48.css?v=10.55","./returns-v10.49.css?v=10.55","./dca-v10.53.css?v=10.55","./myh88-core.js?v=10.55","./script.part1.js?v=10.55","./script.part2.js?v=10.55","./script.part3.js?v=10.55","./script.part4.js?v=10.55","./script.part5.js?v=10.55","./script.part6.js?v=10.55","./build-meta.json","./manifest.webmanifest","./avatar-baby.jpg","./avatar.png","./app-icon.svg","./icon-192.png","./icon-512.png","./kv-quotes-all-current.json","./logos/rklb.svg","./logos/nvda.svg","./logos/mrvl.svg","./logos/aaoi.svg","./logos/xfab.svg","./logos/vrt.svg","./logos/spcx.svg","./logos/googl.svg","./logos/mu.svg","./logos/dram.svg","./logos/cash.svg"];
 
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE_VERSION).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()));

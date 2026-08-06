@@ -264,6 +264,7 @@
       missingSymbols,
       positions,
       snapshot: {
+        scope: "active",
         date: asOf,
         capital,
         netAsset: market + cash,
@@ -356,7 +357,7 @@
     const validPeriods = new Set(["all", "month", "year"]);
     const selectedPeriod = validPeriods.has(period) ? period : "all";
     const sorted = snapshots
-      .filter((item) => item && String(item.date || "") && num(item.netAsset) > 0)
+      .filter((item) => item && (!item.scope || item.scope === "active") && String(item.date || "") && num(item.netAsset) > 0)
       .map((item) => ({
         date: String(item.date),
         capital: num(item.capital),
@@ -523,9 +524,49 @@
     };
   }
 
+  function buildDcaReturnSeries(plan = {}, asOfDate = "") {
+    const date = String(asOfDate || new Date().toISOString().slice(0, 10)).slice(0, 10);
+    const stored = (Array.isArray(plan.snapshots) ? plan.snapshots : [])
+      .filter((item) => item && String(item.date || "") && num(item.costBasisUSD) > 0)
+      .map((item) => {
+        const costBasisUSD = num(item.costBasisUSD);
+        const marketValueUSD = num(item.marketValueUSD);
+        const pnlUSD = Number.isFinite(Number(item.pnlUSD)) ? num(item.pnlUSD) : marketValueUSD - costBasisUSD;
+        return {
+          date: String(item.date).slice(0, 10),
+          costBasisUSD,
+          marketValueUSD,
+          pnlUSD,
+          returnPct: Number.isFinite(Number(item.returnPct)) ? num(item.returnPct) : pnlUSD / costBasisUSD * 100,
+        };
+      });
+    const current = computeDcaPlan(plan, date);
+    if (current.totalCostUSD > 0) {
+      stored.push({
+        date,
+        costBasisUSD: current.totalCostUSD,
+        marketValueUSD: current.marketValueUSD,
+        pnlUSD: current.pnlUSD,
+        returnPct: current.returnPct,
+      });
+    }
+    const byDate = new Map();
+    stored.sort((a, b) => a.date.localeCompare(b.date)).forEach((item) => byDate.set(item.date, item));
+    const points = [...byDate.values()];
+    const latest = points.at(-1);
+    return {
+      points,
+      returnPct: latest?.returnPct || 0,
+      pnlUSD: latest?.pnlUSD || 0,
+      startDate: points[0]?.date || "",
+      endDate: latest?.date || "",
+    };
+  }
+
   root.MYH88Core = Object.freeze({
     allocateLotSale,
     buildHistoricalSnapshot,
+    buildDcaReturnSeries,
     buildReturnSeries,
     computeDcaPlan,
     computeLedgerMetrics,

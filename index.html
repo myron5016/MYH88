@@ -13,12 +13,12 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=10.54">
-  <link rel="stylesheet" href="fresh-radar.css?v=10.54">
-  <link rel="stylesheet" href="layout-v10.34.css?v=10.54">
-  <link rel="stylesheet" href="lot-v10.48.css?v=10.54">
-  <link rel="stylesheet" href="returns-v10.49.css?v=10.54">
-  <link rel="stylesheet" href="dca-v10.53.css?v=10.54">
+  <link rel="stylesheet" href="style.css?v=10.55">
+  <link rel="stylesheet" href="fresh-radar.css?v=10.55">
+  <link rel="stylesheet" href="layout-v10.34.css?v=10.55">
+  <link rel="stylesheet" href="lot-v10.48.css?v=10.55">
+  <link rel="stylesheet" href="returns-v10.49.css?v=10.55">
+  <link rel="stylesheet" href="dca-v10.53.css?v=10.55">
 </head>
 <body>
 <main class="container">
@@ -152,7 +152,7 @@
 
   <section class="card chart-card return-card">
     <div class="section-head return-head">
-      <div><h2>收益率曲线</h2><p class="section-note">已剔除追加和提取本金的影响</p></div>
+      <div><h2>个股收益率曲线</h2><p class="section-note">仅统计梦想金库主动持仓，已剔除本金变动与长期定投</p></div>
       <button class="admin-only hidden return-snapshot-button" onclick="captureSnapshot(true)">更新今日快照</button>
     </div>
     <div class="return-switcher" role="tablist" aria-label="收益率周期">
@@ -161,9 +161,9 @@
       <button class="return-tab" data-return-view="year" role="tab" aria-selected="false" onclick="selectReturnView('year')">本年度</button>
     </div>
     <div id="returnCarousel" class="return-carousel" aria-label="可左右滑动的收益率曲线">
-      <article class="return-slide" data-return-slide="all"><div class="return-summary"><div><span>累计收益率</span><strong id="returnValue-all">--</strong></div><div class="return-meta"><b id="returnPnl-all">--</b><small id="returnRange-all">--</small></div></div><div id="returnEmpty-all" class="return-empty hidden">积累两个资产快照后显示曲线</div><svg id="returnChart-all" class="return-chart" role="img" aria-label="截止目前收益率曲线"></svg></article>
-      <article class="return-slide" data-return-slide="month"><div class="return-summary"><div><span>本月收益率</span><strong id="returnValue-month">--</strong></div><div class="return-meta"><b id="returnPnl-month">--</b><small id="returnRange-month">--</small></div></div><div id="returnEmpty-month" class="return-empty hidden">本月积累两个资产快照后显示曲线</div><svg id="returnChart-month" class="return-chart" role="img" aria-label="本月收益率曲线"></svg></article>
-      <article class="return-slide" data-return-slide="year"><div class="return-summary"><div><span>本年度收益率</span><strong id="returnValue-year">--</strong></div><div class="return-meta"><b id="returnPnl-year">--</b><small id="returnRange-year">--</small></div></div><div id="returnEmpty-year" class="return-empty hidden">本年度积累两个资产快照后显示曲线</div><svg id="returnChart-year" class="return-chart" role="img" aria-label="本年度收益率曲线"></svg></article>
+      <article class="return-slide" data-return-slide="all"><div class="return-summary"><div><span>个股累计收益率</span><strong id="returnValue-all">--</strong></div><div class="return-meta"><b id="returnPnl-all">--</b><small id="returnRange-all">--</small></div></div><div id="returnEmpty-all" class="return-empty hidden">积累两个个股资产快照后显示曲线</div><svg id="returnChart-all" class="return-chart" role="img" aria-label="个股截止目前收益率曲线"></svg></article>
+      <article class="return-slide" data-return-slide="month"><div class="return-summary"><div><span>个股本月收益率</span><strong id="returnValue-month">--</strong></div><div class="return-meta"><b id="returnPnl-month">--</b><small id="returnRange-month">--</small></div></div><div id="returnEmpty-month" class="return-empty hidden">本月积累两个个股资产快照后显示曲线</div><svg id="returnChart-month" class="return-chart" role="img" aria-label="个股本月收益率曲线"></svg></article>
+      <article class="return-slide" data-return-slide="year"><div class="return-summary"><div><span>个股本年度收益率</span><strong id="returnValue-year">--</strong></div><div class="return-meta"><b id="returnPnl-year">--</b><small id="returnRange-year">--</small></div></div><div id="returnEmpty-year" class="return-empty hidden">本年度积累两个个股资产快照后显示曲线</div><svg id="returnChart-year" class="return-chart" role="img" aria-label="个股本年度收益率曲线"></svg></article>
     </div>
     <div class="return-dots" aria-hidden="true"><i class="active"></i><i></i><i></i></div>
   </section>
@@ -247,6 +247,11 @@
       <span>当前市值 <b id="dcaTotalValue">$0</b></span>
       <span>累计收益 <b id="dcaTotalPnl">$0 / 0%</b></span>
       <details class="dca-history"><summary>查看定投记录</summary><div id="dcaHistoryList" class="dca-history-list"></div></details>
+    </div>
+    <div class="dca-return-panel">
+      <div class="dca-return-summary"><div><small>定投收益率</small><strong id="dcaReturnValue">--</strong></div><div><b id="dcaReturnPnl">--</b><small id="dcaReturnRange">--</small></div></div>
+      <div id="dcaReturnEmpty" class="return-empty hidden">积累两个定投快照后显示曲线</div>
+      <svg id="dcaReturnChart" class="return-chart dca-return-chart" role="img" aria-label="长期定投收益率曲线"></svg>
     </div>
   </section>
 
@@ -380,12 +385,12 @@
   </form>
 </dialog>
 
-<script src="myh88-core.js?v=10.54"></script>
-<script src="script.part1.js?v=10.54"></script>
-<script src="script.part2.js?v=10.54"></script>
-<script src="script.part3.js?v=10.54"></script>
-<script src="script.part4.js?v=10.54"></script>
-<script src="script.part5.js?v=10.54"></script>
-<script src="script.part6.js?v=10.54"></script>
+<script src="myh88-core.js?v=10.55"></script>
+<script src="script.part1.js?v=10.55"></script>
+<script src="script.part2.js?v=10.55"></script>
+<script src="script.part3.js?v=10.55"></script>
+<script src="script.part4.js?v=10.55"></script>
+<script src="script.part5.js?v=10.55"></script>
+<script src="script.part6.js?v=10.55"></script>
 </body>
 </html>

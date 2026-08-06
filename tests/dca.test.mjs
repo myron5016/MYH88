@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 await import("../myh88-core.js");
-const { computeDcaPlan, computeLedgerMetrics } = globalThis.MYH88Core;
+const { buildDcaReturnSeries, buildReturnSeries, computeDcaPlan, computeLedgerMetrics } = globalThis.MYH88Core;
 
 const plan = {
   monthlyBudgetUSD: 500,
@@ -17,6 +17,11 @@ const plan = {
     { date: "2026-07-01", type: "reinvest", symbol: "VOO", plannedAmountUSD: 0, shares: 0.0008, costBasisUSD: 0.54713916, countsTowardPlan: false },
     { date: "2026-07-07", type: "buy", symbol: "VOO", plannedAmountUSD: 300, shares: 0.4359, costBasisUSD: 300.29313574 },
     { date: "2026-07-07", type: "buy", symbol: "QQQM", plannedAmountUSD: 200, shares: 0.6831, costBasisUSD: 200.34841392 },
+  ],
+  snapshots: [
+    { date: "2026-06-05", costBasisUSD: 500.6358995998, marketValueUSD: 499.9351596498 },
+    { date: "2026-07-07", costBasisUSD: 1001.9721510398, marketValueUSD: 998.712114 },
+    { date: "2026-08-06", costBasisUSD: 1001.9721510398, marketValueUSD: 1018.6419854271 },
   ],
 };
 
@@ -42,4 +47,22 @@ test("定投计划不改变梦想金库主账本指标", () => {
   const before = computeLedgerMetrics(main);
   const after = computeLedgerMetrics({ ...main, dcaPlan: plan });
   assert.deepEqual(after, before);
+});
+
+test("DCA return curve uses only DCA snapshots", () => {
+  const series = buildDcaReturnSeries(plan, "2026-08-06");
+  assert.equal(series.points.length, 3);
+  assert.ok(Math.abs(series.pnlUSD - 16.6698343873) < 0.001);
+  assert.ok(Math.abs(series.returnPct - 1.6637023664) < 0.001);
+});
+
+test("active return curve ignores DCA scoped snapshots", () => {
+  const series = buildReturnSeries([
+    { scope: "active", date: "2026-06-21", capital: 10000, netAsset: 10000 },
+    { scope: "dca", date: "2026-07-07", capital: 1000, netAsset: 1200 },
+    { scope: "active", date: "2026-08-06", capital: 10000, netAsset: 9500 },
+  ], "all");
+  assert.deepEqual(series.points.map((point) => point.date), ["2026-06-21", "2026-08-06"]);
+  assert.equal(series.pnlUSD, -500);
+  assert.equal(series.returnPct, -5);
 });
