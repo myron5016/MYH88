@@ -1,9 +1,9 @@
 {
-  "release": "11.2",
-  "version": "V11.2 驾驶舱校准版",
-  "serviceWorker": "11.2",
+  "release": "11.3",
+  "version": "V11.3 驾驶舱明细版",
+  "serviceWorker": "11.3",
   "worker": "10.52",
   "ledgerSchema": "10.48",
   "channel": "stable",
-  "builtAt": "2026-08-06T14:30:00.000Z"
+  "builtAt": "2026-08-06T16:00:00.000Z"
 }

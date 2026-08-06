@@ -55,11 +55,12 @@ function companyLogoMarkup(label){
 function renderTreemap(){
   const box=$("treemap");box.innerHTML="";
   const items=treemapItems(),denom=Math.max(contributedCapital()+realizedPnl(),1);
-  const width=box.getBoundingClientRect().width,mobile=window.matchMedia("(max-width: 640px)").matches;
+  const boxStyle=getComputedStyle(box),layoutWidth=Math.max(1,box.clientWidth-num(parseFloat(boxStyle.borderLeftWidth)+parseFloat(boxStyle.borderRightWidth))),layoutHeight=Math.max(1,box.clientHeight-num(parseFloat(boxStyle.borderTopWidth)+parseFloat(boxStyle.borderBottomWidth)));
+  const width=layoutWidth,mobile=window.matchMedia("(max-width: 640px)").matches;
   box.classList.toggle("mobile-map",mobile);
   const height=mobile?Math.min(690,Math.max(500,430+Math.max(0,items.length-8)*20)):treemapHeight(items.length,width);
   box.style.height=`${height}px`;box.style.minHeight=`${height}px`;
-  const rect=box.getBoundingClientRect(),tiles=squarifiedTreemap(items,0,0,rect.width,rect.height);
+  const tiles=squarifiedTreemap(items,0,0,layoutWidth,layoutHeight);
   tiles.forEach(t=>{
     const d=document.createElement("div"),share=round(t.value/denom*100),size=treemapTileSize(t),showLogo=size!=="micro",wideCompact=t.w>=180&&t.h>=82&&t.h<175&&t.w/t.h>=1.5;
     d.className=`tile tile-${size}`;

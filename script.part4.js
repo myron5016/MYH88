@@ -106,15 +106,15 @@ function renderHoldingCardsV2(){
 
 function renderMapHoldingTable(){
   const body=$("mapHoldingBody");if(!body)return;
-  const total=Math.max(contributedCapital()+realizedPnl(),1);
-  const rows=state.positions.slice().sort((a,b)=>num(b.costBasisUSD)-num(a.costBasisUSD)).map(p=>{
-    const pnl=floatingPnlUSD(p),weight=round(p.costBasisUSD/total*100),ret=round(p.costBasisUSD?pnl/p.costBasisUSD*100:0);
-    const actions=isAdminMode?`<div class="cockpit-row-actions"><button onclick="openTrade('buy','${p.id}')">买入</button><button onclick="openTrade('sell','${p.id}')">卖出</button><button onclick="editPosition('${p.id}')">编辑</button></div>`:`<button class="cockpit-manage-button" onclick="location.href='?admin=1#allocationMap'">管理</button>`;
-    return `<tr><td><i style="background:${validColor(p.color)}"></i><strong>${escapeHtml(p.symbol)}</strong><small>${escapeHtml(p.name||p.sector)}</small></td><td>${round(p.shares,4)}</td><td>${money(marketUSD(p))}</td><td><b>${weight}%</b><small>${escapeHtml(p.sector)}</small></td><td class="${cls(pnl)}"><strong>${money(pnl)}</strong><small>${ret>0?"+":""}${ret}%</small></td><td>${actions}</td></tr>`
+  const holdingsTotal=Math.max(state.positions.reduce((sum,p)=>sum+marketUSD(p),0),1);
+  const usdPrice=value=>Number.isFinite(value)?`$${Number(value).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4})}`:"—";
+  const rows=state.positions.slice().sort((a,b)=>marketUSD(b)-marketUSD(a)).map(p=>{
+    const pnl=floatingPnlUSD(p),marketValue=marketUSD(p),weight=round(marketValue/holdingsTotal*100),ret=round(p.costBasisUSD?pnl/p.costBasisUSD*100:0);
+    const costPrice=num(p.avgCost)*fx(p.currency),currentPrice=num(p.price)*fx(p.currency);
+    const actions=isAdminMode?`<div class="cockpit-row-actions"><button title="记录买入" aria-label="记录买入 ${escapeHtml(p.symbol)}" onclick="openTrade('buy','${p.id}')">买</button><button title="记录卖出" aria-label="记录卖出 ${escapeHtml(p.symbol)}" onclick="openTrade('sell','${p.id}')">卖</button><button title="编辑资产" aria-label="编辑 ${escapeHtml(p.symbol)}" onclick="editPosition('${p.id}')">编</button></div>`:`<button class="cockpit-manage-button" onclick="location.href='?admin=1#allocationMap'">管理</button>`;
+    return `<tr><td class="position-code"><span class="position-logo">${companyLogoMarkup(p.symbol)}</span><strong>${escapeHtml(p.symbol)}</strong></td><td class="position-name">${escapeHtml(p.name||p.symbol)}</td><td>${round(p.shares,4)}</td><td>${money(marketValue)}</td><td>${weight}%</td><td>${usdPrice(costPrice)}</td><td>${usdPrice(currentPrice)}</td><td class="${cls(pnl)}"><strong>${money(pnl)}</strong></td><td class="${cls(ret)}"><strong>${ret>0?"+":""}${ret}%</strong></td><td>${actions}</td></tr>`;
   }).join("");
-  const cash=cashBalance();
-  const cashAction=isAdminMode?`<button class="cash-action" onclick="openCashFlow()">本金变动</button>`:`<span class="quote-source source-muted">账本</span>`;
-  body.innerHTML=rows+(cash>0?`<tr class="cash-row"><td><i style="background:${sectorBaseColor("现金")}"></i><strong>CASH</strong><small>可用现金</small></td><td>—</td><td>${money(cash)}</td><td><b>${round(cash/total*100)}%</b><small>现金</small></td><td class="muted">—</td><td>${cashAction}</td></tr>`:"");
+  body.innerHTML=rows||'<tr><td colspan="10" class="muted empty-table-cell">暂无当前持仓</td></tr>';
 }
 
 function renderAll(){renderKpis();renderTreemap();renderSectorsV2();renderMapHoldingTable();renderReturnDashboard();renderHoldingCardsV2();renderPositionTable();renderTransactionTable();renderCashFlowTable();renderBackupList();renderSectorAdminPanel();$("positionCount").textContent=state.positions.length;$("transactionCount").textContent=state.transactions.length;$("cashFlowCount").textContent=state.cashFlows.length;switchLedgerTab(activeLedgerTab);$("pageTitle").textContent=state.settings.title;document.title=state.settings.title;$("titleInput").value=state.settings.title;$("cacheInput").value=state.settings.priceCacheMinutes;if($("eurFxInput"))$("eurFxInput").value=state.fxRates.EUR||defaultState.fxRates.EUR;if($("proxyInput"))$("proxyInput").value=priceProxyUrl();renderSyncStatus();renderDiagnostics()}

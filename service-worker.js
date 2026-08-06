@@ -1,7 +1,7 @@
-const RELEASE="11.2";
-const CACHE_VERSION="dream-fund-v11-2";
+const RELEASE="11.3";
+const CACHE_VERSION="dream-fund-v11-3";
 const DATA_CACHE="dream-fund-data-v10-47";
-const APP_SHELL=["./","./index.html","./style.css?v=11.2","./fresh-radar.css?v=11.2","./layout-v10.34.css?v=11.2","./lot-v10.48.css?v=11.2","./returns-v10.49.css?v=11.2","./dca-v10.53.css?v=11.2","./v11-cockpit.css?v=11.2","./myh88-core.js?v=11.2","./script.part1.js?v=11.2","./script.part2.js?v=11.2","./script.part3.js?v=11.2","./script.part4.js?v=11.2","./script.part5.js?v=11.2","./script.part6.js?v=11.2","./build-meta.json","./manifest.webmanifest","./avatar-baby.jpg","./avatar.png","./app-icon.svg","./icon-192.png","./icon-512.png","./kv-quotes-all-current.json","./logos/rklb.svg","./logos/nvda.svg","./logos/mrvl.svg","./logos/aaoi.svg","./logos/xfab.svg","./logos/vrt.svg","./logos/spcx.svg","./logos/googl.svg","./logos/mu.svg","./logos/dram.svg","./logos/cash.svg"];
+const APP_SHELL=["./","./index.html","./style.css?v=11.3","./fresh-radar.css?v=11.3","./layout-v10.34.css?v=11.3","./lot-v10.48.css?v=11.3","./returns-v10.49.css?v=11.3","./dca-v10.53.css?v=11.3","./v11-cockpit.css?v=11.3","./myh88-core.js?v=11.3","./script.part1.js?v=11.3","./script.part2.js?v=11.3","./script.part3.js?v=11.3","./script.part4.js?v=11.3","./script.part5.js?v=11.3","./script.part6.js?v=11.3","./build-meta.json","./manifest.webmanifest","./avatar-baby.jpg","./avatar.png","./app-icon.svg","./icon-192.png","./icon-512.png","./kv-quotes-all-current.json","./logos/rklb.svg","./logos/nvda.svg","./logos/mrvl.svg","./logos/aaoi.svg","./logos/xfab.svg","./logos/vrt.svg","./logos/spcx.svg","./logos/googl.svg","./logos/mu.svg","./logos/dram.svg","./logos/cash.svg"];
 
 self.addEventListener("install",event=>{
   event.waitUntil(caches.open(CACHE_VERSION).then(cache=>cache.addAll(APP_SHELL)).then(()=>self.skipWaiting()));

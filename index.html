@@ -13,13 +13,13 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=11.2">
-  <link rel="stylesheet" href="fresh-radar.css?v=11.2">
-  <link rel="stylesheet" href="layout-v10.34.css?v=11.2">
-  <link rel="stylesheet" href="lot-v10.48.css?v=11.2">
-  <link rel="stylesheet" href="returns-v10.49.css?v=11.2">
-  <link rel="stylesheet" href="dca-v10.53.css?v=11.2">
-  <link rel="stylesheet" href="v11-cockpit.css?v=11.2">
+  <link rel="stylesheet" href="style.css?v=11.3">
+  <link rel="stylesheet" href="fresh-radar.css?v=11.3">
+  <link rel="stylesheet" href="layout-v10.34.css?v=11.3">
+  <link rel="stylesheet" href="lot-v10.48.css?v=11.3">
+  <link rel="stylesheet" href="returns-v10.49.css?v=11.3">
+  <link rel="stylesheet" href="dca-v10.53.css?v=11.3">
+  <link rel="stylesheet" href="v11-cockpit.css?v=11.3">
 </head>
 <body>
 <main id="overview" class="container">
@@ -27,7 +27,7 @@
     <div class="hero-left">
       <img src="avatar-baby.jpg" class="avatar" alt="小宝贝头像">
       <div>
-        <div class="hero-badge">♥ Family Dream Fund · V11.2 驾驶舱</div>
+        <div class="hero-badge">♥ Family Dream Fund · V11.3 驾驶舱</div>
         <h1 id="pageTitle">孟一晗的梦想金库</h1>
         <p class="subtitle">爸爸妈妈为你种下的未来</p>
       </div>
@@ -128,18 +128,19 @@
   </section>
 
   <section id="allocationMap" class="terminal-grid">
-    <div class="card map-card">
+    <div class="card map-card cockpit-panel">
       <div class="section-head">
         <div><span class="section-kicker">ALLOCATION MAP</span><h2>本金配置地图</h2><p class="section-note">按持仓成本展示；小仓位保留最小可读面积，数字均为真实占比</p></div>
-        <span id="status">正在读取共享数据...</span>
+        <span id="status" class="panel-status">正在读取共享数据...</span>
       </div>
       <div id="treemap"></div>
     </div>
-    <aside class="card map-side-card">
-      <div class="section-head compact-head"><div><span class="section-kicker">POSITION BOOK</span><h2>持仓明细</h2><p class="section-note">按成本占比排序</p></div></div>
+    <aside class="card map-side-card cockpit-panel">
+      <div class="section-head compact-head"><div><span class="section-kicker">POSITION BOOK</span><h2>持仓明细</h2><p class="section-note">按持仓市值排序；价格、盈亏统一折算为 USD</p></div></div>
       <div class="map-table-wrap">
         <table class="map-holding-table">
-          <thead><tr><th>资产</th><th>数量</th><th>市值</th><th>占比</th><th>浮动盈亏</th><th>操作</th></tr></thead>
+          <colgroup><col class="col-symbol"><col class="col-name"><col class="col-shares"><col class="col-market"><col class="col-weight"><col class="col-cost"><col class="col-current"><col class="col-pnl"><col class="col-return"><col class="col-action"></colgroup>
+          <thead><tr><th>代码</th><th>名称</th><th>持仓数量</th><th>持仓市值 (USD)</th><th>持仓占比</th><th>成本价 (USD)</th><th>当前价 (USD)</th><th>浮动盈亏 (USD)</th><th>浮动盈亏率</th><th>操作</th></tr></thead>
           <tbody id="mapHoldingBody"></tbody>
         </table>
       </div>
@@ -147,15 +148,15 @@
   </section>
 
   <section id="analytics" class="insight-grid">
-  <section class="card sector-overview-card">
-    <div class="section-head"><div><h2>成本板块配置</h2><p class="section-note">与本金配置地图使用相同口径</p></div></div>
+  <section class="card sector-overview-card cockpit-panel">
+    <div class="section-head"><div><span class="section-kicker">SECTOR ALLOCATION</span><h2>成本板块配置</h2><p class="section-note">与本金配置地图使用相同口径</p></div></div>
     <div id="sectorBar" class="sector-bar"></div>
     <div id="sectorLegend" class="legend"></div>
   </section>
 
-  <section class="card chart-card return-card">
+  <section class="card chart-card return-card cockpit-panel">
     <div class="section-head return-head">
-      <div><h2>个股收益率曲线</h2><p class="section-note">仅统计梦想金库主动持仓，已剔除本金变动与长期定投</p></div>
+      <div><span class="section-kicker">RETURN CURVE</span><h2>个股收益率曲线</h2><p class="section-note">仅统计梦想金库主动持仓，已剔除本金变动与长期定投</p></div>
       <button class="admin-only hidden return-snapshot-button" onclick="captureSnapshot(true)">更新今日快照</button>
     </div>
     <div class="return-switcher" role="tablist" aria-label="收益率周期">
@@ -178,10 +179,10 @@
     <div id="holdingCards" class="holding-cards"></div>
   </section>
 
-  <section id="ledgerPanel" class="card">
+  <section id="ledgerPanel" class="card cockpit-panel">
     <div class="section-head ledger-head">
       <div>
-        <h2>梦想金库账本</h2>
+        <span class="section-kicker">FUND LEDGER</span><h2>梦想金库账本</h2>
         <p class="section-note">持仓负责汇总，流水负责记住每一次变化</p>
       </div>
       <div class="buttons admin-only hidden">
@@ -225,7 +226,7 @@
     </div>
   </section>
 
-  <section id="dcaZone" class="card dca-zone">
+  <section id="dcaZone" class="card dca-zone cockpit-panel">
     <div class="section-head dca-head">
       <div>
         <span class="dca-eyebrow">LONG-TERM CORE</span>
@@ -396,12 +397,12 @@
   </form>
 </dialog>
 
-<script src="myh88-core.js?v=11.2"></script>
-<script src="script.part1.js?v=11.2"></script>
-<script src="script.part2.js?v=11.2"></script>
-<script src="script.part3.js?v=11.2"></script>
-<script src="script.part4.js?v=11.2"></script>
-<script src="script.part5.js?v=11.2"></script>
-<script src="script.part6.js?v=11.2"></script>
+<script src="myh88-core.js?v=11.3"></script>
+<script src="script.part1.js?v=11.3"></script>
+<script src="script.part2.js?v=11.3"></script>
+<script src="script.part3.js?v=11.3"></script>
+<script src="script.part4.js?v=11.3"></script>
+<script src="script.part5.js?v=11.3"></script>
+<script src="script.part6.js?v=11.3"></script>
 </body>
 </html>
