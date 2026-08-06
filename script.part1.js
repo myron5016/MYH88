@@ -1,5 +1,5 @@
-const VERSION="V10.52 PWA家庭版";
-const RELEASE="10.52";
+const VERSION="V10.53 PWA家庭版";
+const RELEASE="10.53";
 const LEDGER_SCHEMA_VERSION="10.33";
 const STATE_KEY="v9_last_state";
 const RETURN_SNAPSHOT_KEY="v10_return_snapshots";
@@ -333,8 +333,8 @@ function saveLocal(){
   localStorage.setItem(RETURN_SNAPSHOT_KEY,JSON.stringify(state.snapshots.slice(-400)));
 }
 function markDirty(reason="本地数据已修改"){dirty=true;lastMutationReason=reason;state.settings.localUpdatedAt=new Date().toISOString();saveLocal();renderSyncStatus()}
-function summaryOf(s){return{positions:Array.isArray(s?.positions)?s.positions.length:0,transactions:Array.isArray(s?.transactions)?s.transactions.length:0,cashFlows:Array.isArray(s?.cashFlows)?s.cashFlows.length:0,snapshots:Array.isArray(s?.snapshots)?s.snapshots.length:0}}
-function dangerBetween(local,remote){const l=summaryOf(local),r=summaryOf(remote),reasons=[],intentionalTransactionDelete=dirty&&/交易已删除/.test(lastMutationReason);if(l.transactions<r.transactions&&!intentionalTransactionDelete)reasons.push(`交易流水从 ${r.transactions} 条减少到 ${l.transactions} 条`);if(l.cashFlows<r.cashFlows)reasons.push(`资金流水从 ${r.cashFlows} 条减少到 ${l.cashFlows} 条`);if(!l.positions&&r.positions&&l.transactions<=r.transactions)reasons.push(`当前持仓从 ${r.positions} 个变成 0 个`);return reasons}
+function summaryOf(s){return{positions:Array.isArray(s?.positions)?s.positions.length:0,transactions:Array.isArray(s?.transactions)?s.transactions.length:0,cashFlows:Array.isArray(s?.cashFlows)?s.cashFlows.length:0,snapshots:Array.isArray(s?.snapshots)?s.snapshots.length:0,dcaEntries:Array.isArray(s?.dcaPlan?.entries)?s.dcaPlan.entries.length:0}}
+function dangerBetween(local,remote){const l=summaryOf(local),r=summaryOf(remote),reasons=[],intentionalTransactionDelete=dirty&&/交易已删除/.test(lastMutationReason),intentionalDcaDelete=dirty&&/定投记录已删除/.test(lastMutationReason);if(l.transactions<r.transactions&&!intentionalTransactionDelete)reasons.push(`交易流水从 ${r.transactions} 条减少到 ${l.transactions} 条`);if(l.cashFlows<r.cashFlows)reasons.push(`资金流水从 ${r.cashFlows} 条减少到 ${l.cashFlows} 条`);if(l.dcaEntries<r.dcaEntries&&!intentionalDcaDelete)reasons.push(`定投记录从 ${r.dcaEntries} 条减少到 ${l.dcaEntries} 条`);if(!l.positions&&r.positions&&l.transactions<=r.transactions)reasons.push(`当前持仓从 ${r.positions} 个变成 0 个`);return reasons}
 function renderSyncStatus(mode=""){
   const dot=$("syncDot"),label=$("syncLabel"),detail=$("syncDetail");if(!dot||!label||!detail)return;
   dot.className="sync-dot";

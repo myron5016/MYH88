@@ -442,10 +442,92 @@
     };
   }
 
+  function computeDcaPlan(plan = {}, asOfDate = "") {
+    const funds = Array.isArray(plan.funds) ? plan.funds : [];
+    const entries = (Array.isArray(plan.entries) ? plan.entries : [])
+      .filter((entry) => entry && !entry.voided)
+      .slice()
+      .sort((a, b) => String(a.date || "").localeCompare(String(b.date || "")));
+    const monthKey = String(asOfDate || new Date().toISOString().slice(0, 10)).slice(0, 7);
+    const monthlyBudgetUSD = Math.max(0, num(plan.monthlyBudgetUSD));
+    const bySymbol = new Map(funds.map((fund) => [String(fund.symbol || "").toUpperCase(), {
+      ...fund,
+      symbol: String(fund.symbol || "").toUpperCase(),
+      shares: 0,
+      costBasisUSD: 0,
+    }]));
+
+    for (const entry of entries) {
+      const symbol = String(entry.symbol || "").toUpperCase();
+      if (!symbol) continue;
+      if (!bySymbol.has(symbol)) bySymbol.set(symbol, { symbol, name: symbol, targetWeight: 0, price: 0, shares: 0, costBasisUSD: 0 });
+      const fund = bySymbol.get(symbol);
+      const direction = entry.type === "sell" ? -1 : 1;
+      const shares = num(entry.shares);
+      const cost = Number.isFinite(Number(entry.costBasisUSD))
+        ? num(entry.costBasisUSD)
+        : shares * num(entry.price) + num(entry.feeUSD);
+      fund.shares += direction * shares;
+      fund.costBasisUSD += direction * cost;
+    }
+
+    const computedFunds = [...bySymbol.values()].map((fund) => {
+      const marketValueUSD = Math.max(0, num(fund.shares)) * num(fund.price);
+      const pnlUSD = marketValueUSD - num(fund.costBasisUSD);
+      return {
+        ...fund,
+        shares: Math.max(0, num(fund.shares)),
+        costBasisUSD: Math.max(0, num(fund.costBasisUSD)),
+        marketValueUSD,
+        pnlUSD,
+        returnPct: fund.costBasisUSD ? pnlUSD / fund.costBasisUSD * 100 : 0,
+      };
+    });
+    const plannedEntries = entries.filter((entry) => entry.countsTowardPlan !== false && entry.type !== "reinvest" && entry.type !== "sell");
+    const monthlyInvestedUSD = plannedEntries
+      .filter((entry) => String(entry.date || "").slice(0, 7) === monthKey)
+      .reduce((sum, entry) => sum + num(entry.plannedAmountUSD || entry.amountUSD), 0);
+    const monthTotals = new Map();
+    for (const entry of plannedEntries) {
+      const key = String(entry.date || "").slice(0, 7);
+      if (key) monthTotals.set(key, (monthTotals.get(key) || 0) + num(entry.plannedAmountUSD || entry.amountUSD));
+    }
+    const completedMonths = [...monthTotals.entries()].filter(([, value]) => monthlyBudgetUSD > 0 && value >= monthlyBudgetUSD * 0.98).map(([key]) => key).sort();
+    let consecutiveMonths = 0;
+    if (completedMonths.length) {
+      let cursor = completedMonths.at(-1);
+      while (completedMonths.includes(cursor)) {
+        consecutiveMonths += 1;
+        const [year, month] = cursor.split("-").map(Number);
+        const previous = new Date(Date.UTC(year, month - 2, 1));
+        cursor = `${previous.getUTCFullYear()}-${String(previous.getUTCMonth() + 1).padStart(2, "0")}`;
+      }
+    }
+    const totalCostUSD = computedFunds.reduce((sum, fund) => sum + fund.costBasisUSD, 0);
+    const marketValueUSD = computedFunds.reduce((sum, fund) => sum + fund.marketValueUSD, 0);
+    const pnlUSD = marketValueUSD - totalCostUSD;
+    return {
+      monthlyBudgetUSD,
+      monthlyInvestedUSD,
+      monthlyProgressPct: monthlyBudgetUSD ? Math.min(100, monthlyInvestedUSD / monthlyBudgetUSD * 100) : 0,
+      lifetimePlannedUSD: plannedEntries.reduce((sum, entry) => sum + num(entry.plannedAmountUSD || entry.amountUSD), 0),
+      totalCostUSD,
+      marketValueUSD,
+      pnlUSD,
+      returnPct: totalCostUSD ? pnlUSD / totalCostUSD * 100 : 0,
+      completedMonths,
+      consecutiveMonths,
+      monthKey,
+      funds: computedFunds,
+      entries,
+    };
+  }
+
   root.MYH88Core = Object.freeze({
     allocateLotSale,
     buildHistoricalSnapshot,
     buildReturnSeries,
+    computeDcaPlan,
     computeLedgerMetrics,
     createLot,
     lotsBeforeTransaction,

@@ -13,11 +13,12 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=10.52">
-  <link rel="stylesheet" href="fresh-radar.css?v=10.52">
-  <link rel="stylesheet" href="layout-v10.34.css?v=10.52">
-  <link rel="stylesheet" href="lot-v10.48.css?v=10.52">
-  <link rel="stylesheet" href="returns-v10.49.css?v=10.52">
+  <link rel="stylesheet" href="style.css?v=10.53">
+  <link rel="stylesheet" href="fresh-radar.css?v=10.53">
+  <link rel="stylesheet" href="layout-v10.34.css?v=10.53">
+  <link rel="stylesheet" href="lot-v10.48.css?v=10.53">
+  <link rel="stylesheet" href="returns-v10.49.css?v=10.53">
+  <link rel="stylesheet" href="dca-v10.53.css?v=10.53.1">
 </head>
 <body>
 <main class="container">
@@ -121,6 +122,35 @@
     <div class="kpi"><span>已实现盈亏</span><strong id="kpiRealized">$0</strong></div>
     <div class="kpi"><span>浮动盈亏</span><strong id="kpiFloating">$0 / 0%</strong></div>
     <div class="kpi"><span>累计总盈亏</span><strong id="kpiPnl">$0 / 0%</strong></div>
+  </section>
+
+  <section id="dcaZone" class="card dca-zone">
+    <div class="section-head dca-head">
+      <div>
+        <span class="dca-eyebrow">LONG-TERM CORE</span>
+        <h2>长期定投专区</h2>
+        <p class="section-note">VOO 打底、QQQM 增长；独立于主动仓位与梦想金库主账本</p>
+      </div>
+      <div class="dca-head-actions">
+        <span id="dcaMonthStatus" class="dca-status pending">等待计划</span>
+        <button class="primary admin-only hidden" type="button" onclick="openDcaEntry()">＋ 记录定投</button>
+      </div>
+    </div>
+    <div class="dca-layout">
+      <div class="dca-progress-panel">
+        <div class="dca-progress-title"><div><small id="dcaMonthTitle">本月定投</small><strong id="dcaProgressValue">$0 / $500</strong></div><b id="dcaProgressPercent">0%</b></div>
+        <div class="dca-progress-track"><i id="dcaProgressBar"></i></div>
+        <div class="dca-plan-split"><span><i class="voo-dot"></i>VOO <b>60%</b></span><span><i class="qqqm-dot"></i>QQQM <b>40%</b></span></div>
+        <div class="dca-streak"><span>每月计划 <b>$500</b></span><span id="dcaStreak">连续完成 0 期</span></div>
+      </div>
+      <div id="dcaFundGrid" class="dca-fund-grid"></div>
+    </div>
+    <div class="dca-summary">
+      <span>定投成本 <b id="dcaTotalCost">$0</b></span>
+      <span>当前市值 <b id="dcaTotalValue">$0</b></span>
+      <span>累计收益 <b id="dcaTotalPnl">$0 / 0%</b></span>
+      <details class="dca-history"><summary>查看定投记录</summary><div id="dcaHistoryList" class="dca-history-list"></div></details>
+    </div>
   </section>
 
   <section class="terminal-grid">
@@ -262,6 +292,25 @@
   </form>
 </dialog>
 
+<dialog id="dcaEntryDialog" class="modal small-modal dca-entry-dialog">
+  <form method="dialog" onsubmit="submitDcaEntry(event)">
+    <div class="modal-head"><div><span class="dca-eyebrow">MONTHLY DCA</span><h2>记录本月定投</h2></div><button type="button" class="icon-btn" onclick="dcaEntryDialog.close()">×</button></div>
+    <p class="note">定投资金单独核算，不改变主仓现金、配置地图和主动投资收益率。</p>
+    <div class="form-grid">
+      <label>交易日期<input id="dcaDate" type="date" required></label>
+      <label>定投ETF<select id="dcaSymbol"><option value="VOO">VOO · Vanguard S&P 500</option><option value="QQQM">QQQM · Invesco NASDAQ 100</option></select></label>
+      <label>计划金额 USD<input id="dcaPlannedAmount" type="number" min="0" step="0.01" required></label>
+      <label>买入份额<input id="dcaShares" type="number" min="0.000001" step="any" required></label>
+      <label>成交价 USD<input id="dcaPrice" type="number" min="0.000001" step="any" required></label>
+      <label>手续费 USD<input id="dcaFee" type="number" min="0" step="any" value="0.35"></label>
+      <label class="check-row wide"><input id="dcaCountsTowardPlan" type="checkbox" checked>计入本月 $500 定投进度</label>
+      <label class="wide">备注<input id="dcaNote" placeholder="例如：8月自动定投"></label>
+    </div>
+    <div id="dcaEntryPreview" class="dca-entry-preview"></div>
+    <div class="modal-actions"><button type="button" onclick="dcaEntryDialog.close()">取消</button><button class="primary" type="submit">确认记录</button></div>
+  </form>
+</dialog>
+
 <dialog id="cashDialog" class="modal small-modal">
   <form method="dialog" onsubmit="submitCashFlow(event)">
     <div class="modal-head"><h2>记录本金变动</h2><button type="button" class="icon-btn" onclick="cashDialog.close()">×</button></div>
@@ -332,11 +381,12 @@
   </form>
 </dialog>
 
-<script src="myh88-core.js?v=10.52"></script>
-<script src="script.part1.js?v=10.52"></script>
-<script src="script.part2.js?v=10.52"></script>
-<script src="script.part3.js?v=10.52"></script>
-<script src="script.part4.js?v=10.52"></script>
-<script src="script.part5.js?v=10.52"></script>
+<script src="myh88-core.js?v=10.53"></script>
+<script src="script.part1.js?v=10.53"></script>
+<script src="script.part2.js?v=10.53"></script>
+<script src="script.part3.js?v=10.53"></script>
+<script src="script.part4.js?v=10.53"></script>
+<script src="script.part5.js?v=10.53"></script>
+<script src="script.part6.js?v=10.53"></script>
 </body>
 </html>

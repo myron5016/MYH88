@@ -1,2 +1,2 @@
-// V10.52 browser source is split across script.part1.js through script.part5.js.
+// V10.53 browser source is split across script.part1.js through script.part6.js.
 // The files are loaded in order by index.html and validated together in CI.

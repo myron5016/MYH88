@@ -1,9 +1,9 @@
 {
-  "release": "10.52",
-  "version": "V10.52 PWA家庭版",
-  "serviceWorker": "10.52",
+  "release": "10.53",
+  "version": "V10.53 PWA家庭版",
+  "serviceWorker": "10.53",
   "worker": "10.52",
   "ledgerSchema": "10.48",
   "channel": "stable",
-  "builtAt": "2026-08-06T03:20:00.000Z"
+  "builtAt": "2026-08-06T06:55:00.000Z"
 }

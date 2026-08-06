@@ -113,9 +113,9 @@ function floatingReturn(){return ledgerMetrics().floatingReturn}
 
 function getPriceCache(){return readJson(localStorage.getItem(PRICE_CACHE_KEY),null)}
 function getFxCache(){return readJson(localStorage.getItem(FX_CACHE_KEY),null)}
-function applyPriceCache(){const pc=getPriceCache();const fc=getFxCache();if(fc?.fxRates)state.fxRates={...state.fxRates,...fc.fxRates,USD:1};if(pc?.prices)state.positions.forEach(p=>{const q=pc.prices[p.symbol];if(q&&num(q.price)>0){p.price=num(q.price);p.changePercent=num(q.changePercent);p.priceSource=q.priceSource||p.priceSource;p.priceProvider=q.priceProvider||p.priceProvider;p.priceUpdatedAt=q.priceUpdatedAt||p.priceUpdatedAt;p.priceAsOf=q.priceAsOf||q.priceUpdatedAt||p.priceAsOf}});if(pc?.lastPriceRefresh){state.settings.lastPriceRefresh=pc.lastPriceRefresh;state.settings.lastPriceRefreshText=pc.lastPriceRefreshText||""}}
+function applyPriceCache(){const pc=getPriceCache();const fc=getFxCache();if(fc?.fxRates)state.fxRates={...state.fxRates,...fc.fxRates,USD:1};if(pc?.prices)trackedQuoteItems().forEach(p=>{const q=pc.prices[p.symbol];if(q&&num(q.price)>0){p.price=num(q.price);p.changePercent=num(q.changePercent);p.priceSource=q.priceSource||p.priceSource;p.priceProvider=q.priceProvider||p.priceProvider;p.priceUpdatedAt=q.priceUpdatedAt||p.priceUpdatedAt;p.priceAsOf=q.priceAsOf||q.priceUpdatedAt||p.priceAsOf}});if(pc?.lastPriceRefresh){state.settings.lastPriceRefresh=pc.lastPriceRefresh;state.settings.lastPriceRefreshText=pc.lastPriceRefreshText||""}}
 function priceCacheValid(){const last=num(getPriceCache()?.lastPriceRefresh),mins=num(state.settings.priceCacheMinutes)||30;return last&&Date.now()-last<mins*60000}
-function savePriceCache(){const prices={};state.positions.forEach(p=>prices[p.symbol]={price:p.price,changePercent:p.changePercent||0,priceSource:p.priceSource||"",priceProvider:p.priceProvider||"",priceUpdatedAt:p.priceUpdatedAt||"",priceAsOf:p.priceAsOf||""});localStorage.setItem(PRICE_CACHE_KEY,JSON.stringify({lastPriceRefresh:state.settings.lastPriceRefresh,lastPriceRefreshText:state.settings.lastPriceRefreshText,prices}))}
+function savePriceCache(){const prices={};trackedQuoteItems().forEach(p=>prices[p.symbol]={price:p.price,changePercent:p.changePercent||0,priceSource:p.priceSource||"",priceProvider:p.priceProvider||"",priceUpdatedAt:p.priceUpdatedAt||"",priceAsOf:p.priceAsOf||""});localStorage.setItem(PRICE_CACHE_KEY,JSON.stringify({lastPriceRefresh:state.settings.lastPriceRefresh,lastPriceRefreshText:state.settings.lastPriceRefreshText,prices}))}
 function friendlyFetchError(error){
   if(error?.name==="AbortError")return"请求超时，请检查手机网络后会自动重试";
   if(error instanceof TypeError)return"网络请求失败，可能是手机网络或微信浏览器临时拦截";
@@ -301,7 +301,7 @@ async function refreshLastClosePrices(clock=marketClockState||marketClock()){
   }
   if(button)button.disabled=true;
   try{
-    const items=state.positions.filter(p=>p.source==="twelve"&&p.symbol),symbols=[...new Set(items.map(p=>p.symbol))];
+    const items=trackedQuoteItems().filter(p=>p.source==="twelve"&&p.symbol),symbols=[...new Set(items.map(p=>p.symbol))];
     if(symbols.length){
       const res=await fetchQuoteBatchResilient(symbols,"last-close"),providers=new Set();
       items.forEach(p=>{const q=symbols.length===1?res:res[p.symbol];const provider=String(q?.source||"last-close").toLowerCase();if(provider)providers.add(provider);const price=num(q?.close||q?.price);if(price>0)p.price=price;p.changePercent=num(q?.percent_change);p.priceSource="last-close";p.priceProvider=provider;p.priceUpdatedAt=q?.as_of||q?.datetime||q?.last_quote_at||new Date().toISOString();p.priceAsOf=p.priceUpdatedAt});
@@ -353,7 +353,7 @@ async function putGithubFile(path,raw,message,sha=null){const body={message,cont
 async function checkCloudStatus(manual=false){
   if(!admin.owner||!admin.repo||!admin.token){renderSyncStatus();if(manual)alert("请先填写 GitHub 用户名、仓库名和 Token");return null}
   renderSyncStatus("checking");
-  try{const remote=await getRemoteData();cloudState=remote.data;cloudSha=remote.sha;renderSyncStatus();if(manual){const l=summaryOf(state),r=summaryOf(cloudState),danger=dangerBetween(state,cloudState);alert(danger.length?`发现危险差异，保存已被锁定：\n${danger.join("\n")}`:`核对完成。\n本地：${l.positions} 个持仓 / ${l.transactions} 条交易\n云端：${r.positions} 个持仓 / ${r.transactions} 条交易`)}return remote}catch(error){cloudState=null;renderSyncStatus();if(manual)alert("云端核对失败："+error.message);return null}
+  try{const remote=await getRemoteData();cloudState=remote.data;cloudSha=remote.sha;renderSyncStatus();if(manual){const l=summaryOf(state),r=summaryOf(cloudState),danger=dangerBetween(state,cloudState);alert(danger.length?`发现危险差异，保存已被锁定：\n${danger.join("\n")}`:`核对完成。\n本地：${l.positions} 个持仓 / ${l.transactions} 条交易 / ${l.dcaEntries} 条定投\n云端：${r.positions} 个持仓 / ${r.transactions} 条交易 / ${r.dcaEntries} 条定投`)}return remote}catch(error){cloudState=null;renderSyncStatus();if(manual)alert("云端核对失败："+error.message);return null}
 }
 async function createCloudBackup(remote){
   if(!remote?.sha)return null;const stamp=new Date().toISOString().replace(/[-:TZ.]/g,"").slice(0,17),path=`backups/data-${stamp}.json`;const result=await putGithubFile(path,remote.raw,`Backup data.json before V10 save (${stamp})`);const box=$("cloudBackupStatus");if(box)box.textContent=`已备份旧云端账本：${path}`;return{path,result}
@@ -373,7 +373,7 @@ async function saveToGithub(){
     const remote=await getRemoteData(),danger=dangerBetween(state,remote.data);cloudState=remote.data;cloudSha=remote.sha;
     if(danger.length){renderSyncStatus();throw new Error(`安全锁已阻止覆盖：${danger.join("；")}。请先恢复或重新载入云端数据。`)}
     const l=summaryOf(state),r=summaryOf(remote.data);
-    if(!confirm(`即将安全保存到 GitHub：\n\n本地：${l.positions} 个持仓 / ${l.transactions} 条交易 / ${l.cashFlows} 条资金流水\n云端：${r.positions} 个持仓 / ${r.transactions} 条交易 / ${r.cashFlows} 条资金流水\n\n系统会先备份旧云端账本，再执行保存。是否继续？`)){renderSyncStatus();return}
+    if(!confirm(`即将安全保存到 GitHub：\n\n本地：${l.positions} 个持仓 / ${l.transactions} 条交易 / ${l.cashFlows} 条资金流水 / ${l.dcaEntries} 条定投\n云端：${r.positions} 个持仓 / ${r.transactions} 条交易 / ${r.cashFlows} 条资金流水 / ${r.dcaEntries} 条定投\n\n系统会先备份旧云端账本，再执行保存。是否继续？`)){renderSyncStatus();return}
     createBackup("安全保存 GitHub 前");$("status").textContent="正在备份旧的云端账本...";await createCloudBackup(remote);
     state.settings.lastCloudSaveAt=new Date().toISOString();const raw=JSON.stringify(ledgerForCloud(),null,2);$("status").textContent="云端备份完成，正在保存新账本...";const result=await putGithubFile("data.json",raw,"Update baby dream fund data V10",remote.sha);
     cloudSha=result.content?.sha||null;cloudState=structuredClone(state);dirty=false;lastMutationReason="";saveLocal();renderSyncStatus();$("status").textContent="安全保存完成：旧账本已备份，新账本已同步。";alert("V10 安全保存完成。旧的云端账本已经自动备份。")

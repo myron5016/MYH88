@@ -36,3 +36,5 @@ V10.50 makes month-to-date and year-to-date ranges follow strict calendar period
 V10.51 displays month-to-date and year-to-date ranges from the first actual US trading day, while separately identifying the first available Dream Fund net-asset snapshot. Performance still uses only the website ledger, holdings, cash, and website quote snapshots; no broker account data is read.
 
 V10.52 reconstructs the first US trading day's closing net asset value from the Dream Fund website ledger and historical closing prices served by the Cloudflare Worker. The inception return now uses the intuitive account formula, total profit or loss divided by cumulative contributed capital. This release requires `npx wrangler deploy`; it never reads IBKR and must not overwrite `data.json`.
+
+V10.53 adds an independent VOO/QQQM recurring-investment zone seeded from the owner's confirmed IBKR lots. Recurring contributions, progress, and returns are stored under `dcaPlan` and never alter the active portfolio's cash, treemap, or return calculations. The existing Worker is unchanged, so this release does not require `npx wrangler deploy`.
