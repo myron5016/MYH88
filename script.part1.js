@@ -1,5 +1,5 @@
-const VERSION="V11.3 驾驶舱明细版";
-const RELEASE="11.3";
+const VERSION="V11.4 配置融合版";
+const RELEASE="11.4";
 const LEDGER_SCHEMA_VERSION="10.33";
 const STATE_KEY="v9_last_state";
 const RETURN_SNAPSHOT_KEY="v10_return_snapshots";

@@ -28,7 +28,10 @@ function treemapTileSize(tile){
   if(shortSide>=55&&area>=6000)return "small";
   return "micro";
 }
-const COMPANY_LOGO_ASSETS=Object.freeze({NVDA:"nvda.svg",RKLB:"rklb.svg",SPCX:"spcx.svg",CASH:"cash.svg"});
+const COMPANY_LOGO_ASSETS=Object.freeze({
+  AAOI:"aaoi.svg",CASH:"cash.svg",DRAM:"dram.svg",GOOGL:"googl.svg",MRVL:"mrvl.svg",MU:"mu.svg",
+  NVDA:"nvda.svg",RKLB:"rklb.svg",SPCX:"spcx.svg",VRT:"vrt.svg",XFAB:"xfab.svg",SKHY:"dram.svg"
+});
 const COMPANY_LOGO_DOMAINS=Object.freeze({
   AAOI:"appliedoptoelectronics.com",DRAM:"skhynix.com",GOOGL:"google.com",MRVL:"marvell.com",
   MU:"micron.com",TSM:"tsmc.com",TSLA:"tesla.com",SKHY:"skhynix.com",SOXL:"direxion.com",
@@ -43,7 +46,7 @@ function companyLogoMarkup(label){
   const glyph=COMPANY_LOGO_GLYPHS[key]||key.slice(0,2)||".";
   const asset=COMPANY_LOGO_ASSETS[key];
   const domain=COMPANY_LOGO_DOMAINS[key];
-  const localSrc=asset?`logos/${asset}?v=10.48`:"";
+  const localSrc=asset?`logos/${asset}?v=11.4`:"";
   const officialSrc=domain?`https://www.google.com/s2/favicons?domain=${domain}&sz=128`:"";
   const alternateSrc=domain?`https://icons.duckduckgo.com/ip3/${domain}.ico`:"";
   const safeKey=key.toLowerCase().replace(/[^a-z0-9-]/g,"")||"asset";

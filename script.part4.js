@@ -1,4 +1,10 @@
+function requireAdminMode(){
+  if(isAdminMode)return true;
+  alert("仅管理员可以修改梦想金库账本");
+  return false;
+}
 function commitTransactionChange(nextTransactions,reason){
+  if(!requireAdminMode())return false;
   const before=structuredClone(state);
   createBackup(reason+"前");
   try{
@@ -9,9 +15,11 @@ function commitTransactionChange(nextTransactions,reason){
   }
 }
 function openTrade(type,positionId=""){
+  if(!requireAdminMode())return;
   tradeSectorAuto=!positionId;tradeColorAuto=!positionId;$("tradeEditId").value="";$("tradeType").value=type;$("tradeTitle").textContent=type==="buy"?"记录买入":"记录卖出";$("tradeDate").value=today();$("tradeSymbol").value="";$("tradeShares").value="";$("tradePrice").value="";$("tradeFee").value="0";$("tradeCurrency").value="USD";$("tradeFx").value="1";$("tradeName").value="";$("tradeSector").value="未分类";$("tradeColor").value="#38bdf8";$("tradeSource").value="twelve";$("tradeNote").value="";const existing=state.positions.find(p=>p.id===positionId);if(existing)fillTradeFromPosition(existing);["sourceLabel","nameLabel","sectorLabel","colorLabel"].forEach(id=>$(id).classList.toggle("hidden",type==="sell"));updateTradePreview();$("tradeDialog").showModal();setTimeout(()=>$("tradeSymbol").focus(),30)
 }
 function openTradeEdit(id){
+  if(!requireAdminMode())return;
   const t=state.transactions.find(x=>x.id===id);if(!t||t.voided)return;
   const m=transactionMetaMap()[t.symbol]||{};
   tradeSectorAuto=false;tradeColorAuto=false;
@@ -19,6 +27,7 @@ function openTradeEdit(id){
 }
 function submitTrade(event){
   event.preventDefault();
+  if(!requireAdminMode())return;
   const editId=$("tradeEditId").value;
   if(editId){
     const existing=state.transactions.find(t=>t.id===editId);if(!existing)return;
@@ -32,17 +41,19 @@ function submitTrade(event){
   }catch(error){alert(error.message)}
 }
 function deleteTransaction(id){
+  if(!requireAdminMode())return;
   const t=state.transactions.find(x=>x.id===id);if(!t)return;
   if(!confirm(`删除这条交易记录？\n${transactionLabel(t)} ${t.symbol} ${t.shares} 股 @ ${t.price} ${t.currency}\n\n系统会用剩余流水重新计算当前持仓。`))return;
   commitTransactionChange(state.transactions.filter(x=>x.id!==id),`${t.symbol} 交易已删除`);
 }
 function renderTransactionTable(){const q=$("transactionSearch")?.value.trim().toUpperCase()||"",type=$("transactionTypeFilter")?.value||"all",filtered=state.transactions.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).filter(t=>(!q||String(t.symbol).includes(q))&&(type==="all"||t.type===type)),pages=Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));transactionPage=Math.min(transactionPage,pages);const items=filtered.slice((transactionPage-1)*PAGE_SIZE,transactionPage*PAGE_SIZE);$("transactionBody").innerHTML=items.length?items.map(t=>`<tr class="${t.voided?"muted":""}"><td>${escapeHtml(t.date)}</td><td><span class="type-pill">${transactionLabel(t)}</span></td><td><strong>${escapeHtml(t.symbol)}</strong></td><td>${round(t.shares,4)}</td><td>${round(t.price,4)} ${escapeHtml(t.currency)}</td><td>${round(t.fee,4)} ${escapeHtml(t.currency)}</td><td>${round(t.fxRate,6)}</td><td class="${t.voided?"muted":cls(t.realizedPnlUSD)}">${t.type==="sell"?money(t.realizedPnlUSD):"—"}</td><td>${escapeHtml(t.note||"")}</td><td>${isAdminMode&&!t.voided?`<div class="correction-buttons"><button onclick="openTradeEdit('${t.id}')">编辑</button><button class="danger" onclick="deleteTransaction('${t.id}')">删除</button></div>`:"—"}</td></tr>`).join(""):'<tr><td colspan="10" class="muted">暂无交易记录</td></tr>';$("transactionPager").innerHTML=`<button ${transactionPage<=1?"disabled":""} onclick="transactionPage--;renderTransactionTable()">上一页</button><span>${transactionPage} / ${pages} · 共 ${filtered.length} 条</span><button ${transactionPage>=pages?"disabled":""} onclick="transactionPage++;renderTransactionTable()">下一页</button>`}
 function editPosition(id){
+  if(!requireAdminMode())return;
   const p=state.positions.find(x=>x.id===id);if(!p)return;$("positionEditId").value=p.id;$("positionEditTitle").textContent=`编辑资产：${p.symbol}`;$("positionEditName").value=p.name||"";$("positionEditSector").value=p.sector||"未分类";$("positionEditSectorLocked").checked=Boolean(p.sectorLocked);$("positionEditSource").value=p.source||"twelve";$("positionEditPrice").value=p.price||0;$("positionEditColor").value=validColor(p.color);$("positionEditColorLocked").checked=Boolean(p.colorLocked);$("positionDialog").showModal()
 }
 function setPositionEditColor(color){$("positionEditColor").value=validColor(color)}
 function submitPositionEdit(event){
-  event.preventDefault();const id=$("positionEditId").value,p=state.positions.find(x=>x.id===id);if(!p)return;const color=validColor($("positionEditColor").value),source=$("positionEditSource").value;if(!["twelve","manual"].includes(source)){alert("数据源只能是 Twelve 或 Manual");return}
+  event.preventDefault();if(!requireAdminMode())return;const id=$("positionEditId").value,p=state.positions.find(x=>x.id===id);if(!p)return;const color=validColor($("positionEditColor").value),source=$("positionEditSource").value;if(!["twelve","manual"].includes(source)){alert("数据源只能是 Twelve 或 Manual");return}
   createBackup(`${p.symbol} 资料编辑前`);
   p.name=$("positionEditName").value.trim()||p.symbol;p.sector=$("positionEditSector").value.trim()||"未分类";p.sectorLocked=$("positionEditSectorLocked").checked;p.source=source;p.color=color;p.colorLocked=$("positionEditColorLocked").checked;if(source==="manual"&&num($("positionEditPrice").value)>=0){p.price=num($("positionEditPrice").value);p.priceSource="manual";p.priceProvider="manual";p.priceUpdatedAt=new Date().toISOString()}
   state.transactions.forEach(t=>{if(t.symbol===p.symbol){t.name=p.name;t.sector=p.sector;t.source=p.source;t.color=p.color}});
@@ -111,10 +122,10 @@ function renderMapHoldingTable(){
   const rows=state.positions.slice().sort((a,b)=>marketUSD(b)-marketUSD(a)).map(p=>{
     const pnl=floatingPnlUSD(p),marketValue=marketUSD(p),weight=round(marketValue/holdingsTotal*100),ret=round(p.costBasisUSD?pnl/p.costBasisUSD*100:0);
     const costPrice=num(p.avgCost)*fx(p.currency),currentPrice=num(p.price)*fx(p.currency);
-    const actions=isAdminMode?`<div class="cockpit-row-actions"><button title="记录买入" aria-label="记录买入 ${escapeHtml(p.symbol)}" onclick="openTrade('buy','${p.id}')">买</button><button title="记录卖出" aria-label="记录卖出 ${escapeHtml(p.symbol)}" onclick="openTrade('sell','${p.id}')">卖</button><button title="编辑资产" aria-label="编辑 ${escapeHtml(p.symbol)}" onclick="editPosition('${p.id}')">编</button></div>`:`<button class="cockpit-manage-button" onclick="location.href='?admin=1#allocationMap'">管理</button>`;
-    return `<tr><td class="position-code"><span class="position-logo">${companyLogoMarkup(p.symbol)}</span><strong>${escapeHtml(p.symbol)}</strong></td><td class="position-name">${escapeHtml(p.name||p.symbol)}</td><td>${round(p.shares,4)}</td><td>${money(marketValue)}</td><td>${weight}%</td><td>${usdPrice(costPrice)}</td><td>${usdPrice(currentPrice)}</td><td class="${cls(pnl)}"><strong>${money(pnl)}</strong></td><td class="${cls(ret)}"><strong>${ret>0?"+":""}${ret}%</strong></td><td>${actions}</td></tr>`;
+    const actions=isAdminMode?`<td class="admin-column"><div class="cockpit-row-actions"><button title="记录买入" aria-label="记录买入 ${escapeHtml(p.symbol)}" onclick="openTrade('buy','${p.id}')">买</button><button title="记录卖出" aria-label="记录卖出 ${escapeHtml(p.symbol)}" onclick="openTrade('sell','${p.id}')">卖</button><button title="编辑资产" aria-label="编辑 ${escapeHtml(p.symbol)}" onclick="editPosition('${p.id}')">编</button></div></td>`:"";
+    return `<tr><td class="position-code"><span class="position-logo">${companyLogoMarkup(p.symbol)}</span><strong>${escapeHtml(p.symbol)}</strong></td><td class="position-name">${escapeHtml(p.name||p.symbol)}</td><td>${round(p.shares,4)}</td><td>${money(marketValue)}</td><td>${weight}%</td><td>${usdPrice(costPrice)}</td><td>${usdPrice(currentPrice)}</td><td class="${cls(pnl)}"><strong>${money(pnl)}</strong></td><td class="${cls(ret)}"><strong>${ret>0?"+":""}${ret}%</strong></td>${actions}</tr>`;
   }).join("");
-  body.innerHTML=rows||'<tr><td colspan="10" class="muted empty-table-cell">暂无当前持仓</td></tr>';
+  body.innerHTML=rows||`<tr><td colspan="${isAdminMode?10:9}" class="muted empty-table-cell">暂无当前持仓</td></tr>`;
 }
 
 function renderAll(){renderKpis();renderTreemap();renderSectorsV2();renderMapHoldingTable();renderReturnDashboard();renderHoldingCardsV2();renderPositionTable();renderTransactionTable();renderCashFlowTable();renderBackupList();renderSectorAdminPanel();$("positionCount").textContent=state.positions.length;$("transactionCount").textContent=state.transactions.length;$("cashFlowCount").textContent=state.cashFlows.length;switchLedgerTab(activeLedgerTab);$("pageTitle").textContent=state.settings.title;document.title=state.settings.title;$("titleInput").value=state.settings.title;$("cacheInput").value=state.settings.priceCacheMinutes;if($("eurFxInput"))$("eurFxInput").value=state.fxRates.EUR||defaultState.fxRates.EUR;if($("proxyInput"))$("proxyInput").value=priceProxyUrl();renderSyncStatus();renderDiagnostics()}

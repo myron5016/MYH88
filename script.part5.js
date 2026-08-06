@@ -104,9 +104,11 @@ function rebuildCurrentPositionsFromTransactions(transactions=state.transactions
 }
 
 function openTrade(type,positionId=""){
+  if(!requireAdminMode())return;
   tradeSectorAuto=!positionId;tradeColorAuto=!positionId;tradeLotDraftAllocations=[];$("tradeEditId").value="";$("tradeType").value=type;$("tradeTitle").textContent=type==="buy"?"记录买入":"记录卖出";$("tradeDate").value=today();$("tradeSymbol").value="";$("tradeShares").value="";$("tradePrice").value="";$("tradeFee").value="0";$("tradeCurrency").value="USD";$("tradeFx").value="1";$("tradeName").value="";$("tradeSector").value="未分类";$("tradeColor").value="#38bdf8";$("tradeSource").value="twelve";$("tradeNote").value="";$("tradeLotMethod").value=type==="sell"?"specific":"average";const existing=state.positions.find(p=>p.id===positionId);if(existing)fillTradeFromPosition(existing);["sourceLabel","nameLabel","sectorLabel","colorLabel"].forEach(id=>$(id).classList.toggle("hidden",type==="sell"));renderTradeLotPanel();updateTradePreview();$("tradeDialog").showModal();setTimeout(()=>$("tradeSymbol").focus(),30);
 }
 function openTradeEdit(id){
+  if(!requireAdminMode())return;
   const t=state.transactions.find(x=>x.id===id);if(!t||t.voided)return;const m=transactionMetaMap()[t.symbol]||{};tradeSectorAuto=false;tradeColorAuto=false;tradeLotDraftAllocations=structuredClone(t.lotAllocations||[]);
   $("tradeEditId").value=t.id;$("tradeType").value=t.type==="opening"?"opening":t.type;$("tradeTitle").textContent=t.type==="sell"?`编辑卖出批次：${t.symbol}`:`编辑交易：${t.symbol}`;$("tradeDate").value=t.date||today();$("tradeSymbol").value=t.symbol||"";$("tradeShares").value=t.shares||"";$("tradePrice").value=t.price||"";$("tradeFee").value=t.fee||0;$("tradeCurrency").value=t.currency||m.currency||"USD";$("tradeFx").value=t.fxRate||fx(t.currency);$("tradeName").value=t.name||m.name||"";$("tradeSector").value=t.sector||m.sector||"未分类";$("tradeColor").value=validColor(t.color||m.color);$("tradeSource").value=t.source||m.source||"twelve";$("tradeNote").value=t.note||"";$("tradeLotMethod").value=t.lotMethod||(t.lotAllocations?.length?"specific":"average");["sourceLabel","nameLabel","sectorLabel","colorLabel"].forEach(labelId=>$(labelId).classList.remove("hidden"));renderTradeLotPanel();updateTradePreview();$("tradeDialog").showModal();
 }

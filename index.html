@@ -13,13 +13,13 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=11.3">
-  <link rel="stylesheet" href="fresh-radar.css?v=11.3">
-  <link rel="stylesheet" href="layout-v10.34.css?v=11.3">
-  <link rel="stylesheet" href="lot-v10.48.css?v=11.3">
-  <link rel="stylesheet" href="returns-v10.49.css?v=11.3">
-  <link rel="stylesheet" href="dca-v10.53.css?v=11.3">
-  <link rel="stylesheet" href="v11-cockpit.css?v=11.3">
+  <link rel="stylesheet" href="style.css?v=11.4">
+  <link rel="stylesheet" href="fresh-radar.css?v=11.4">
+  <link rel="stylesheet" href="layout-v10.34.css?v=11.4">
+  <link rel="stylesheet" href="lot-v10.48.css?v=11.4">
+  <link rel="stylesheet" href="returns-v10.49.css?v=11.4">
+  <link rel="stylesheet" href="dca-v10.53.css?v=11.4">
+  <link rel="stylesheet" href="v11-cockpit.css?v=11.4">
 </head>
 <body>
 <main id="overview" class="container">
@@ -27,7 +27,7 @@
     <div class="hero-left">
       <img src="avatar-baby.jpg" class="avatar" alt="小宝贝头像">
       <div>
-        <div class="hero-badge">♥ Family Dream Fund · V11.3 驾驶舱</div>
+        <div class="hero-badge">♥ Family Dream Fund · V11.4 驾驶舱</div>
         <h1 id="pageTitle">孟一晗的梦想金库</h1>
         <p class="subtitle">爸爸妈妈为你种下的未来</p>
       </div>
@@ -134,26 +134,28 @@
         <span id="status" class="panel-status">正在读取共享数据...</span>
       </div>
       <div id="treemap"></div>
+      <div class="allocation-sector-summary">
+        <div class="allocation-sector-head">
+          <div><span class="section-kicker">SECTOR ALLOCATION</span><h3>成本板块配置</h3></div>
+          <span>与上方地图使用同一成本口径</span>
+        </div>
+        <div id="sectorBar" class="sector-bar"></div>
+        <div id="sectorLegend" class="legend"></div>
+      </div>
     </div>
     <aside class="card map-side-card cockpit-panel">
       <div class="section-head compact-head"><div><span class="section-kicker">POSITION BOOK</span><h2>持仓明细</h2><p class="section-note">按持仓市值排序；价格、盈亏统一折算为 USD</p></div></div>
       <div class="map-table-wrap">
         <table class="map-holding-table">
-          <colgroup><col class="col-symbol"><col class="col-name"><col class="col-shares"><col class="col-market"><col class="col-weight"><col class="col-cost"><col class="col-current"><col class="col-pnl"><col class="col-return"><col class="col-action"></colgroup>
-          <thead><tr><th>代码</th><th>名称</th><th>持仓数量</th><th>持仓市值 (USD)</th><th>持仓占比</th><th>成本价 (USD)</th><th>当前价 (USD)</th><th>浮动盈亏 (USD)</th><th>浮动盈亏率</th><th>操作</th></tr></thead>
+          <colgroup><col class="col-symbol"><col class="col-name"><col class="col-shares"><col class="col-market"><col class="col-weight"><col class="col-cost"><col class="col-current"><col class="col-pnl"><col class="col-return"><col class="col-action admin-only hidden"></colgroup>
+          <thead><tr><th>代码</th><th>名称</th><th>持仓数量</th><th>持仓市值 (USD)</th><th>持仓占比</th><th>成本价 (USD)</th><th>当前价 (USD)</th><th>浮动盈亏 (USD)</th><th>浮动盈亏率</th><th class="admin-only hidden">操作</th></tr></thead>
           <tbody id="mapHoldingBody"></tbody>
         </table>
       </div>
     </aside>
   </section>
 
-  <section id="analytics" class="insight-grid">
-  <section class="card sector-overview-card cockpit-panel">
-    <div class="section-head"><div><span class="section-kicker">SECTOR ALLOCATION</span><h2>成本板块配置</h2><p class="section-note">与本金配置地图使用相同口径</p></div></div>
-    <div id="sectorBar" class="sector-bar"></div>
-    <div id="sectorLegend" class="legend"></div>
-  </section>
-
+  <section id="analytics" class="insight-grid return-only">
   <section class="card chart-card return-card cockpit-panel">
     <div class="section-head return-head">
       <div><span class="section-kicker">RETURN CURVE</span><h2>个股收益率曲线</h2><p class="section-note">仅统计梦想金库主动持仓，已剔除本金变动与长期定投</p></div>
@@ -397,12 +399,12 @@
   </form>
 </dialog>
 
-<script src="myh88-core.js?v=11.3"></script>
-<script src="script.part1.js?v=11.3"></script>
-<script src="script.part2.js?v=11.3"></script>
-<script src="script.part3.js?v=11.3"></script>
-<script src="script.part4.js?v=11.3"></script>
-<script src="script.part5.js?v=11.3"></script>
-<script src="script.part6.js?v=11.3"></script>
+<script src="myh88-core.js?v=11.4"></script>
+<script src="script.part1.js?v=11.4"></script>
+<script src="script.part2.js?v=11.4"></script>
+<script src="script.part3.js?v=11.4"></script>
+<script src="script.part4.js?v=11.4"></script>
+<script src="script.part5.js?v=11.4"></script>
+<script src="script.part6.js?v=11.4"></script>
 </body>
 </html>

@@ -115,22 +115,31 @@ button,.file-btn,input,select{border-radius:5px}
 #treemap .tile-micro{padding:4px!important}#treemap .tile-micro .tile-symbol{font-size:9px}#treemap .tile-micro .tile-meta{display:none}
 #treemap .company-logo-card{width:50px;height:50px;padding:6px;border-radius:7px;box-shadow:0 5px 14px rgba(7,26,23,.16)}
 #treemap .tile-small .company-logo-card{width:34px;height:34px;padding:4px}
+.allocation-sector-summary{margin-top:15px;padding-top:14px;border-top:1px solid var(--v11-line)}
+.allocation-sector-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:10px}
+.allocation-sector-head h3{margin:2px 0 0;color:var(--v11-ink);font-size:16px}
+.allocation-sector-head>span{color:var(--v11-muted);font-size:9px;font-weight:800}
+.allocation-sector-summary .sector-bar{height:38px;margin:0;border:1px solid var(--v11-line);border-radius:4px;background:#edf4f0}
+.allocation-sector-summary .segment{min-width:0;border-radius:0;font-size:9px}
+.allocation-sector-summary .legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:9px}
+.allocation-sector-summary .legend span{display:flex;align-items:center;min-width:0;padding:6px 7px;border:1px solid #e2ece6;border-radius:4px;background:#fbfdfc;color:#4f685f;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.allocation-sector-summary .legend .dot{flex:0 0 auto}
 
 .map-side-card{padding:16px 17px 14px!important;overflow:hidden}
 .compact-head{margin-bottom:9px}
 .map-table-wrap{width:100%;height:auto;max-height:560px;overflow:auto;border:1px solid var(--v11-line);border-radius:4px;background:#fff}
 .map-holding-table{width:100%;min-width:1250px;border-collapse:collapse;table-layout:fixed}
 .map-holding-table .col-symbol{width:7.5%}.map-holding-table .col-name{width:14%}.map-holding-table .col-shares{width:8%}.map-holding-table .col-market{width:11%}.map-holding-table .col-weight{width:8%}.map-holding-table .col-cost{width:10%}.map-holding-table .col-current{width:10%}.map-holding-table .col-pnl{width:11%}.map-holding-table .col-return{width:9%}.map-holding-table .col-action{width:11.5%}
-.map-holding-table th,.map-holding-table td{height:38px;padding:7px 9px;border-bottom:1px solid #e7eeea;color:#203b33;font-size:10px;line-height:1.25;text-align:left;vertical-align:middle;white-space:nowrap}
+.map-holding-table th,.map-holding-table td{height:44px;padding:8px 10px;border-bottom:1px solid #e7eeea;color:#203b33;font-size:10px;line-height:1.25;text-align:left;vertical-align:middle;white-space:nowrap}
 .map-holding-table th{position:sticky;z-index:2;top:0;height:34px;background:#edf7f1;color:#46655b;font-size:9px;font-weight:900}
 .map-holding-table tbody tr:nth-child(even) td{background:#fbfdfc}
 .map-holding-table tbody tr:hover td{background:#f1f8f4}
 .map-holding-table tr:last-child td{border-bottom:0}
-.map-holding-table .position-code{display:flex;align-items:center;gap:6px;min-width:0}
-.map-holding-table .position-code strong{font-size:10px;color:#18372d}
-.map-holding-table .position-logo{display:inline-flex;width:18px;height:18px;flex:0 0 18px}
-.map-holding-table .position-logo .company-logo-card{width:18px;height:18px;min-width:18px;padding:2px;border:0;border-radius:50%;box-shadow:none;background:#eef5f1}
-.map-holding-table .position-logo .logo-fallback{font-size:6px}
+.map-holding-table .position-code{display:flex;align-items:center;gap:8px;min-width:0}
+.map-holding-table .position-code strong{font-size:11px;color:#18372d}
+.map-holding-table .position-logo{display:inline-flex;width:28px;height:28px;flex:0 0 28px}
+.map-holding-table .position-logo .company-logo-card{width:28px;height:28px;min-width:28px;padding:4px;border:1px solid #dce9e2;border-radius:6px;box-shadow:0 2px 7px rgba(7,26,23,.08);background:#fff}
+.map-holding-table .position-logo .logo-fallback{font-size:7px}
 .map-holding-table .position-name{overflow:hidden;text-overflow:ellipsis;color:#516a62}
 .map-holding-table td:nth-child(n+3){font-variant-numeric:tabular-nums}
 .map-holding-table td strong{font-size:10px}
@@ -138,11 +147,15 @@ button,.file-btn,input,select{border-radius:5px}
 .cockpit-row-actions{display:flex;gap:3px;white-space:nowrap}
 .cockpit-row-actions button,.cockpit-manage-button{min-width:26px;min-height:24px;padding:3px 5px;border:1px solid #cfe0d7;border-radius:3px;background:#f7fbf8;color:var(--v11-green-dark);font-size:9px}
 .cockpit-manage-button{min-width:44px}
+body.viewer-mode .map-holding-table{min-width:1120px}
+body.viewer-mode .map-holding-table .col-action,body.viewer-mode .map-holding-table .admin-column{display:none!important}
 
 /* Sector configuration and return curve */
 .holdings-view{display:none!important}
 .insight-grid{display:grid;grid-template-columns:minmax(430px,.72fr) minmax(660px,1.28fr);gap:12px;margin-bottom:12px;min-width:0}
 .insight-grid>.card{min-width:0;height:100%;margin:0}
+.insight-grid.return-only{display:block}
+.insight-grid.return-only .return-card{width:100%;min-height:350px}
 .sector-overview-card{display:flex;flex-direction:column;min-height:350px}
 .sector-overview-card .sector-bar{height:46px;margin-top:10px;border:1px solid var(--v11-line);border-radius:4px;background:#edf4f0}
 .sector-overview-card .segment{border-radius:0;font-size:10px}
@@ -194,6 +207,7 @@ button,.file-btn,input,select{border-radius:5px}
   .hero{grid-template-columns:1fr;gap:12px}
   .hero-command{padding:11px}
   .map-card #treemap{height:440px!important;min-height:440px!important;max-height:440px!important}
+  .allocation-sector-summary .legend{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
 @media(max-width:700px){
@@ -228,10 +242,15 @@ button,.file-btn,input,select{border-radius:5px}
   #treemap.mobile-map .tile-small .company-logo-card,#treemap.mobile-map .tile-micro .company-logo-card{display:none}
   #treemap.mobile-map .tile-small .tile-symbol{font-size:9px!important}
   #treemap.mobile-map .tile-micro .tile-symbol{font-size:8px!important}
+  .allocation-sector-summary{margin-top:11px;padding-top:11px}
+  .allocation-sector-head{display:block;margin-bottom:7px}.allocation-sector-head>span{display:block;margin-top:3px}
+  .allocation-sector-summary .sector-bar{height:34px}
+  .allocation-sector-summary .legend{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}.allocation-sector-summary .legend::-webkit-scrollbar{display:none}
+  .allocation-sector-summary .legend span{flex:0 0 auto;padding:6px;font-size:8px}
   .map-side-card{padding:10px!important}
   .map-table-wrap{max-height:410px}
   .map-holding-table{min-width:1180px}
-  .map-holding-table th,.map-holding-table td{height:36px;padding:6px 8px}
+  .map-holding-table th,.map-holding-table td{height:42px;padding:6px 8px}
   .insight-grid{grid-template-columns:minmax(0,1fr)!important;gap:8px;margin-bottom:8px}
   .insight-grid>.card{width:100%}
   .sector-overview-card .legend{display:flex;grid-template-columns:none;flex-wrap:nowrap;overflow-x:auto}.sector-overview-card .legend span{flex:0 0 auto}
