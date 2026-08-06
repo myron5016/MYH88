@@ -12,14 +12,15 @@ const files = Object.fromEntries(await Promise.all(
 ));
 const frontendSource = scriptParts.map((name) => files[name]).join("");
 
-assert.equal(meta.release, "10.55");
+assert.equal(meta.release, "11.0");
 for (const name of scriptParts) {
-  assert.match(files["index.html"], new RegExp(`${name.replace(".", "\\.")}\\?v=10\\.55`));
+  assert.match(files["index.html"], new RegExp(`${name.replace(".", "\\.")}\\?v=11\\.0`));
   assert.ok((await stat(resolve(root, name))).size < 30_000, `${name} exceeds direct-publish limit`);
 }
-assert.match(files["index.html"], /myh88-core\.js\?v=10\.55/);
-assert.match(files["index.html"], /returns-v10\.49\.css\?v=10\.55/);
-assert.match(files["index.html"], /dca-v10\.53\.css\?v=10\.55/);
+assert.match(files["index.html"], /myh88-core\.js\?v=11\.0/);
+assert.match(files["index.html"], /returns-v10\.49\.css\?v=11\.0/);
+assert.match(files["index.html"], /dca-v10\.53\.css\?v=11\.0/);
+assert.match(files["index.html"], /v11-cockpit\.css\?v=11\.0/);
 assert.doesNotMatch(files["index.html"], /资产成长记录/);
 assert.doesNotMatch(files["index.html"], /dcaMonthStatus|还差 \$/);
 assert.ok(files["index.html"].indexOf('id="dcaZone"') > files["index.html"].indexOf('id="ledgerPanel"'), "Recurring investment zone must stay below the Dream Fund ledger");
@@ -28,7 +29,7 @@ assert.match(files["index.html"], /仅统计梦想金库主动持仓/);
 assert.match(files["index.html"], /id="dcaReturnChart"/);
 assert.match(frontendSource, /activeReturnSnapshots/);
 assert.match(files["myh88-core.js"], /buildDcaReturnSeries/);
-assert.match(frontendSource, /const VERSION="V10\.55 PWA家庭版"/);
-assert.match(files["service-worker.js"], /const RELEASE="10\.55"/);
+assert.match(frontendSource, /const VERSION="V11\.0 持仓驾驶舱版"/);
+assert.match(files["service-worker.js"], /const RELEASE="11\.0"/);
 assert.match(files["cloudflare-worker.js"], new RegExp(`const WORKER_VERSION = "${meta.worker.replace(".", "\\.")}"`));
-console.log("Release fingerprint is consistent: 10.55 (Worker 10.52 unchanged)");
+console.log("Release fingerprint is consistent: 11.0 (Worker 10.52 unchanged)");

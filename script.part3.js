@@ -57,15 +57,16 @@ function renderTreemap(){
   const items=treemapItems(),denom=Math.max(contributedCapital()+realizedPnl(),1);
   const width=box.getBoundingClientRect().width,mobile=window.matchMedia("(max-width: 640px)").matches;
   box.classList.toggle("mobile-map",mobile);
-  if(mobile){box.style.removeProperty("height");box.style.removeProperty("min-height")}
-  else{const height=treemapHeight(items.length,width);box.style.height=`${height}px`;box.style.minHeight=`${height}px`}
-  const rect=box.getBoundingClientRect(),tiles=mobile?items.map(item=>({...item,x:0,y:0,w:rect.width/2,h:116})):squarifiedTreemap(items,0,0,rect.width,rect.height);
+  const height=mobile?Math.min(690,Math.max(500,430+Math.max(0,items.length-8)*20)):treemapHeight(items.length,width);
+  box.style.height=`${height}px`;box.style.minHeight=`${height}px`;
+  const rect=box.getBoundingClientRect(),tiles=squarifiedTreemap(items,0,0,rect.width,rect.height);
   tiles.forEach(t=>{
-    const d=document.createElement("div"),share=round(t.value/denom*100),size=mobile?"medium":treemapTileSize(t),showLogo=size!=="micro",wideCompact=!mobile&&t.w>=180&&t.h>=82&&t.h<175&&t.w/t.h>=1.5;
+    const d=document.createElement("div"),share=round(t.value/denom*100),size=treemapTileSize(t),showLogo=size!=="micro",wideCompact=t.w>=180&&t.h>=82&&t.h<175&&t.w/t.h>=1.5;
     d.className=`tile tile-${size}`;
     if(wideCompact)d.classList.add("tile-wide-compact");
     if(mobile&&share>=35)d.classList.add("tile-dominant");
     Object.assign(d.style,{left:t.x+"px",top:t.y+"px",width:t.w+"px",height:t.h+"px",background:`radial-gradient(circle at 28% 18%, ${mixColor(t.color,"#ffffff",.28)}, transparent 58%), linear-gradient(145deg, ${mixColor(t.color,"#ffffff",.04)}, ${mixColor(t.color,"#000000",.18)})`,borderColor:mixColor(t.color,"#020617",.38),color:"white"});
+    d.style.setProperty("--tile-x",t.x+"px");d.style.setProperty("--tile-y",t.y+"px");d.style.setProperty("--tile-w",t.w+"px");d.style.setProperty("--tile-h",t.h+"px");
     d.title=`${t.label} ${money(t.value)} | ${share}%`;
     d.setAttribute("aria-label",`${t.label}，持仓成本 ${money(t.value)}，占比 ${share}%`);
     const meta=size==="large"||wideCompact?`${money(t.value)} | ${share}%`:`${share}%`;

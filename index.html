@@ -13,20 +13,21 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=10.55">
-  <link rel="stylesheet" href="fresh-radar.css?v=10.55">
-  <link rel="stylesheet" href="layout-v10.34.css?v=10.55">
-  <link rel="stylesheet" href="lot-v10.48.css?v=10.55">
-  <link rel="stylesheet" href="returns-v10.49.css?v=10.55">
-  <link rel="stylesheet" href="dca-v10.53.css?v=10.55">
+  <link rel="stylesheet" href="style.css?v=11.0">
+  <link rel="stylesheet" href="fresh-radar.css?v=11.0">
+  <link rel="stylesheet" href="layout-v10.34.css?v=11.0">
+  <link rel="stylesheet" href="lot-v10.48.css?v=11.0">
+  <link rel="stylesheet" href="returns-v10.49.css?v=11.0">
+  <link rel="stylesheet" href="dca-v10.53.css?v=11.0">
+  <link rel="stylesheet" href="v11-cockpit.css?v=11.0">
 </head>
 <body>
-<main class="container">
+<main id="overview" class="container">
   <header class="hero">
     <div class="hero-left">
       <img src="avatar-baby.jpg" class="avatar" alt="小宝贝头像">
       <div>
-        <div class="hero-badge">♥ Family Dream Fund · V10 PWA家庭版</div>
+        <div class="hero-badge">♥ Family Dream Fund · V11 持仓驾驶舱</div>
         <h1 id="pageTitle">孟一晗的梦想金库</h1>
         <p class="subtitle">爸爸妈妈为你种下的未来</p>
       </div>
@@ -124,7 +125,7 @@
     <div class="kpi"><span>累计总盈亏</span><strong id="kpiPnl">$0 / 0%</strong></div>
   </section>
 
-  <section class="terminal-grid">
+  <section id="allocationMap" class="terminal-grid">
     <div class="card map-card">
       <div class="section-head">
         <div><h2>本金配置地图</h2><p class="section-note">按持仓成本展示；小仓位保留最小可读面积，数字均为真实占比</p></div>
@@ -136,14 +137,14 @@
       <div class="section-head compact-head"><div><h2>持仓明细</h2><p class="section-note">按成本占比排序</p></div></div>
       <div class="map-table-wrap">
         <table class="map-holding-table">
-          <thead><tr><th>资产</th><th>市值</th><th>占比</th><th>盈亏</th></tr></thead>
+          <thead><tr><th>资产</th><th>数量</th><th>市值</th><th>仓位</th><th>平均成本</th><th>浮动盈亏</th><th>行情</th></tr></thead>
           <tbody id="mapHoldingBody"></tbody>
         </table>
       </div>
     </aside>
   </section>
 
-  <section class="insight-grid">
+  <section id="analytics" class="insight-grid">
   <section class="card sector-overview-card">
     <div class="section-head"><div><h2>成本板块配置</h2><p class="section-note">与本金配置地图使用相同口径</p></div></div>
     <div id="sectorBar" class="sector-bar"></div>
@@ -170,7 +171,7 @@
 
   </section>
 
-  <section class="card holdings-view">
+  <section class="card holdings-view" aria-hidden="true">
     <div class="section-head"><h2>当前持仓明细</h2><span class="muted">每只资产只显示一次</span></div>
     <div id="holdingCards" class="holding-cards"></div>
   </section>
@@ -257,6 +258,14 @@
 
   <footer class="footer">♥ 送给最爱的宝贝</footer>
 </main>
+
+<nav class="mobile-bottom-nav" aria-label="手机端主导航">
+  <a href="#overview" class="active"><span>总览</span></a>
+  <a href="#allocationMap"><span>持仓</span></a>
+  <a href="#analytics"><span>收益</span></a>
+  <a href="#ledgerPanel"><span>账本</span></a>
+  <a href="#dcaZone"><span>定投</span></a>
+</nav>
 
 <dialog id="tradeDialog" class="modal">
   <form method="dialog" onsubmit="submitTrade(event)">
@@ -385,12 +394,12 @@
   </form>
 </dialog>
 
-<script src="myh88-core.js?v=10.55"></script>
-<script src="script.part1.js?v=10.55"></script>
-<script src="script.part2.js?v=10.55"></script>
-<script src="script.part3.js?v=10.55"></script>
-<script src="script.part4.js?v=10.55"></script>
-<script src="script.part5.js?v=10.55"></script>
-<script src="script.part6.js?v=10.55"></script>
+<script src="myh88-core.js?v=11.0"></script>
+<script src="script.part1.js?v=11.0"></script>
+<script src="script.part2.js?v=11.0"></script>
+<script src="script.part3.js?v=11.0"></script>
+<script src="script.part4.js?v=11.0"></script>
+<script src="script.part5.js?v=11.0"></script>
+<script src="script.part6.js?v=11.0"></script>
 </body>
 </html>

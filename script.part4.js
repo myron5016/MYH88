@@ -108,11 +108,11 @@ function renderMapHoldingTable(){
   const body=$("mapHoldingBody");if(!body)return;
   const total=Math.max(contributedCapital()+realizedPnl(),1);
   const rows=state.positions.slice().sort((a,b)=>num(b.costBasisUSD)-num(a.costBasisUSD)).map(p=>{
-    const pnl=floatingPnlUSD(p),weight=round(p.costBasisUSD/total*100);
-    return `<tr><td><i style="background:${validColor(p.color)}"></i><strong>${escapeHtml(p.symbol)}</strong><small>${escapeHtml(p.sector)}</small></td><td>${money(marketUSD(p))}</td><td>${weight}%</td><td class="${cls(pnl)}">${money(pnl)}</td></tr>`
+    const pnl=floatingPnlUSD(p),weight=round(p.costBasisUSD/total*100),ret=round(p.costBasisUSD?pnl/p.costBasisUSD*100:0),source=priceSourceLabel(p);
+    return `<tr><td><i style="background:${validColor(p.color)}"></i><strong>${escapeHtml(p.symbol)}</strong><small>${escapeHtml(p.name||p.sector)}</small></td><td>${round(p.shares,4)}</td><td>${money(marketUSD(p))}</td><td><b>${weight}%</b><small>${escapeHtml(p.sector)}</small></td><td>${round(p.avgCost,4)} ${escapeHtml(p.currency)}</td><td class="${cls(pnl)}"><strong>${money(pnl)}</strong><small>${ret>0?"+":""}${ret}%</small></td><td><span class="quote-source ${priceSourceClass(p)}">${escapeHtml(source)}</span></td></tr>`
   }).join("");
   const cash=cashBalance();
-  body.innerHTML=rows+(cash>0?`<tr><td><i style="background:${sectorBaseColor("现金")}"></i><strong>CASH</strong><small>现金</small></td><td>${money(cash)}</td><td>${round(cash/total*100)}%</td><td class="muted">—</td></tr>`:"");
+  body.innerHTML=rows+(cash>0?`<tr class="cash-row"><td><i style="background:${sectorBaseColor("现金")}"></i><strong>CASH</strong><small>可用现金</small></td><td>—</td><td>${money(cash)}</td><td><b>${round(cash/total*100)}%</b><small>现金</small></td><td>—</td><td class="muted">—</td><td><span class="quote-source source-muted">账本</span></td></tr>`:"");
 }
 
 function renderAll(){renderKpis();renderTreemap();renderSectorsV2();renderMapHoldingTable();renderReturnDashboard();renderHoldingCardsV2();renderPositionTable();renderTransactionTable();renderCashFlowTable();renderBackupList();renderSectorAdminPanel();$("positionCount").textContent=state.positions.length;$("transactionCount").textContent=state.transactions.length;$("cashFlowCount").textContent=state.cashFlows.length;switchLedgerTab(activeLedgerTab);$("pageTitle").textContent=state.settings.title;document.title=state.settings.title;$("titleInput").value=state.settings.title;$("cacheInput").value=state.settings.priceCacheMinutes;if($("eurFxInput"))$("eurFxInput").value=state.fxRates.EUR||defaultState.fxRates.EUR;if($("proxyInput"))$("proxyInput").value=priceProxyUrl();renderSyncStatus();renderDiagnostics()}

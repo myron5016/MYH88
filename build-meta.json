@@ -1,9 +1,9 @@
 {
-  "release": "10.55",
-  "version": "V10.55 PWA家庭版",
-  "serviceWorker": "10.55",
+  "release": "11.0",
+  "version": "V11.0 持仓驾驶舱版",
+  "serviceWorker": "11.0",
   "worker": "10.52",
   "ledgerSchema": "10.48",
   "channel": "stable",
-  "builtAt": "2026-08-06T11:20:00.000Z"
+  "builtAt": "2026-08-06T14:30:00.000Z"
 }

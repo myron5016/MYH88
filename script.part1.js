@@ -1,5 +1,5 @@
-const VERSION="V10.55 PWA家庭版";
-const RELEASE="10.55";
+const VERSION="V11.0 持仓驾驶舱版";
+const RELEASE="11.0";
 const LEDGER_SCHEMA_VERSION="10.33";
 const STATE_KEY="v9_last_state";
 const RETURN_SNAPSHOT_KEY="v10_return_snapshots";
