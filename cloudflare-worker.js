@@ -1,8 +1,9 @@
-const WORKER_VERSION = "10.47";
-const WORKER_BUILT_AT = "2026-07-23T05:30:00.000Z";
+const WORKER_VERSION = "10.52";
+const WORKER_BUILT_AT = "2026-08-06T03:20:00.000Z";
 const CACHE_SECONDS = 30 * 60;
 const STALE_SECONDS = 6 * 60 * 60;
 const LAST_CLOSE_CACHE_SECONDS = 8 * 24 * 60 * 60;
+const HISTORICAL_CACHE_SECONDS = 365 * 24 * 60 * 60;
 const MARKET_CLOCK_CACHE_SECONDS = 15 * 60;
 const PORTFOLIO_CACHE_SECONDS = 5 * 60;
 const PROVIDER_BACKOFF_SECONDS = 30 * 60;
@@ -55,6 +56,7 @@ function configuredTwelvePriority(env) {
 }
 function quoteCacheKey(symbol, mode = "live", asOf = "") {
   const ticker = normalizeSymbols(symbol)[0] || "";
+  if (mode === "historical-close") return `quote:historical:${asOf}:${ticker}`;
   return mode === "last-close" ? `quote:last-close:${asOf}:${ticker}` : `quote:live:${ticker}`;
 }
 function nyParts(date = new Date()) {
@@ -102,11 +104,14 @@ async function fetchJsonUpstream(url, timeoutMs = 8000) {
   } finally { clearTimeout(timer); }
 }
 async function livePortfolioSymbols(env) {
-  const key = "config:portfolio-symbols", cached = await readSharedCache(env, key);
+  const key = "config:portfolio-symbols:v2", cached = await readSharedCache(env, key);
   if (cached?.body && Date.now() - Number(cached.cachedAt || 0) < PORTFOLIO_CACHE_SECONDS * 1000) return JSON.parse(cached.body).symbols;
   try {
     const data = await fetchJsonUpstream(PORTFOLIO_DATA_URL, 5000);
-    const symbols = normalizeSymbols((data.positions || []).filter((p) => p?.source !== "manual").map((p) => p.symbol).join(","));
+    const symbols = normalizeSymbols([
+      ...(data.positions || []).filter((p) => p?.source !== "manual").map((p) => p.symbol),
+      ...(data.transactions || []).filter((item) => !item?.voided && item?.source !== "manual").map((item) => item.symbol),
+    ].join(","));
     if (!symbols.length) throw new Error("No portfolio symbols in data.json");
     const response = json({ symbols }, 200); await writeSharedCache(env, key, response, PORTFOLIO_CACHE_SECONDS * 3); return symbols;
   } catch (error) { log("portfolio_config_fallback", { message: error.message }); return FALLBACK_PORTFOLIO_SYMBOLS; }
@@ -117,6 +122,25 @@ function normalizeFinnhubQuote(symbol, data) {
 }
 async function fetchFinnhubQuote(symbol, key) { if (!key) throw new Error("FINNHUB_API_KEY is not configured"); const url = new URL(`${FINNHUB_BASE}/quote`); url.searchParams.set("symbol", symbol); url.searchParams.set("token", key); const data = await fetchJsonUpstream(url); if (!(Number(data.c) > 0)) throw new Error(`Finnhub quote missing for ${symbol}`); return normalizeFinnhubQuote(symbol, data); }
 async function fetchTwelveQuotes(symbols, key) { if (!key || key.length < 10) throw new Error("TWELVE_DATA_KEY is missing or invalid"); const url = new URL(`${TWELVE_BASE}/quote`); url.searchParams.set("symbol", symbols.join(",")); url.searchParams.set("apikey", key); return fetchJsonUpstream(url); }
+function normalizeHistoricalQuote(symbol, date, item, source) {
+  const close = Number(item?.close || 0), open = Number(item?.open || close), high = Number(item?.high || close), low = Number(item?.low || close);
+  if (!(close > 0)) throw new Error(`${source} historical close missing for ${symbol}`);
+  return { symbol, name: symbol, currency: "USD", exchange: "", datetime: `${date}T20:00:00.000Z`, timestamp: Math.floor(Date.parse(`${date}T20:00:00.000Z`) / 1000), open: String(open), high: String(high), low: String(low), close: String(close), previous_close: String(close), change: "0", percent_change: "0", is_market_open: false, source, as_of: date };
+}
+async function fetchTwelveHistoricalClose(symbol, date, key) {
+  if (!key || key.length < 10) throw new Error("TWELVE_DATA_KEY is missing or invalid");
+  const url = new URL(`${TWELVE_BASE}/time_series`);
+  url.searchParams.set("symbol", symbol);url.searchParams.set("interval", "1day");url.searchParams.set("start_date", date);url.searchParams.set("end_date", addDate(date, 1));url.searchParams.set("outputsize", "1");url.searchParams.set("apikey", key);
+  const data = await fetchJsonUpstream(url), item = Array.isArray(data?.values) ? data.values.find((value) => String(value.datetime || "").slice(0, 10) === date) || data.values[0] : null;
+  return normalizeHistoricalQuote(symbol, date, item, "twelve");
+}
+async function fetchFinnhubHistoricalClose(symbol, date, key) {
+  if (!key) throw new Error("FINNHUB_API_KEY is not configured");
+  const start = Math.floor(Date.parse(`${date}T00:00:00.000Z`) / 1000), url = new URL(`${FINNHUB_BASE}/stock/candle`);
+  url.searchParams.set("symbol", symbol);url.searchParams.set("resolution", "D");url.searchParams.set("from", String(start));url.searchParams.set("to", String(start + 86399));url.searchParams.set("token", key);
+  const data = await fetchJsonUpstream(url);if(data?.s !== "ok" || !Array.isArray(data.c) || !data.c.length)throw new Error(`Finnhub historical close missing for ${symbol}`);
+  const index = data.c.length - 1;return normalizeHistoricalQuote(symbol, date, { open: data.o?.[index], high: data.h?.[index], low: data.l?.[index], close: data.c[index] }, "finnhub");
+}
 function quoteMapFromProvider(data, symbols, source) { const quotes = {}; if (symbols.length === 1 && data && !data[symbols[0]]) quotes[symbols[0]] = { ...data, source }; for (const symbol of symbols) if (data?.[symbol] && !data[symbol].code && data[symbol].status !== "error") quotes[symbol] = { ...data[symbol], source }; return quotes; }
 async function providerBackedOff(env, provider) { const item = await readSharedCache(env, `provider:${provider}:backoff`); return item?.body ? JSON.parse(item.body) : null; }
 async function backoffProvider(env, provider, error) { if (!isQuotaError(error)) return; const response = json({ until: Date.now() + PROVIDER_BACKOFF_SECONDS * 1000, message: safeHeaderValue(error.message || error, 120) }); await writeSharedCache(env, `provider:${provider}:backoff`, response, PROVIDER_BACKOFF_SECONDS); }
@@ -209,6 +233,32 @@ async function fetchQuotesWithCache(request, env, ctx, canonicalSymbols, request
     return noStoreJson({ error: error.message || "Quote request failed" }, 502);
   }
 }
+async function fetchHistoricalCloseWithCache(env, ctx, canonicalSymbols, requestedSymbols, date) {
+  const records = await Promise.all(requestedSymbols.map(async (symbol) => {
+    const key = quoteCacheKey(symbol, "historical-close", date), record = await readSharedCache(env, key);let quote = null;
+    try { quote = record?.body ? JSON.parse(record.body) : null; } catch {}
+    return { symbol, key, quote };
+  }));
+  const body = Object.fromEntries(records.filter((item) => item.quote).map((item) => [item.symbol, item.quote])), missing = records.filter((item) => !item.quote).map((item) => item.symbol);
+  if (!missing.length) return jsonResponse(body, "HIT-HISTORICAL-PER-SYMBOL", { source: "cache", asOf: date });
+  const limit = await limitMiss(env, `quotes:historical:${date}`);if(!limit.success)return noStoreJson({ error: "Historical quote refresh is temporarily busy." }, 429);
+  const plan = buildProviderPlan(missing, configuredTwelvePriority(env), TWELVE_BATCH_LIMIT), warnings = [], fetched = {};
+  for (const symbol of missing) {
+    let quote = null;
+    if (plan.twelve.includes(symbol)) {
+      try { quote = await fetchTwelveHistoricalClose(symbol, date, String(env.TWELVE_DATA_KEY || "").trim()); }
+      catch (error) { warnings.push(`${symbol} Twelve: ${safeHeaderValue(error.message)}`); }
+    }
+    if (!quote) {
+      try { quote = await fetchFinnhubHistoricalClose(symbol, date, String(env.FINNHUB_API_KEY || "").trim()); }
+      catch (error) { warnings.push(`${symbol} Finnhub: ${safeHeaderValue(error.message)}`); }
+    }
+    if (quote) fetched[symbol] = body[symbol] = quote;
+  }
+  if (!Object.keys(body).length) return noStoreJson({ error: warnings.join("; ") || "No historical closes available" }, 502);
+  ctx.waitUntil(Promise.all(Object.entries(fetched).map(([symbol, quote]) => writeSharedCache(env, quoteCacheKey(symbol, "historical-close", date), jsonResponse(quote, "STORE-HISTORICAL", { source: quote.source, asOf: date }), HISTORICAL_CACHE_SECONDS))));
+  return jsonResponse(body, "MISS-HISTORICAL", { source: new Set(Object.values(fetched).map((quote) => quote.source)).size > 1 ? "mixed" : Object.values(fetched)[0]?.source || "cache", asOf: date, warnings: warnings.join(" | ") });
+}
 async function fetchMarketClockWithCache(env, ctx) {
   const key = "market-clock:US", shared = await readSharedCache(env, key);
   if (shared?.body && Date.now() - Number(shared.cachedAt || 0) < MARKET_CLOCK_CACHE_SECONDS * 1000) return responseFromCached(shared, "HIT-MARKET-CLOCK");
@@ -233,6 +283,7 @@ export default {
           cacheSeconds: CACHE_SECONDS,
           staleSeconds: STALE_SECONDS,
           lastCloseCacheSeconds: LAST_CLOSE_CACHE_SECONDS,
+          historicalCacheSeconds: HISTORICAL_CACHE_SECONDS,
           sharedCache: Boolean(env.MYH88_CACHE),
           providers: { twelve: Boolean(String(env.TWELVE_DATA_KEY || "").trim()), finnhub: Boolean(String(env.FINNHUB_API_KEY || "").trim()) },
           providerBackoff: { twelve: twelveBackoff || null, finnhub: finnhubBackoff || null },
@@ -248,7 +299,12 @@ export default {
       const requested = normalizeSymbols(url.searchParams.get("symbols")); if (!requested.length) return noStoreJson({ error: "Missing symbols" }, 400);
       const portfolio = await livePortfolioSymbols(env), blocked = requested.filter((symbol) => !portfolio.includes(symbol));
       if (blocked.length) return noStoreJson({ error: "Only current portfolio symbols may be requested", symbols: blocked }, 400);
-      const mode = String(url.searchParams.get("mode") || "live").toLowerCase(); if (mode !== "live" && mode !== "last-close") return noStoreJson({ error: "Unsupported quote mode" }, 400);
+      const mode = String(url.searchParams.get("mode") || "live").toLowerCase(); if (mode !== "live" && mode !== "last-close" && mode !== "historical-close") return noStoreJson({ error: "Unsupported quote mode" }, 400);
+      if (mode === "historical-close") {
+        const date = String(url.searchParams.get("date") || "");
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !isTradingDate(date) || date > previousTradingDate()) return noStoreJson({ error: "Invalid historical trading date" }, 400);
+        return fetchHistoricalCloseWithCache(env, ctx, portfolio, requested, date);
+      }
       return fetchQuotesWithCache(request, env, ctx, portfolio, requested, mode);
     } catch (error) { log("worker_error", { path, message: error.message || String(error) }); return noStoreJson({ error: error.message || "Proxy failed" }, 502); }
   },

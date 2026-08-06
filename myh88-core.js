@@ -221,6 +221,60 @@
     return Object.fromEntries([...bySymbol.entries()].map(([symbol, lots]) => [symbol, lots.map((lot) => ({ ...lot }))]));
   }
 
+  function buildHistoricalSnapshot(state = {}, date = "", prices = {}) {
+    const asOf = String(date || "");
+    const transactions = (state.transactions || []).filter((item) => !item?.voided && String(item.date || "") <= asOf);
+    const cashFlows = (state.cashFlows || []).filter((item) => !item?.voided && String(item.date || "") <= asOf);
+    const lotsBySymbol = lotsBeforeTransaction(transactions);
+    const currentMetadata = new Map((state.positions || []).map((item) => [String(item.symbol || "").toUpperCase(), item]));
+    const transactionMetadata = new Map();
+    transactions.forEach((item) => transactionMetadata.set(String(item.symbol || "").toUpperCase(), item));
+    const fxRates = { USD: 1, ...(state.fxRates || {}) };
+    const positions = [];
+    const missingSymbols = [];
+
+    Object.entries(lotsBySymbol).forEach(([symbol, lots]) => {
+      const remaining = summarizeLots(lots);
+      if (!(remaining.shares > LOT_EPSILON)) return;
+      const metadata = currentMetadata.get(symbol) || transactionMetadata.get(symbol) || {};
+      const currency = String(metadata.currency || "USD").toUpperCase();
+      const source = String(metadata.source || "twelve").toLowerCase();
+      const rawPrice = prices[symbol];
+      const historicalPrice = num(rawPrice?.close ?? rawPrice?.price ?? rawPrice);
+      const manualPrice = source === "manual" ? num(metadata.price) : 0;
+      const price = historicalPrice || manualPrice;
+      if (!(price > 0)) missingSymbols.push(symbol);
+      positions.push({
+        symbol,
+        source,
+        currency,
+        shares: remaining.shares,
+        costBasisUSD: remaining.costBasisUSD,
+        price,
+      });
+    });
+
+    const capital = cashFlows.reduce((sum, item) => sum + (item.type === "withdraw" ? -1 : 1) * num(item.amountUSD), 0);
+    const realizedPnl = transactions.filter((item) => item.type === "sell").reduce((sum, item) => sum + num(item.realizedPnlUSD), 0);
+    const currentCost = positions.reduce((sum, item) => sum + num(item.costBasisUSD), 0);
+    const cash = capital + realizedPnl - currentCost;
+    const market = positions.reduce((sum, item) => sum + num(item.shares) * num(item.price) * (item.currency === "USD" ? 1 : num(fxRates[item.currency])), 0);
+    return {
+      complete: missingSymbols.length === 0 && positions.length > 0,
+      missingSymbols,
+      positions,
+      snapshot: {
+        date: asOf,
+        capital,
+        netAsset: market + cash,
+        market,
+        cash,
+        openingBaseline: true,
+        source: "ledger-historical-close",
+      },
+    };
+  }
+
   function treemapVisualItems(items) {
     const total = items.reduce((sum, item) => sum + num(item.value), 0);
     if (!total || items.length < 2) return items.map((item) => ({ ...item, visualValue: num(item.value) }));
@@ -307,6 +361,7 @@
         date: String(item.date),
         capital: num(item.capital),
         netAsset: num(item.netAsset),
+        openingBaseline: Boolean(item.openingBaseline),
       }))
       .sort((a, b) => a.date.localeCompare(b.date))
       .filter((item, index, list) => index === list.length - 1 || item.date !== list[index + 1].date);
@@ -327,7 +382,28 @@
     const baseline = baselineCandidate && baselineGapDays >= 0 && baselineGapDays <= 7
       ? baselineCandidate
       : null;
+    const openingBaseline = sorted[firstInPeriod]?.openingBaseline ? sorted[firstInPeriod] : null;
     const hasPriorHistory = firstInPeriod > 0;
+    const useCapitalBasis = selectedPeriod === "all" || !hasPriorHistory;
+    if (useCapitalBasis) {
+      const points = sorted.slice(firstInPeriod).map((current) => ({
+        date: current.date,
+        value: current.netAsset,
+        returnPct: current.capital > 0 ? (current.netAsset - current.capital) / current.capital * 100 : 0,
+      }));
+      return {
+        period: selectedPeriod,
+        points,
+        returnPct: points.at(-1)?.returnPct || 0,
+        pnlUSD: latest.netAsset - latest.capital,
+        startDate: sorted[firstInPeriod]?.date || periodStart,
+        endDate: latest.date,
+        baselineDate: "",
+        periodStart,
+        dataStart: sorted[firstInPeriod]?.date || "",
+        baselineComplete: true,
+      };
+    }
     let previous = baseline;
     let wealth = 1;
     const points = baseline ? [{ date: baseline.date, value: baseline.netAsset, returnPct: 0, baseline: true }] : [];
@@ -335,9 +411,7 @@
     for (let index = firstInPeriod; index < sorted.length; index += 1) {
       const current = sorted[index];
       if (!previous) {
-        wealth = hasPriorHistory && selectedPeriod !== "all"
-          ? 1
-          : current.capital > 0 ? current.netAsset / current.capital : 1;
+        wealth = 1;
       } else if (previous.netAsset > 0) {
         const externalFlow = current.capital - previous.capital;
         wealth *= (current.netAsset - externalFlow) / previous.netAsset;
@@ -361,15 +435,16 @@
       pnlUSD,
       startDate: sorted[firstInPeriod]?.date || periodStart,
       endDate: latest.date,
-      baselineDate: baseline?.date || "",
+      baselineDate: baseline?.date || openingBaseline?.date || "",
       periodStart,
       dataStart: sorted[firstInPeriod]?.date || "",
-      baselineComplete: selectedPeriod === "all" || Boolean(baseline) || !hasPriorHistory,
+      baselineComplete: selectedPeriod === "all" || Boolean(baseline) || Boolean(openingBaseline) || !hasPriorHistory,
     };
   }
 
   root.MYH88Core = Object.freeze({
     allocateLotSale,
+    buildHistoricalSnapshot,
     buildReturnSeries,
     computeLedgerMetrics,
     createLot,

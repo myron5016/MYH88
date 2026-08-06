@@ -1,5 +1,5 @@
-const VERSION="V10.51 PWA家庭版";
-const RELEASE="10.51";
+const VERSION="V10.52 PWA家庭版";
+const RELEASE="10.52";
 const LEDGER_SCHEMA_VERSION="10.33";
 const STATE_KEY="v9_last_state";
 const RETURN_SNAPSHOT_KEY="v10_return_snapshots";
@@ -57,7 +57,7 @@ let lastQuoteCache="";
 let lastQuoteWarnings="";
 let tradeSectorAuto=true;
 let tradeColorAuto=true;
-let buildMeta={release:RELEASE,version:VERSION,serviceWorker:RELEASE,worker:"10.47"};
+let buildMeta={release:RELEASE,version:VERSION,serviceWorker:RELEASE,worker:"10.52"};
 let serviceWorkerVersion="";
 
 const SECTOR_RULES=[
@@ -284,13 +284,13 @@ function applySharedDataText(raw,reason=""){
 async function loadSharedData(autoRefresh=false){
   const status=$("status");status.textContent="正在读取 GitHub 共享数据...";
   try{
-    const raw=await fetchSharedText();applySharedDataText(raw);
+    const raw=await fetchSharedText();applySharedDataText(raw);await ensureCurrentMonthOpeningSnapshot();
     status.textContent=navigator.onLine?(isAdminMode?`已读取共享数据：${new Date().toLocaleString("zh-CN")}`:"已读取最新云端账本"):"离线模式：已读取设备中最近缓存的数据";
     if(admin.owner&&admin.repo&&admin.token)checkCloudStatus(false);if(autoRefresh)smartRefreshPricesOnLoad();
   }catch(error){
     console.warn("共享数据读取失败",error);
     const cached=localStorage.getItem(STATE_KEY)||localStorage.getItem("v8_last_state");
-    if(cached){normalizeState(readJson(cached,defaultState));applyPriceCache();dirty=isAdminMode;lastMutationReason=isAdminMode?"正在使用本机缓存":"";renderAll();status.textContent="读取失败，已使用本机缓存"}
+    if(cached){normalizeState(readJson(cached,defaultState));applyPriceCache();await ensureCurrentMonthOpeningSnapshot();dirty=isAdminMode;lastMutationReason=isAdminMode?"正在使用本机缓存":"";renderAll();status.textContent="读取失败，已使用本机缓存"}
     else{normalizeState(defaultState);dirty=isAdminMode;lastMutationReason=isAdminMode?"云端读取失败":"";renderAll();status.textContent="读取失败，已使用默认数据"}
     renderSyncStatus();
   }

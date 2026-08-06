@@ -145,6 +145,41 @@ async function fetchJsonWithHeaders(url,options={}){
     clearTimeout(timer);
   }
 }
+function monthOpeningTradingDate(date){
+  const cursor=new Date(`${String(date).slice(0,7)}-01T12:00:00Z`);
+  for(let offset=0;offset<10;offset++){
+    const iso=cursor.toISOString().slice(0,10),day=cursor.getUTCDay();
+    if(day!==0&&day!==6&&!US_STATIC_HOLIDAYS[iso])return iso;
+    cursor.setUTCDate(cursor.getUTCDate()+1);
+  }
+  return String(date);
+}
+async function ensureCurrentMonthOpeningSnapshot(){
+  const latestDate=state.snapshots.map(item=>String(item?.date||"")).filter(Boolean).sort().at(-1)||today();
+  const openingDate=monthOpeningTradingDate(latestDate);
+  if(state.snapshots.some(item=>String(item?.date||"")===openingDate))return;
+  const datedTransactions=state.transactions.filter(item=>!item?.voided&&String(item.date||"")<=openingDate);
+  const lots=MYH88Core.lotsBeforeTransaction(datedTransactions);
+  const currentBySymbol=new Map(state.positions.map(item=>[String(item.symbol||"").toUpperCase(),item]));
+  const transactionBySymbol=new Map();
+  datedTransactions.forEach(item=>transactionBySymbol.set(String(item.symbol||"").toUpperCase(),item));
+  const symbols=Object.entries(lots).filter(([,items])=>items.some(item=>num(item.remainingShares)>0)).map(([symbol])=>symbol);
+  const automatic=symbols.filter(symbol=>String((currentBySymbol.get(symbol)||transactionBySymbol.get(symbol)||{}).source||"twelve").toLowerCase()!=="manual");
+  if(!automatic.length)return;
+  try{
+    const proxy=priceProxyUrl();if(!proxy)throw new Error("未配置行情代理");
+    const url=`${proxy}/quotes?symbols=${encodeURIComponent(automatic.join(","))}&mode=historical-close&date=${encodeURIComponent(openingDate)}`;
+    const quotes=await fetchJson(url,{timeout:PROXY_TIMEOUT_MS});
+    const built=MYH88Core.buildHistoricalSnapshot(state,openingDate,quotes);
+    if(!built.complete)throw new Error(`缺少 ${built.missingSymbols.join(", ")} 的 ${openingDate} 收盘价`);
+    state.snapshots=state.snapshots.filter(item=>String(item?.date||"")!==openingDate);
+    state.snapshots.push({...built.snapshot,reconstructedAt:new Date().toISOString()});
+    state.snapshots.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+    saveLocal();renderReturnDashboard();
+  }catch(error){
+    console.warn("月初收盘基准重建失败",error);
+  }
+}
 async function refreshWorkerHealth(){
   const proxy=priceProxyUrl();
   if(!proxy){workerHealth={ok:false,error:"未配置行情代理地址"};renderDiagnostics();return workerHealth}

@@ -19,13 +19,14 @@ test("不足八只时由当前持仓补满 Twelve 名额", () => {
 test("逐股缓存键与请求组合和顺序无关", () => {
   assert.equal(quoteCacheKey("NVDA", "live"), "quote:live:NVDA");
   assert.equal(quoteCacheKey("NVDA", "last-close", "2026-07-22"), "quote:last-close:2026-07-22:NVDA");
+  assert.equal(quoteCacheKey("NVDA", "historical-close", "2026-08-03"), "quote:historical:2026-08-03:NVDA");
   assert.notEqual(quoteCacheKey("NVDA", "live"), quoteCacheKey("TSLA", "live"));
 });
 
 test("Worker 可直接命中单只股票缓存且不请求整套持仓", async () => {
   const now = Date.now();
   const records = new Map([
-    ["config:portfolio-symbols", {
+    ["config:portfolio-symbols:v2", {
       cachedAt: now,
       body: JSON.stringify({ symbols: ["NVDA", "TSLA"] }),
     }],
