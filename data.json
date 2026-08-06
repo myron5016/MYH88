@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-06T00:58:00.608Z",
+    "lastCloudSaveAt": "2026-08-06T13:54:14.245Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -2179,6 +2179,16 @@
       "cash": 2006.27
     },
     {
+      "date": "2026-08-03",
+      "capital": 22370,
+      "netAsset": 21501.80643022,
+      "market": 12966.859088000001,
+      "cash": 8534.947342219997,
+      "openingBaseline": true,
+      "source": "ledger-historical-close",
+      "reconstructedAt": "2026-08-06T05:55:16.749Z"
+    },
+    {
       "date": "2026-08-05",
       "capital": 22370,
       "netAsset": 22479.99,
@@ -2188,9 +2198,149 @@
     {
       "date": "2026-08-06",
       "capital": 22370,
-      "netAsset": 21058.75,
-      "market": 18657.5,
+      "netAsset": 21081.84,
+      "market": 18680.59,
       "cash": 2401.25
     }
-  ]
+  ],
+  "dcaPlan": {
+    "seedVersion": "ibkr-2026-08-06",
+    "monthlyBudgetUSD": 500,
+    "funds": [
+      {
+        "symbol": "VOO",
+        "name": "Vanguard S&P 500 ETF",
+        "issuer": "Vanguard",
+        "targetWeight": 0.6,
+        "source": "twelve",
+        "price": 708.51000975,
+        "priceAsOf": "2026-08-06T12:50:00.937Z",
+        "changePercent": 0,
+        "priceSource": "last-close",
+        "priceProvider": "last-close",
+        "priceUpdatedAt": "2026-08-06T12:50:00.937Z"
+      },
+      {
+        "symbol": "QQQM",
+        "name": "Invesco NASDAQ 100 ETF",
+        "issuer": "Invesco",
+        "targetWeight": 0.4,
+        "source": "twelve",
+        "price": 294.3200073,
+        "priceAsOf": "2026-08-06T12:50:00.937Z",
+        "changePercent": 0,
+        "priceSource": "last-close",
+        "priceProvider": "last-close",
+        "priceUpdatedAt": "2026-08-06T12:50:00.937Z"
+      }
+    ],
+    "entries": [
+      {
+        "id": "dca_20260605_voo",
+        "date": "2026-06-05",
+        "type": "buy",
+        "symbol": "VOO",
+        "plannedAmountUSD": 300,
+        "shares": 0.4374,
+        "price": 685.752621,
+        "feeUSD": 0.35034604,
+        "costBasisUSD": 300.2985424654,
+        "countsTowardPlan": true,
+        "source": "ibkr"
+      },
+      {
+        "id": "dca_20260605_qqqm",
+        "date": "2026-06-05",
+        "type": "buy",
+        "symbol": "QQQM",
+        "plannedAmountUSD": 200,
+        "shares": 0.6732,
+        "price": 297.069167,
+        "feeUSD": 0.35039391,
+        "costBasisUSD": 200.3373571344,
+        "countsTowardPlan": true,
+        "source": "ibkr"
+      },
+      {
+        "id": "dca_20260629_qqqm_drip",
+        "date": "2026-06-29",
+        "type": "reinvest",
+        "symbol": "QQQM",
+        "plannedAmountUSD": 0,
+        "shares": 0.0005,
+        "price": 294.83,
+        "feeUSD": 0.00014762,
+        "costBasisUSD": 0.14756262,
+        "countsTowardPlan": false,
+        "source": "ibkr"
+      },
+      {
+        "id": "dca_20260701_voo_drip",
+        "date": "2026-07-01",
+        "type": "reinvest",
+        "symbol": "VOO",
+        "plannedAmountUSD": 0,
+        "shares": 0.0008,
+        "price": 683.24,
+        "feeUSD": 0.00054716,
+        "costBasisUSD": 0.54713916,
+        "countsTowardPlan": false,
+        "source": "ibkr"
+      },
+      {
+        "id": "dca_20260707_voo",
+        "date": "2026-07-07",
+        "type": "buy",
+        "symbol": "VOO",
+        "plannedAmountUSD": 300,
+        "shares": 0.4359,
+        "price": 688.1,
+        "feeUSD": 0.35034574,
+        "costBasisUSD": 300.29313574,
+        "countsTowardPlan": true,
+        "source": "ibkr"
+      },
+      {
+        "id": "dca_20260707_qqqm",
+        "date": "2026-07-07",
+        "type": "buy",
+        "symbol": "QQQM",
+        "plannedAmountUSD": 200,
+        "shares": 0.6831,
+        "price": 292.78,
+        "feeUSD": 0.35039592,
+        "costBasisUSD": 200.34841392,
+        "countsTowardPlan": true,
+        "source": "ibkr"
+      },
+      {
+        "id": "dca_mshkrx36_xewkqz",
+        "date": "2026-08-06",
+        "type": "buy",
+        "symbol": "VOO",
+        "plannedAmountUSD": 299.99,
+        "shares": 0.4239,
+        "price": 707.69,
+        "feeUSD": 0.35,
+        "costBasisUSD": 300.33979100000005,
+        "countsTowardPlan": true,
+        "note": "8月手动定投",
+        "source": "manual"
+      },
+      {
+        "id": "dca_mshkss5z_pdtl2e",
+        "date": "2026-08-06",
+        "type": "buy",
+        "symbol": "QQQM",
+        "plannedAmountUSD": 199.99,
+        "shares": 0.685,
+        "price": 291.96,
+        "feeUSD": 0.35,
+        "costBasisUSD": 200.3426,
+        "countsTowardPlan": true,
+        "note": "8月手动定投",
+        "source": "manual"
+      }
+    ]
+  }
 }
