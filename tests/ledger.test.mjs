@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 await import("../myh88-core.js");
-const { computeLedgerMetrics } = globalThis.MYH88Core;
+const { buildReturnSeries, computeLedgerMetrics } = globalThis.MYH88Core;
 
 test("追加本金不会被算成投资收益", () => {
   const metrics = computeLedgerMetrics({
@@ -51,4 +51,29 @@ test("外币市值使用手动汇率且作废流水不参与计算", () => {
   assert.equal(metrics.contributedCapital, 9000);
   assert.ok(Math.abs(metrics.marketTotal - 228) < 1e-9);
   assert.ok(Math.abs(metrics.totalPnl - 28) < 1e-9);
+});
+
+test("收益率曲线剔除追加本金影响", () => {
+  const series = buildReturnSeries([
+    { date: "2026-06-30", capital: 15000, netAsset: 16500 },
+    { date: "2026-07-10", capital: 22370, netAsset: 25570 },
+  ], "all");
+  assert.equal(series.points.length, 2);
+  assert.ok(Math.abs(series.points[0].returnPct - 10) < 1e-9);
+  assert.ok(Math.abs(series.returnPct - 21.333333333333325) < 1e-9);
+  assert.equal(series.pnlUSD, 3200);
+});
+
+test("本月收益率以上月最后快照作为比较基准", () => {
+  const series = buildReturnSeries([
+    { date: "2026-07-31", capital: 10000, netAsset: 11000 },
+    { date: "2026-08-05", capital: 10000, netAsset: 10780 },
+    { date: "2026-08-06", capital: 10000, netAsset: 11220 },
+  ], "month");
+  assert.deepEqual(series.points.map((point) => point.date), ["2026-07-31", "2026-08-05", "2026-08-06"]);
+  assert.equal(series.points[0].returnPct, 0);
+  assert.equal(series.points[0].baseline, true);
+  assert.ok(Math.abs(series.returnPct - 2) < 1e-9);
+  assert.equal(series.pnlUSD, 220);
+  assert.equal(series.baselineDate, "2026-07-31");
 });

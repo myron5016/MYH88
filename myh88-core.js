@@ -286,8 +286,74 @@
     return result;
   }
 
+  function returnPeriodStart(period, latestDate) {
+    const date = String(latestDate || "");
+    if (period === "month") return `${date.slice(0, 7)}-01`;
+    if (period === "year") return `${date.slice(0, 4)}-01-01`;
+    return "";
+  }
+
+  function buildReturnSeries(snapshots = [], period = "all") {
+    const validPeriods = new Set(["all", "month", "year"]);
+    const selectedPeriod = validPeriods.has(period) ? period : "all";
+    const sorted = snapshots
+      .filter((item) => item && String(item.date || "") && num(item.netAsset) > 0)
+      .map((item) => ({
+        date: String(item.date),
+        capital: num(item.capital),
+        netAsset: num(item.netAsset),
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .filter((item, index, list) => index === list.length - 1 || item.date !== list[index + 1].date);
+    if (!sorted.length) {
+      return { period: selectedPeriod, points: [], returnPct: 0, pnlUSD: 0, startDate: "", endDate: "", baselineDate: "" };
+    }
+
+    const latest = sorted.at(-1);
+    const periodStart = returnPeriodStart(selectedPeriod, latest.date);
+    const firstInPeriod = periodStart ? sorted.findIndex((item) => item.date >= periodStart) : 0;
+    if (firstInPeriod < 0) {
+      return { period: selectedPeriod, points: [], returnPct: 0, pnlUSD: 0, startDate: periodStart, endDate: latest.date, baselineDate: "" };
+    }
+    const baselineIndex = firstInPeriod > 0 ? firstInPeriod - 1 : -1;
+    const baseline = baselineIndex >= 0 ? sorted[baselineIndex] : null;
+    let previous = baseline;
+    let wealth = 1;
+    const points = baseline ? [{ date: baseline.date, value: baseline.netAsset, returnPct: 0, baseline: true }] : [];
+
+    for (let index = firstInPeriod; index < sorted.length; index += 1) {
+      const current = sorted[index];
+      if (!previous) {
+        wealth = current.capital > 0 ? current.netAsset / current.capital : 1;
+      } else if (previous.netAsset > 0) {
+        const externalFlow = current.capital - previous.capital;
+        wealth *= (current.netAsset - externalFlow) / previous.netAsset;
+      }
+      points.push({
+        date: current.date,
+        value: current.netAsset,
+        returnPct: (wealth - 1) * 100,
+      });
+      previous = current;
+    }
+
+    const pnlUSD = baseline
+      ? latest.netAsset - baseline.netAsset - (latest.capital - baseline.capital)
+      : latest.netAsset - latest.capital;
+    return {
+      period: selectedPeriod,
+      points,
+      returnPct: points.at(-1)?.returnPct || 0,
+      pnlUSD,
+      startDate: sorted[firstInPeriod]?.date || periodStart,
+      endDate: latest.date,
+      baselineDate: baseline?.date || "",
+    };
+  }
+
   root.MYH88Core = Object.freeze({
     allocateLotSale,
+    buildReturnSeries,
     computeLedgerMetrics,
     createLot,
     lotsBeforeTransaction,

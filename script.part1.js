@@ -1,5 +1,5 @@
-const VERSION="V10.48 PWA家庭版";
-const RELEASE="10.48";
+const VERSION="V10.49 PWA家庭版";
+const RELEASE="10.49";
 const LEDGER_SCHEMA_VERSION="10.33";
 const STATE_KEY="v9_last_state";
 const BACKUP_KEY="v9_backups";
