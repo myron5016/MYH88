@@ -44,6 +44,10 @@ function trackedQuoteItems(){
   const funds=Array.isArray(state.dcaPlan?.funds)?state.dcaPlan.funds:[];
   return [...positions,...funds];
 }
+function automaticQuoteGroups(){
+  const valid=items=>(Array.isArray(items)?items:[]).filter(item=>item.source==="twelve"&&item.symbol);
+  return[valid(state.positions),valid(state.dcaPlan?.funds)].filter(group=>group.length);
+}
 
 function dcaMetrics(){return MYH88Core.computeDcaPlan(state.dcaPlan,today())}
 function dcaMonthLabel(monthKey){const [year,month]=String(monthKey).split("-");return `${Number(month)}月定投`}

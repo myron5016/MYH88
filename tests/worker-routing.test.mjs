@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import worker, { buildProviderPlan, quoteCacheKey } from "../cloudflare-worker.js";
+import worker, { buildProviderPlan, portfolioSymbolsFromData, quoteCacheKey } from "../cloudflare-worker.js";
 
 test("Twelve 优先名单不受持仓原始顺序影响", () => {
   const symbols = ["NEW2", "MRVL", "NVDA", "NEW1", "RKLB", "SPCX", "GOOGL", "TSLA", "MU", "TSM"];
@@ -23,10 +23,30 @@ test("逐股缓存键与请求组合和顺序无关", () => {
   assert.notEqual(quoteCacheKey("NVDA", "live"), quoteCacheKey("TSLA", "live"));
 });
 
+test("portfolio allowlist includes recurring investment funds", () => {
+  const symbols = portfolioSymbolsFromData({
+    positions: [
+      { symbol: "NVDA", source: "twelve" },
+      { symbol: "XFAB", source: "manual" },
+    ],
+    transactions: [
+      { symbol: "SPCX", source: "twelve" },
+      { symbol: "VOID", source: "twelve", voided: true },
+    ],
+    dcaPlan: {
+      funds: [
+        { symbol: "VOO", source: "twelve" },
+        { symbol: "QQQM", source: "twelve" },
+      ],
+    },
+  });
+  assert.deepEqual(symbols, ["NVDA", "SPCX", "VOO", "QQQM"]);
+});
+
 test("Worker 可直接命中单只股票缓存且不请求整套持仓", async () => {
   const now = Date.now();
   const records = new Map([
-    ["config:portfolio-symbols:v2", {
+    ["config:portfolio-symbols:v3", {
       cachedAt: now,
       body: JSON.stringify({ symbols: ["NVDA", "TSLA"] }),
     }],

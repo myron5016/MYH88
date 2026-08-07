@@ -1,5 +1,5 @@
-const WORKER_VERSION = "10.52";
-const WORKER_BUILT_AT = "2026-08-06T03:20:00.000Z";
+const WORKER_VERSION = "10.54";
+const WORKER_BUILT_AT = "2026-08-07T03:45:00.000Z";
 const CACHE_SECONDS = 30 * 60;
 const STALE_SECONDS = 6 * 60 * 60;
 const LAST_CLOSE_CACHE_SECONDS = 8 * 24 * 60 * 60;
@@ -7,6 +7,7 @@ const HISTORICAL_CACHE_SECONDS = 365 * 24 * 60 * 60;
 const MARKET_CLOCK_CACHE_SECONDS = 15 * 60;
 const PORTFOLIO_CACHE_SECONDS = 5 * 60;
 const PROVIDER_BACKOFF_SECONDS = 30 * 60;
+const FINNHUB_BACKOFF_SECONDS = 90;
 const TWELVE_BATCH_LIMIT = 8;
 const TWELVE_BASE = "https://api.twelvedata.com";
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
@@ -15,7 +16,7 @@ const US_MARKET_TZ = "America/New_York";
 const US_MARKET_OPEN_MIN = 9 * 60 + 30;
 const US_MARKET_CLOSE_MIN = 16 * 60;
 const US_EARLY_CLOSE_MIN = 13 * 60;
-const FALLBACK_PORTFOLIO_SYMBOLS = ["NVDA", "MRVL", "AAOI", "XFAB", "RKLB", "VRT", "SPCX", "GOOGL", "LITE", "MU"];
+const FALLBACK_PORTFOLIO_SYMBOLS = ["NVDA", "MRVL", "AAOI", "XFAB", "RKLB", "VRT", "SPCX", "GOOGL", "LITE", "MU", "VOO", "QQQM"];
 const DEFAULT_TWELVE_PRIORITY = ["NVDA", "RKLB", "SPCX", "GOOGL", "MU", "MRVL", "AAOI", "TSLA"];
 const US_STATIC_HOLIDAYS = {
   "2026-01-01": "New Year's Day", "2026-01-19": "Martin Luther King Jr. Day", "2026-02-16": "Presidents' Day", "2026-04-03": "Good Friday", "2026-05-25": "Memorial Day", "2026-06-19": "Juneteenth", "2026-07-03": "Independence Day observed", "2026-09-07": "Labor Day", "2026-11-26": "Thanksgiving Day", "2026-12-25": "Christmas Day",
@@ -103,15 +104,19 @@ async function fetchJsonUpstream(url, timeoutMs = 8000) {
     return data;
   } finally { clearTimeout(timer); }
 }
+function portfolioSymbolsFromData(data = {}) {
+  return normalizeSymbols([
+    ...(data.positions || []).filter((item) => item?.source !== "manual").map((item) => item.symbol),
+    ...(data.transactions || []).filter((item) => !item?.voided && item?.source !== "manual").map((item) => item.symbol),
+    ...(data.dcaPlan?.funds || []).filter((item) => item?.source !== "manual").map((item) => item.symbol),
+  ].join(","));
+}
 async function livePortfolioSymbols(env) {
-  const key = "config:portfolio-symbols:v2", cached = await readSharedCache(env, key);
+  const key = "config:portfolio-symbols:v3", cached = await readSharedCache(env, key);
   if (cached?.body && Date.now() - Number(cached.cachedAt || 0) < PORTFOLIO_CACHE_SECONDS * 1000) return JSON.parse(cached.body).symbols;
   try {
     const data = await fetchJsonUpstream(PORTFOLIO_DATA_URL, 5000);
-    const symbols = normalizeSymbols([
-      ...(data.positions || []).filter((p) => p?.source !== "manual").map((p) => p.symbol),
-      ...(data.transactions || []).filter((item) => !item?.voided && item?.source !== "manual").map((item) => item.symbol),
-    ].join(","));
+    const symbols = portfolioSymbolsFromData(data);
     if (!symbols.length) throw new Error("No portfolio symbols in data.json");
     const response = json({ symbols }, 200); await writeSharedCache(env, key, response, PORTFOLIO_CACHE_SECONDS * 3); return symbols;
   } catch (error) { log("portfolio_config_fallback", { message: error.message }); return FALLBACK_PORTFOLIO_SYMBOLS; }
@@ -143,7 +148,7 @@ async function fetchFinnhubHistoricalClose(symbol, date, key) {
 }
 function quoteMapFromProvider(data, symbols, source) { const quotes = {}; if (symbols.length === 1 && data && !data[symbols[0]]) quotes[symbols[0]] = { ...data, source }; for (const symbol of symbols) if (data?.[symbol] && !data[symbol].code && data[symbol].status !== "error") quotes[symbol] = { ...data[symbol], source }; return quotes; }
 async function providerBackedOff(env, provider) { const item = await readSharedCache(env, `provider:${provider}:backoff`); return item?.body ? JSON.parse(item.body) : null; }
-async function backoffProvider(env, provider, error) { if (!isQuotaError(error)) return; const response = json({ until: Date.now() + PROVIDER_BACKOFF_SECONDS * 1000, message: safeHeaderValue(error.message || error, 120) }); await writeSharedCache(env, `provider:${provider}:backoff`, response, PROVIDER_BACKOFF_SECONDS); }
+async function backoffProvider(env, provider, error) { if (!isQuotaError(error)) return; const seconds = provider === "finnhub" ? FINNHUB_BACKOFF_SECONDS : PROVIDER_BACKOFF_SECONDS; const response = json({ until: Date.now() + seconds * 1000, message: safeHeaderValue(error.message || error, 120) }); await writeSharedCache(env, `provider:${provider}:backoff`, response, seconds); }
 async function fetchFinnhubPartial(symbols, key) {
   const quotes = {}, errors = [];
   for (let offset = 0; offset < symbols.length; offset += 3) {
@@ -310,4 +315,4 @@ export default {
   },
 };
 
-export { buildProviderPlan, localMarketClock, previousTradingDate, quoteCacheKey };
+export { buildProviderPlan, localMarketClock, portfolioSymbolsFromData, previousTradingDate, quoteCacheKey };

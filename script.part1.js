@@ -1,5 +1,5 @@
-const VERSION="V11.4.1 持仓标识修正版";
-const RELEASE="11.4.1";
+const VERSION="V11.4.2 行情白名单修正版";
+const RELEASE="11.4.2";
 const LEDGER_SCHEMA_VERSION="10.33";
 const STATE_KEY="v9_last_state";
 const RETURN_SNAPSHOT_KEY="v10_return_snapshots";
@@ -57,7 +57,7 @@ let lastQuoteCache="";
 let lastQuoteWarnings="";
 let tradeSectorAuto=true;
 let tradeColorAuto=true;
-let buildMeta={release:RELEASE,version:VERSION,serviceWorker:RELEASE,worker:"10.52"};
+let buildMeta={release:RELEASE,version:VERSION,serviceWorker:RELEASE,worker:"10.54"};
 let serviceWorkerVersion="";
 
 const SECTOR_RULES=[

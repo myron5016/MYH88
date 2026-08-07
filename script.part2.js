@@ -283,14 +283,31 @@ async function refreshPrices(useCache=true){
   priceRefreshPromise=doRefreshPrices(useCache).finally(()=>{priceRefreshPromise=null});
   return priceRefreshPromise;
 }
-async function refreshPricesSmart(){
-  const status=$("status");
-  const clock=await refreshMarketClock();
-  if(clock?.isOpen||clock?.phase==="open")return refreshPrices(false);
-  return refreshLastClosePrices(clock);
-}
-function refreshPricesForced(){
-  return refreshPrices(false);
+async function refreshPricesSmart(){const clock=await refreshMarketClock();return clock?.isOpen||clock?.phase==="open"?refreshPrices(false):refreshLastClosePrices(clock)}
+function refreshPricesForced(){return refreshPrices(false)}
+async function refreshAutomaticQuoteGroups(mode="live"){
+  const providers=new Set(),routes=new Set(),errors=[];let updated=0;
+  for(const items of automaticQuoteGroups()){
+    const symbols=[...new Set(items.map(item=>item.symbol))];
+    try{
+      const res=await fetchQuoteBatchResilient(symbols,mode);routes.add(lastMarketRoute);
+      items.forEach(item=>{
+        const quote=symbols.length===1?res:res[item.symbol],provider=String(quote?.source||(mode==="last-close"?"last-close":"twelve")).toLowerCase(),price=num(quote?.close||quote?.price);
+        if(!(price>0))return;
+        item.price=price;item.changePercent=num(quote?.percent_change);item.priceSource=mode==="last-close"?"last-close":(provider==="static"?"static":provider);item.priceProvider=provider;
+        item.priceUpdatedAt=quote?.as_of||quote?.datetime||quote?.last_quote_at||new Date().toISOString();item.priceAsOf=item.priceUpdatedAt;
+        if(provider)providers.add(provider);updated++;
+      });
+    }catch(error){errors.push(error)}
+  }
+  if(!updated)throw errors[0]||new Error("No valid quotes returned");
+  if(routes.has("proxy"))lastMarketRoute=routes.size>1?"mixed-cache":"proxy";
+  else if(routes.has("fallback"))lastMarketRoute=routes.size>1?"mixed-cache":"fallback";
+  else if(routes.has("static"))lastMarketRoute="static";
+  if(providers.size===1)lastMarketProvider=[...providers][0];
+  else if(providers.size>1)lastMarketProvider="mixed";
+  if(errors.length){const warning=errors.map(friendlyFetchError).join("; ");lastQuoteWarnings=[lastQuoteWarnings,warning].filter(Boolean).join("; ");lastMarketError=warning}
+  return updated;
 }
 async function refreshLastClosePrices(clock=marketClockState||marketClock()){
   const status=$("status"),button=$("refreshButton");
@@ -301,12 +318,9 @@ async function refreshLastClosePrices(clock=marketClockState||marketClock()){
   }
   if(button)button.disabled=true;
   try{
-    const items=trackedQuoteItems().filter(p=>p.source==="twelve"&&p.symbol),symbols=[...new Set(items.map(p=>p.symbol))];
-    if(symbols.length){
-      const res=await fetchQuoteBatchResilient(symbols,"last-close"),providers=new Set();
-      items.forEach(p=>{const q=symbols.length===1?res:res[p.symbol];const provider=String(q?.source||"last-close").toLowerCase();if(provider)providers.add(provider);const price=num(q?.close||q?.price);if(price>0)p.price=price;p.changePercent=num(q?.percent_change);p.priceSource="last-close";p.priceProvider=provider;p.priceUpdatedAt=q?.as_of||q?.datetime||q?.last_quote_at||new Date().toISOString();p.priceAsOf=p.priceUpdatedAt});
-      if(providers.size===1)lastMarketProvider=[...providers][0];else if(providers.size>1)lastMarketProvider="mixed";
-      lastMarketRoute="last-close";
+    if(automaticQuoteGroups().length){
+      await refreshAutomaticQuoteGroups("last-close");
+      if(lastMarketRoute!=="static"&&lastMarketRoute!=="mixed-cache")lastMarketRoute="last-close";
     }else lastMarketRoute="last-close";
     state.settings.lastPriceRefresh=Date.now();state.settings.lastPriceRefreshText=new Date().toLocaleString("zh-CN");savePriceCache();
     captureSnapshot(false);
@@ -331,12 +345,7 @@ async function doRefreshPrices(useCache=true){
   lastQuoteWarnings="";
   try{
     try{await refreshFx(false)}catch(error){console.warn("FX refresh failed; keep cached rates",error);state.fxRates={...state.fxRates,...(getFxCache()?.fxRates||{}),USD:1}}
-    const items=state.positions.filter(p=>p.source==="twelve"&&p.symbol),symbols=[...new Set(items.map(p=>p.symbol))];
-    if(symbols.length){
-      const res=await fetchQuoteBatchResilient(symbols),providers=new Set();
-      items.forEach(p=>{const q=symbols.length===1?res:res[p.symbol];const provider=String(q?.source||"twelve").toLowerCase();if(provider)providers.add(provider);const price=num(q?.close||q?.price);if(price>0)p.price=price;p.changePercent=num(q?.percent_change);p.priceSource=provider==="static"?"static":provider;p.priceProvider=provider;p.priceUpdatedAt=q?.as_of||q?.datetime||q?.last_quote_at||new Date().toISOString();p.priceAsOf=p.priceUpdatedAt});
-      if(providers.size===1)lastMarketProvider=[...providers][0];else if(providers.size>1)lastMarketProvider="mixed";
-    }
+    if(automaticQuoteGroups().length)await refreshAutomaticQuoteGroups("live");
     state.settings.lastPriceRefresh=Date.now();state.settings.lastPriceRefreshText=new Date().toLocaleString("zh-CN");savePriceCache();
     if(lastMarketRoute!=="static")captureSnapshot(false);else saveLocal();
     renderAll();status.textContent=lastMarketRoute==="static"?`代理行情失败，已临时使用静态缓存：${lastMarketError}`:(isAdminMode?"已刷新："+state.settings.lastPriceRefreshText+"。保存到 GitHub 后家人可见":"已刷新："+state.settings.lastPriceRefreshText+"。本次价格已缓存在本设备");
