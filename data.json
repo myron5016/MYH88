@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-06T13:54:14.245Z",
+    "lastCloudSaveAt": "2026-08-08T01:07:14.224Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -202,14 +202,14 @@
       "name": "Space X",
       "currency": "USD",
       "source": "twelve",
-      "shares": 32,
-      "avgCost": 136.5534375,
+      "shares": 20,
+      "avgCost": 135.03400000000002,
       "sector": "太空",
-      "color": "#d03e61",
+      "color": "#f16183",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 4369.71,
+      "costBasisUSD": 2700.68,
       "lots": [
         {
           "lotId": "tx_mqnjborg_1jspyf",
@@ -224,48 +224,6 @@
           "remainingCostBasisNative": 1500,
           "currency": "USD",
           "price": 150
-        },
-        {
-          "lotId": "tx_mrbe5rqe_vhdot4",
-          "buyTransactionId": "tx_mrbe5rqe_vhdot4",
-          "date": "2026-07-08",
-          "order": 31,
-          "shares": 2,
-          "remainingShares": 2,
-          "costBasisUSD": 298.35,
-          "remainingCostBasisUSD": 298.35,
-          "costBasisNative": 298.35,
-          "remainingCostBasisNative": 298.35,
-          "currency": "USD",
-          "price": 149
-        },
-        {
-          "lotId": "tx_mrkw6so9_bh7gl8",
-          "buyTransactionId": "tx_mrkw6so9_bh7gl8",
-          "date": "2026-07-15",
-          "order": 37,
-          "shares": 5,
-          "remainingShares": 5,
-          "costBasisUSD": 695.34,
-          "remainingCostBasisUSD": 695.34,
-          "costBasisNative": 695.34,
-          "remainingCostBasisNative": 695.34,
-          "currency": "USD",
-          "price": 139
-        },
-        {
-          "lotId": "tx_mrn5mw3z_1vftc9",
-          "buyTransactionId": "tx_mrn5mw3z_1vftc9",
-          "date": "2026-07-15",
-          "order": 39,
-          "shares": 5,
-          "remainingShares": 5,
-          "costBasisUSD": 675.34,
-          "remainingCostBasisUSD": 675.34,
-          "costBasisNative": 675.34,
-          "remainingCostBasisNative": 675.34,
-          "currency": "USD",
-          "price": 135
         },
         {
           "lotId": "tx_mrta51lq_p5xhvg",
@@ -370,65 +328,6 @@
           "remainingCostBasisNative": 1080.35,
           "currency": "USD",
           "price": 1080
-        }
-      ]
-    },
-    {
-      "id": "pos_msfttw3y_rlmlu9",
-      "symbol": "SPCH",
-      "name": "2倍做多SpaceX",
-      "currency": "USD",
-      "source": "twelve",
-      "shares": 1000,
-      "avgCost": 6.07823,
-      "sector": "太空",
-      "color": "#f16183",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "",
-      "costBasisUSD": 6078.23,
-      "lots": [
-        {
-          "lotId": "tx_msfttw3q_667rfu",
-          "buyTransactionId": "tx_msfttw3q_667rfu",
-          "date": "2026-08-05",
-          "order": 57,
-          "shares": 500,
-          "remainingShares": 500,
-          "costBasisUSD": 3151.05,
-          "remainingCostBasisUSD": 3151.05,
-          "costBasisNative": 3151.05,
-          "remainingCostBasisNative": 3151.05,
-          "currency": "USD",
-          "price": 6.3
-        },
-        {
-          "lotId": "tx_msfwutp7_5b1cbo",
-          "buyTransactionId": "tx_msfwutp7_5b1cbo",
-          "date": "2026-08-05",
-          "order": 58,
-          "shares": 250,
-          "remainingShares": 250,
-          "costBasisUSD": 1501.66,
-          "remainingCostBasisUSD": 1501.66,
-          "costBasisNative": 1501.66,
-          "remainingCostBasisNative": 1501.66,
-          "currency": "USD",
-          "price": 6
-        },
-        {
-          "lotId": "tx_msgt1vzd_apvi4y",
-          "buyTransactionId": "tx_msgt1vzd_apvi4y",
-          "date": "2026-08-06",
-          "order": 59,
-          "shares": 250,
-          "remainingShares": 250,
-          "costBasisUSD": 1425.52,
-          "remainingCostBasisUSD": 1425.52,
-          "costBasisNative": 1425.52,
-          "remainingCostBasisNative": 1425.52,
-          "currency": "USD",
-          "price": 5.7
         }
       ]
     }
@@ -775,7 +674,7 @@
       "migration": true,
       "source": "twelve",
       "sector": "太空",
-      "color": "#d03e61",
+      "color": "#f16183",
       "schemaVersion": "10.6",
       "costBasisNative": 1500
     },
@@ -798,7 +697,7 @@
       "migration": true,
       "source": "twelve",
       "sector": "太空",
-      "color": "#d03e61",
+      "color": "#f16183",
       "schemaVersion": "10.6",
       "closedHistory": true
     },
@@ -1269,7 +1168,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#d03e61",
+      "color": "#f16183",
       "schemaVersion": "10.6",
       "feeUSD": 0.35,
       "costBasisUSD": 298.35,
@@ -1401,7 +1300,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#d03e61",
+      "color": "#f16183",
       "schemaVersion": "10.6",
       "feeUSD": 0.34,
       "costBasisUSD": 695.34,
@@ -1445,7 +1344,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#d03e61",
+      "color": "#f16183",
       "schemaVersion": "10.6",
       "feeUSD": 0.34,
       "costBasisUSD": 675.34,
@@ -1511,7 +1410,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#d03e61",
+      "color": "#f16183",
       "schemaVersion": "10.6",
       "feeUSD": 0.34,
       "costBasisUSD": 615.34,
@@ -1656,7 +1555,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#d03e61",
+      "color": "#f16183",
       "schemaVersion": "10.6",
       "feeUSD": 0.34,
       "costBasisUSD": 585.34,
@@ -2018,6 +1917,116 @@
       "costBasisNative": 4460.42,
       "grossUSD": 5400,
       "realizedPnlUSD": 939.0100000000002
+    },
+    {
+      "id": "tx_msjo6usb_yz2xch",
+      "date": "2026-08-08",
+      "type": "sell",
+      "symbol": "SPCH",
+      "name": "2倍做多SpaceX",
+      "shares": 1000,
+      "price": 8.29,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 2.47,
+      "note": "",
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#f16183",
+      "schemaVersion": "10.48",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_msfttw3q_667rfu",
+          "buyTransactionId": "tx_msfttw3q_667rfu",
+          "date": "2026-08-05",
+          "shares": 500,
+          "unitCostUSD": 6.3021,
+          "unitCostNative": 6.3021,
+          "costBasisUSD": 3151.05,
+          "costBasisNative": 3151.05
+        },
+        {
+          "lotId": "tx_msfwutp7_5b1cbo",
+          "buyTransactionId": "tx_msfwutp7_5b1cbo",
+          "date": "2026-08-05",
+          "shares": 250,
+          "unitCostUSD": 6.00664,
+          "unitCostNative": 6.00664,
+          "costBasisUSD": 1501.66,
+          "costBasisNative": 1501.66
+        },
+        {
+          "lotId": "tx_msgt1vzd_apvi4y",
+          "buyTransactionId": "tx_msgt1vzd_apvi4y",
+          "date": "2026-08-06",
+          "shares": 250,
+          "unitCostUSD": 5.70208,
+          "unitCostNative": 5.70208,
+          "costBasisUSD": 1425.52,
+          "costBasisNative": 1425.52
+        }
+      ],
+      "feeUSD": 2.47,
+      "costBasisUSD": 6078.23,
+      "costBasisNative": 6078.23,
+      "grossUSD": 8290,
+      "realizedPnlUSD": 2209.300000000001
+    },
+    {
+      "id": "tx_msjo8xs5_zefmqb",
+      "date": "2026-08-08",
+      "type": "sell",
+      "symbol": "SPCX",
+      "name": "Space X",
+      "shares": 12,
+      "price": 133.2,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.37,
+      "note": "",
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#f16183",
+      "schemaVersion": "10.48",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mrbe5rqe_vhdot4",
+          "buyTransactionId": "tx_mrbe5rqe_vhdot4",
+          "date": "2026-07-08",
+          "shares": 2,
+          "unitCostUSD": 149.175,
+          "unitCostNative": 149.175,
+          "costBasisUSD": 298.35,
+          "costBasisNative": 298.35
+        },
+        {
+          "lotId": "tx_mrkw6so9_bh7gl8",
+          "buyTransactionId": "tx_mrkw6so9_bh7gl8",
+          "date": "2026-07-15",
+          "shares": 5,
+          "unitCostUSD": 139.068,
+          "unitCostNative": 139.068,
+          "costBasisUSD": 695.34,
+          "costBasisNative": 695.34
+        },
+        {
+          "lotId": "tx_mrn5mw3z_1vftc9",
+          "buyTransactionId": "tx_mrn5mw3z_1vftc9",
+          "date": "2026-07-15",
+          "shares": 5,
+          "unitCostUSD": 135.068,
+          "unitCostNative": 135.068,
+          "costBasisUSD": 675.34,
+          "costBasisNative": 675.34
+        }
+      ],
+      "feeUSD": 0.37,
+      "costBasisUSD": 1669.03,
+      "costBasisNative": 1669.03,
+      "grossUSD": 1598.3999999999999,
+      "realizedPnlUSD": -71
     }
   ],
   "cashFlows": [
@@ -2201,6 +2210,22 @@
       "netAsset": 21081.84,
       "market": 18680.59,
       "cash": 2401.25
+    },
+    {
+      "scope": "active",
+      "date": "2026-08-07",
+      "capital": 22370,
+      "netAsset": 21873.08,
+      "market": 19471.83,
+      "cash": 2401.25
+    },
+    {
+      "scope": "active",
+      "date": "2026-08-08",
+      "capital": 22370,
+      "netAsset": 24725.27,
+      "market": 12438.47,
+      "cash": 12286.81
     }
   ],
   "dcaPlan": {
@@ -2213,12 +2238,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 708.51000975,
-        "priceAsOf": "2026-08-06T12:50:00.937Z",
-        "changePercent": 0,
+        "price": 710.71,
+        "priceAsOf": "2026-08-07T20:00:00.000Z",
+        "changePercent": 0.6101359003397593,
         "priceSource": "last-close",
-        "priceProvider": "last-close",
-        "priceUpdatedAt": "2026-08-06T12:50:00.937Z"
+        "priceProvider": "finnhub",
+        "priceUpdatedAt": "2026-08-07T20:00:00.000Z"
       },
       {
         "symbol": "QQQM",
@@ -2226,12 +2251,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 294.3200073,
-        "priceAsOf": "2026-08-06T12:50:00.937Z",
-        "changePercent": 0,
+        "price": 297.7,
+        "priceAsOf": "2026-08-07T20:00:00.000Z",
+        "changePercent": 1.169034187453272,
         "priceSource": "last-close",
-        "priceProvider": "last-close",
-        "priceUpdatedAt": "2026-08-06T12:50:00.937Z"
+        "priceProvider": "finnhub",
+        "priceUpdatedAt": "2026-08-07T20:00:00.000Z"
       }
     ],
     "entries": [
@@ -2340,6 +2365,36 @@
         "countsTowardPlan": true,
         "note": "8月手动定投",
         "source": "manual"
+      }
+    ],
+    "snapshots": [
+      {
+        "date": "2026-06-05",
+        "costBasisUSD": 500.6358995998,
+        "marketValueUSD": 499.9351596498,
+        "pnlUSD": -0.70073995,
+        "returnPct": -0.1399699763
+      },
+      {
+        "date": "2026-07-07",
+        "costBasisUSD": 1001.9721510398,
+        "marketValueUSD": 998.712114,
+        "pnlUSD": -3.2600370398,
+        "returnPct": -0.3253620409
+      },
+      {
+        "date": "2026-08-06",
+        "costBasisUSD": 1001.9721510398,
+        "marketValueUSD": 1018.6419854271,
+        "pnlUSD": 16.6698343873,
+        "returnPct": 1.6637023664
+      },
+      {
+        "date": "2026-08-08",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1530.34544,
+        "pnlUSD": 27.690898,
+        "returnPct": 1.842799
       }
     ]
   }
