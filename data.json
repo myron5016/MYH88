@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-08T01:07:14.224Z",
+    "lastCloudSaveAt": "2026-08-08T01:11:15.135Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -136,7 +136,7 @@
       "source": "manual",
       "shares": 44,
       "avgCost": 11.685,
-      "price": 6.715,
+      "price": 6.92,
       "sector": "半导体",
       "color": "#ff9a58",
       "sectorLocked": false,
@@ -161,8 +161,8 @@
         }
       ],
       "priceSource": "manual",
-      "priceProvider": "",
-      "priceUpdatedAt": "",
+      "priceProvider": "manual",
+      "priceUpdatedAt": "2026-08-08T01:11:04.467Z",
       "priceAsOf": ""
     },
     {
@@ -2223,8 +2223,8 @@
       "scope": "active",
       "date": "2026-08-08",
       "capital": 22370,
-      "netAsset": 24725.27,
-      "market": 12438.47,
+      "netAsset": 24735.65,
+      "market": 12448.84,
       "cash": 12286.81
     }
   ],
