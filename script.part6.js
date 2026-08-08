@@ -58,8 +58,11 @@ function dcaIssuerMark(fund){
 function dcaQuoteLabel(fund){
   const stamp=fund.priceAsOf||fund.priceUpdatedAt;
   if(!stamp)return"价格待刷新";
+  const tradingDay=MYH88Core.quoteTradingDay(stamp,false);
+  if(fund.priceSource==="last-close")return tradingDay?`${tradingDay} 收盘价`:"最近交易日收盘价";
+  if(fund.priceSource==="static")return tradingDay?`${tradingDay} 静态兜底价`:"静态兜底价";
   const date=new Date(stamp);if(Number.isNaN(date.getTime()))return`${escapeHtml(stamp)} 价格`;
-  return`${new Intl.DateTimeFormat("zh-CN",{timeZone:US_MARKET_TZ,month:"numeric",day:"numeric"}).format(date)} 收盘/最新价`
+  return`${tradingDay||date.toLocaleDateString("zh-CN")} 最新价`
 }
 function drawDcaReturnChart(series){
   const svg=$("dcaReturnChart"),empty=$("dcaReturnEmpty"),points=series.points;

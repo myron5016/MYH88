@@ -1,9 +1,9 @@
 {
-  "release": "11.4.2",
-  "version": "V11.4.2 行情白名单修正版",
-  "serviceWorker": "11.4.2",
+  "release": "11.4.3",
+  "version": "V11.4.3 交易日显示修正版",
+  "serviceWorker": "11.4.3",
   "worker": "10.54",
   "ledgerSchema": "10.48",
   "channel": "stable",
-  "builtAt": "2026-08-07T03:45:00.000Z"
+  "builtAt": "2026-08-08T02:00:00.000Z"
 }

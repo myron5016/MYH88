@@ -46,7 +46,7 @@ function companyLogoMarkup(label){
   const glyph=COMPANY_LOGO_GLYPHS[key]||key.slice(0,2)||".";
   const asset=COMPANY_LOGO_ASSETS[key];
   const domain=COMPANY_LOGO_DOMAINS[key];
-  const localSrc=asset?`logos/${asset}?v=11.4.2`:"";
+  const localSrc=asset?`logos/${asset}?v=11.4.3`:"";
   const officialSrc=domain?`https://www.google.com/s2/favicons?domain=${domain}&sz=128`:"";
   const alternateSrc=domain?`https://icons.duckduckgo.com/ip3/${domain}.ico`:"";
   const safeKey=key.toLowerCase().replace(/[^a-z0-9-]/g,"")||"asset";

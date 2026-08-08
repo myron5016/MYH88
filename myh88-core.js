@@ -221,6 +221,15 @@
     return Object.fromEntries([...bySymbol.entries()].map(([symbol, lots]) => [symbol, lots.map((lot) => ({ ...lot }))]));
   }
 
+  function quoteTradingDay(value, includeYear = true) {
+    const match = String(value || "").trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!match) return "";
+    const [, year, month, day] = match;
+    return includeYear
+      ? `${year}/${Number(month)}/${Number(day)}`
+      : `${Number(month)}/${Number(day)}`;
+  }
+
   function buildHistoricalSnapshot(state = {}, date = "", prices = {}) {
     const asOf = String(date || "");
     const transactions = (state.transactions || []).filter((item) => !item?.voided && String(item.date || "") <= asOf);
@@ -573,6 +582,7 @@
     createLot,
     lotsBeforeTransaction,
     marketUSD,
+    quoteTradingDay,
     summarizeLots,
     squarifiedTreemap,
     treemapVisualItems,

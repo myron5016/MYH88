@@ -1,5 +1,5 @@
-const VERSION="V11.4.2 行情白名单修正版";
-const RELEASE="11.4.2";
+const VERSION="V11.4.3 交易日显示修正版";
+const RELEASE="11.4.3";
 const LEDGER_SCHEMA_VERSION="10.33";
 const STATE_KEY="v9_last_state";
 const RETURN_SNAPSHOT_KEY="v10_return_snapshots";
@@ -376,7 +376,7 @@ function priceSourceClass(p){
   if(label.includes("收盘"))return"source-close";
   return"source-muted";
 }
-function quoteDateLabel(p){const stamp=p.priceAsOf||p.priceUpdatedAt;if(!stamp)return"";const date=new Date(stamp);if(Number.isNaN(date.getTime()))return"";const day=new Intl.DateTimeFormat("zh-CN",{timeZone:US_MARKET_TZ,year:"numeric",month:"numeric",day:"numeric"}).format(date);if(p.priceSource==="last-close")return `${day} 收盘价`;if(p.priceSource==="static")return `${day} 静态兜底价`;return `更新于 ${date.toLocaleString("zh-CN")}`}
+function quoteDateLabel(p){const stamp=p.priceAsOf||p.priceUpdatedAt;if(!stamp)return"";const tradingDay=MYH88Core.quoteTradingDay(stamp,true);if(p.priceSource==="last-close")return tradingDay?`${tradingDay} 收盘价`:"";if(p.priceSource==="static")return tradingDay?`${tradingDay} 静态兜底价`:"";const date=new Date(stamp);if(Number.isNaN(date.getTime()))return"";return `更新于 ${date.toLocaleString("zh-CN")}`}
 function quoteSourceSummary(){
   const counts={twe:0,fin:0,manual:0,close:0,static:0,pending:0};
   state.positions.forEach(p=>{

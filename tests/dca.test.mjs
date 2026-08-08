@@ -2,7 +2,13 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 await import("../myh88-core.js");
-const { buildDcaReturnSeries, buildReturnSeries, computeDcaPlan, computeLedgerMetrics } = globalThis.MYH88Core;
+const { buildDcaReturnSeries, buildReturnSeries, computeDcaPlan, computeLedgerMetrics, quoteTradingDay } = globalThis.MYH88Core;
+
+test("行情交易日不会因纽约时区倒退一天", () => {
+  assert.equal(quoteTradingDay("2026-08-07", true), "2026/8/7");
+  assert.equal(quoteTradingDay("2026-08-07T20:00:00.000Z", true), "2026/8/7");
+  assert.equal(quoteTradingDay("2026-08-07T20:00:00.000Z", false), "8/7");
+});
 
 const plan = {
   monthlyBudgetUSD: 500,
