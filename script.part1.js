@@ -1,5 +1,5 @@
-const VERSION="V11.4.3 交易日显示修正版";
-const RELEASE="11.4.3";
+const VERSION="V11.5.0 稳定性修正版";
+const RELEASE="11.5.0";
 const LEDGER_SCHEMA_VERSION="10.33";
 const STATE_KEY="v9_last_state";
 const RETURN_SNAPSHOT_KEY="v10_return_snapshots";
@@ -281,16 +281,45 @@ async function fetchSharedText(){
 function applySharedDataText(raw,reason=""){
   normalizeState(JSON.parse(raw));mergeLocalReturnSnapshots();applyPriceCache();cloudState=structuredClone(state);lastSharedRaw=raw;dirty=false;lastMutationReason="";saveLocal();renderAll();renderSyncStatus();if(reason)$("status").textContent=reason;
 }
+function startInitialLoadTasks(autoRefresh=false){
+  const tasks=[{label:"opening snapshot",task:()=>ensureCurrentMonthOpeningSnapshot()}];
+  if(autoRefresh)tasks.push({label:"initial price refresh",task:()=>smartRefreshPricesOnLoad()});
+  MYH88Core.scheduleBackgroundTasks(tasks,(error,label)=>{
+    console.warn(`MYH88 ${label} failed`,error);
+    lastQuoteWarnings=[lastQuoteWarnings,error?.message||String(error)].filter(Boolean).join("; ");
+    renderDiagnostics();
+  });
+}
+function addMarketCalendarDays(dateString,days){const date=new Date(`${dateString}T12:00:00Z`);date.setUTCDate(date.getUTCDate()+days);return date.toISOString().slice(0,10)}
+function isCompletedTradingDate(dateString){const weekday=new Date(`${dateString}T12:00:00Z`).getUTCDay();return weekday!==0&&weekday!==6&&!US_STATIC_HOLIDAYS[dateString]}
+function lastCompletedMarketDate(now=new Date()){
+  const clock=marketClock(now);let date=clock.date;
+  if(clock.phase==="pre"||clock.phase==="open"||clock.phase==="weekend"||clock.phase==="holiday")date=addMarketCalendarDays(date,-1);
+  while(!isCompletedTradingDate(date))date=addMarketCalendarDays(date,-1);
+  return date;
+}
+async function fetchStaticQuoteCache(symbols){
+  const data=await fetchJson(STATIC_QUOTES_URL,{timeout:FETCH_TIMEOUT_MS});
+  const parsed=MYH88Core.parseStaticQuoteCache(data);
+  const referenceDate=lastCompletedMarketDate();
+  if(!parsed)throw new Error("静态行情缓存格式无效");
+  if(!MYH88Core.isStaticQuoteFresh(parsed,referenceDate,US_STATIC_HOLIDAYS,2))throw new Error(`静态行情已过期：${parsed.asOfDate||"未知日期"}，基准日 ${referenceDate}`);
+  const quotes=parsed.quotes;
+  const picked={};
+  symbols.forEach(symbol=>{if(quotes?.[symbol])picked[symbol]=quotes[symbol]});
+  if(Object.keys(picked).length)return symbols.length===1?picked[symbols[0]]:picked;
+  throw new Error("Static quote cache missing requested symbols");
+}
 async function loadSharedData(autoRefresh=false){
   const status=$("status");status.textContent="正在读取 GitHub 共享数据...";
   try{
-    const raw=await fetchSharedText();applySharedDataText(raw);await ensureCurrentMonthOpeningSnapshot();
+    const raw=await fetchSharedText();applySharedDataText(raw);startInitialLoadTasks(autoRefresh);
     status.textContent=navigator.onLine?(isAdminMode?`已读取共享数据：${new Date().toLocaleString("zh-CN")}`:"已读取最新云端账本"):"离线模式：已读取设备中最近缓存的数据";
-    if(admin.owner&&admin.repo&&admin.token)checkCloudStatus(false);if(autoRefresh)smartRefreshPricesOnLoad();
+    if(admin.owner&&admin.repo&&admin.token)checkCloudStatus(false);
   }catch(error){
     console.warn("共享数据读取失败",error);
     const cached=localStorage.getItem(STATE_KEY)||localStorage.getItem("v8_last_state");
-    if(cached){normalizeState(readJson(cached,defaultState));applyPriceCache();await ensureCurrentMonthOpeningSnapshot();dirty=isAdminMode;lastMutationReason=isAdminMode?"正在使用本机缓存":"";renderAll();status.textContent="读取失败，已使用本机缓存"}
+    if(cached){normalizeState(readJson(cached,defaultState));applyPriceCache();dirty=isAdminMode;lastMutationReason=isAdminMode?"正在使用本机缓存":"";renderAll();startInitialLoadTasks(autoRefresh);status.textContent="读取失败，已使用本机缓存"}
     else{normalizeState(defaultState);dirty=isAdminMode;lastMutationReason=isAdminMode?"云端读取失败":"";renderAll();status.textContent="读取失败，已使用默认数据"}
     renderSyncStatus();
   }

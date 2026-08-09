@@ -206,14 +206,6 @@ async function refreshMarketClock(){
   renderDiagnostics();
   return marketClockState;
 }
-async function fetchStaticQuoteCache(symbols){
-  const data=await fetchJson(STATIC_QUOTES_URL,{timeout:FETCH_TIMEOUT_MS});
-  const quotes=typeof data.body==="string"?JSON.parse(data.body):data;
-  const picked={};
-  symbols.forEach(symbol=>{if(quotes?.[symbol])picked[symbol]=quotes[symbol]});
-  if(Object.keys(picked).length)return symbols.length===1?picked[symbols[0]]:picked;
-  throw new Error("Static quote cache missing requested symbols");
-}
 async function refreshFx(force=false){
   if(!AUTO_FX_PROXY){
     state.fxRates={...state.fxRates,USD:1};

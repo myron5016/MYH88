@@ -230,6 +230,81 @@
       : `${Number(month)}/${Number(day)}`;
   }
 
+  function dateOnly(value) {
+    const text = String(value || "").trim();
+    const match = text.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+    if (match) return `${match[1]}-${String(match[2]).padStart(2, "0")}-${String(match[3]).padStart(2, "0")}`;
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric) || numeric <= 0) return "";
+    const date = new Date(numeric < 1e12 ? numeric * 1000 : numeric);
+    return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
+  }
+
+  function addUtcDays(dateString, days) {
+    const date = new Date(`${dateString}T12:00:00Z`);
+    date.setUTCDate(date.getUTCDate() + days);
+    return date.toISOString().slice(0, 10);
+  }
+
+  function tradingSessionDistance(startDate, endDate, holidays = {}) {
+    if (!startDate || !endDate || startDate > endDate) return Number.POSITIVE_INFINITY;
+    let cursor = startDate;
+    let sessions = 0;
+    let guard = 0;
+    while (cursor < endDate && guard < 4000) {
+      cursor = addUtcDays(cursor, 1);
+      const weekday = new Date(`${cursor}T12:00:00Z`).getUTCDay();
+      if (weekday !== 0 && weekday !== 6 && !holidays[cursor]) sessions += 1;
+      guard += 1;
+    }
+    return guard >= 4000 ? Number.POSITIVE_INFINITY : sessions;
+  }
+
+  function parseStaticQuoteCache(value) {
+    try {
+      const outer = typeof value === "string" ? JSON.parse(value) : value;
+      if (!outer || typeof outer !== "object") return null;
+      const rawQuotes = outer.quotes
+        || (typeof outer.body === "string" ? JSON.parse(outer.body) : outer.body)
+        || outer;
+      if (!rawQuotes || typeof rawQuotes !== "object" || Array.isArray(rawQuotes)) return null;
+      const entries = Object.values(rawQuotes).filter((item) => item && typeof item === "object" && !Array.isArray(item));
+      if (!entries.length) return null;
+      const quoteDates = entries.map((item) => dateOnly(item.datetime || item.date || item.asOf || item.timestamp));
+      if (quoteDates.some((date) => !date)) return null;
+      const cachedAt = Number(outer.cachedAt);
+      return {
+        quotes: rawQuotes,
+        cachedAt: Number.isFinite(cachedAt) ? cachedAt : 0,
+        quoteDates,
+        asOfDate: [...quoteDates].sort()[0],
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  function isStaticQuoteFresh(value, referenceDate, holidays = {}, maxSessions = 2) {
+    const parsed = value?.asOfDate && value?.quotes ? value : parseStaticQuoteCache(value);
+    const reference = dateOnly(referenceDate);
+    if (!parsed?.asOfDate || !reference || parsed.asOfDate > reference) return false;
+    const distance = tradingSessionDistance(parsed.asOfDate, reference, holidays);
+    return Number.isFinite(distance) && distance <= Math.max(0, num(maxSessions));
+  }
+
+  function scheduleBackgroundTasks(tasks = [], onError = () => {}) {
+    return (Array.isArray(tasks) ? tasks : []).map((entry, index) => {
+      const label = typeof entry === "function" ? `background task ${index + 1}` : String(entry?.label || `background task ${index + 1}`);
+      const task = typeof entry === "function" ? entry : entry?.task;
+      return Promise.resolve()
+        .then(() => (typeof task === "function" ? task() : undefined))
+        .catch((error) => {
+          try { onError(error, label); } catch {}
+          return null;
+        });
+    });
+  }
+
   function buildHistoricalSnapshot(state = {}, date = "", prices = {}) {
     const asOf = String(date || "");
     const transactions = (state.transactions || []).filter((item) => !item?.voided && String(item.date || "") <= asOf);
@@ -582,7 +657,10 @@
     createLot,
     lotsBeforeTransaction,
     marketUSD,
+    parseStaticQuoteCache,
     quoteTradingDay,
+    isStaticQuoteFresh,
+    scheduleBackgroundTasks,
     summarizeLots,
     squarifiedTreemap,
     treemapVisualItems,
