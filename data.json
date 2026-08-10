@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-10T03:35:40.820Z",
+    "lastCloudSaveAt": "2026-08-10T13:50:06.478Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -136,7 +136,7 @@
       "source": "manual",
       "shares": 44,
       "avgCost": 11.685,
-      "price": 6.92,
+      "price": 7.61,
       "sector": "半导体",
       "color": "#ff9a58",
       "sectorLocked": false,
@@ -337,14 +337,14 @@
       "name": "2倍做多SpaceX",
       "currency": "USD",
       "source": "twelve",
-      "shares": 250,
-      "avgCost": 8.35312,
+      "shares": 500,
+      "avgCost": 8.327620000000001,
       "sector": "太空",
       "color": "#f16183",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 2088.28,
+      "costBasisUSD": 4163.81,
       "lots": [
         {
           "lotId": "tx_msmohprx_beatxt",
@@ -359,6 +359,20 @@
           "remainingCostBasisNative": 2088.28,
           "currency": "USD",
           "price": 8.35
+        },
+        {
+          "lotId": "tx_msnaeyul_1qr02t",
+          "buyTransactionId": "tx_msnaeyul_1qr02t",
+          "date": "2026-08-10",
+          "order": 65,
+          "shares": 250,
+          "remainingShares": 250,
+          "costBasisUSD": 2075.53,
+          "remainingCostBasisUSD": 2075.53,
+          "costBasisNative": 2075.53,
+          "remainingCostBasisNative": 2075.53,
+          "currency": "USD",
+          "price": 8.3
         }
       ]
     }
@@ -2080,6 +2094,28 @@
       "costBasisNative": 2088.28,
       "grossUSD": 2087.5,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_msnaeyul_1qr02t",
+      "date": "2026-08-10",
+      "type": "buy",
+      "symbol": "SPCH",
+      "name": "2倍做多SpaceX",
+      "shares": 250,
+      "price": 8.3,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.53,
+      "note": "",
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#f16183",
+      "schemaVersion": "10.48",
+      "feeUSD": 0.53,
+      "costBasisUSD": 2075.53,
+      "costBasisNative": 2075.53,
+      "grossUSD": 2075,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -2292,9 +2328,9 @@
       "scope": "active",
       "date": "2026-08-10",
       "capital": 22370,
-      "netAsset": 24717.37,
-      "market": 14518.84,
-      "cash": 10198.53
+      "netAsset": 24892.28,
+      "market": 16769.28,
+      "cash": 8123
     }
   ],
   "dcaPlan": {
@@ -2320,12 +2356,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 297.7,
-        "priceAsOf": "2026-08-07T20:00:00.000Z",
-        "changePercent": 1.169034187453272,
-        "priceSource": "last-close",
+        "price": 297.46,
+        "priceAsOf": "2026-08-10T13:49:39.000Z",
+        "changePercent": -0.08061807188445048,
+        "priceSource": "finnhub",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-08-07T20:00:00.000Z"
+        "priceUpdatedAt": "2026-08-10T13:49:39.000Z"
       }
     ],
     "entries": [
@@ -2468,9 +2504,9 @@
       {
         "date": "2026-08-10",
         "costBasisUSD": 1502.654542,
-        "marketValueUSD": 1530.34544,
-        "pnlUSD": 27.690898,
-        "returnPct": 1.842799
+        "marketValueUSD": 1529.855408,
+        "pnlUSD": 27.200866,
+        "returnPct": 1.810188
       }
     ]
   }
