@@ -12,15 +12,17 @@ const files = Object.fromEntries(await Promise.all(
 ));
 const frontendSource = scriptParts.map((name) => files[name]).join("");
 
-assert.equal(meta.release, "11.5.0");
+assert.equal(meta.release, "11.6.0");
 for (const name of scriptParts) {
-  assert.match(files["index.html"], new RegExp(`${name.replace(".", "\\.")}\\?v=11\\.5\\.0`));
+  assert.match(files["index.html"], new RegExp(`${name.replace(".", "\\.")}\\?v=11\\.6\\.0`));
   assert.ok((await stat(resolve(root, name))).size < 30_000, `${name} exceeds direct-publish limit`);
 }
-assert.match(files["index.html"], /myh88-core\.js\?v=11\.5\.0/);
-assert.match(files["index.html"], /returns-v10\.49\.css\?v=11\.5\.0/);
-assert.match(files["index.html"], /dca-v10\.53\.css\?v=11\.5\.0/);
-assert.match(files["index.html"], /v11-cockpit\.css\?v=11\.5\.0/);
+assert.match(files["index.html"], /myh88-core\.js\?v=11\.6\.0/);
+assert.match(files["index.html"], /returns-v10\.49\.css\?v=11\.6\.0/);
+assert.match(files["index.html"], /dca-v10\.53\.css\?v=11\.6\.0/);
+assert.match(files["index.html"], /v11-cockpit\.css\?v=11\.6\.0/);
+assert.match(files["index.html"], /brand-v11\.6\.css\?v=11\.6\.0/);
+assert.match(files["index.html"], /brand-v11\.6\.js\?v=11\.6\.0/);
 for (const heading of ["代码", "名称", "持仓数量", "持仓市值 (USD)", "持仓占比", "成本价 (USD)", "当前价 (USD)", "浮动盈亏 (USD)", "浮动盈亏率", "操作"]) {
   assert.match(files["index.html"], new RegExp(`<th(?:[^>]*)?>${heading.replace(/[()]/g, "\\$&")}</th>`));
 }
@@ -37,7 +39,9 @@ assert.match(files["index.html"], /仅统计梦想金库主动持仓/);
 assert.match(files["index.html"], /id="dcaReturnChart"/);
 assert.match(frontendSource, /activeReturnSnapshots/);
 assert.match(files["myh88-core.js"], /buildDcaReturnSeries/);
-assert.match(frontendSource, /const VERSION="V11\.5\.0 稳定性修正版"/);
-assert.match(files["service-worker.js"], /const RELEASE="11\.5\.0"/);
+assert.match(frontendSource, /const VERSION="V11\.6\.0 果园生长版"/);
+assert.match(files["service-worker.js"], /const RELEASE="11\.6\.0"/);
+assert.match(files["service-worker.js"], /assets\/hero-orchard\.jpg/);
+assert.match(files["service-worker.js"], /assets\/closing-path\.jpg/);
 assert.match(files["cloudflare-worker.js"], new RegExp(`const WORKER_VERSION = "${meta.worker.replace(".", "\\.")}"`));
-console.log("Release fingerprint is consistent: 11.5.0 (Worker 10.54)");
+console.log("Release fingerprint is consistent: 11.6.0 (Worker 10.54)");

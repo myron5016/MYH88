@@ -13,41 +13,59 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="app-icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="stylesheet" href="style.css?v=11.5.0">
-  <link rel="stylesheet" href="fresh-radar.css?v=11.5.0">
-  <link rel="stylesheet" href="layout-v10.34.css?v=11.5.0">
-  <link rel="stylesheet" href="lot-v10.48.css?v=11.5.0">
-  <link rel="stylesheet" href="returns-v10.49.css?v=11.5.0">
-  <link rel="stylesheet" href="dca-v10.53.css?v=11.5.0">
-  <link rel="stylesheet" href="v11-cockpit.css?v=11.5.0">
+  <link rel="preload" as="image" href="assets/hero-orchard.jpg" fetchpriority="high">
+  <link rel="stylesheet" href="style.css?v=11.6.0">
+  <link rel="stylesheet" href="fresh-radar.css?v=11.6.0">
+  <link rel="stylesheet" href="layout-v10.34.css?v=11.6.0">
+  <link rel="stylesheet" href="lot-v10.48.css?v=11.6.0">
+  <link rel="stylesheet" href="returns-v10.49.css?v=11.6.0">
+  <link rel="stylesheet" href="dca-v10.53.css?v=11.6.0">
+  <link rel="stylesheet" href="v11-cockpit.css?v=11.6.0">
+  <link rel="stylesheet" href="brand-v11.6.css?v=11.6.0">
 </head>
 <body>
-<main id="overview" class="container">
-  <header class="hero">
-    <div class="hero-left">
-      <img src="avatar-baby.jpg" class="avatar" alt="小宝贝头像">
-      <div>
-        <div class="hero-badge">♥ Family Dream Fund · V11.5.0 驾驶舱</div>
-        <h1 id="pageTitle">孟一晗的梦想金库</h1>
-        <p class="subtitle">爸爸妈妈为你种下的未来</p>
+  <header id="overview" class="brand-hero">
+    <img class="brand-hero-media" src="assets/hero-orchard.jpg" fetchpriority="high" decoding="async" alt="一晗在苹果树旁">
+    <div class="brand-hero-shade" aria-hidden="true"></div>
+
+    <nav class="brand-nav" aria-label="桌面端主导航">
+      <a class="brand-mark" href="#overview" aria-label="回到梦想金库首页">
+        <span class="brand-mark-symbol">MYH</span>
+        <span><b>梦想金库</b><small>FAMILY DREAM FUND</small></span>
+      </a>
+      <div class="brand-nav-links">
+        <a href="#overview">总览</a>
+        <a href="#allocationMap">持仓</a>
+        <a href="#analytics">收益</a>
+        <a href="#ledgerPanel">账本</a>
+        <a href="#dcaZone">定投</a>
+      </div>
+      <button id="installAppButton" class="brand-nav-action" onclick="installApp()">安装到手机</button>
+    </nav>
+
+    <div class="brand-hero-copy">
+      <p class="brand-eyebrow">FAMILY DREAM FUND · V11.6</p>
+      <h1 id="pageTitle">孟一晗的梦想金库</h1>
+      <p class="subtitle">爸爸妈妈为你种下的未来</p>
+      <p class="brand-hero-note">记录每一次选择，让时间陪梦想慢慢长大。</p>
+      <div class="hero-actions">
+        <button class="primary" id="refreshButton" onclick="refreshPricesSmart()">智能刷新行情</button>
+        <a class="brand-secondary-action" href="#allocationMap">进入持仓驾驶舱</a>
       </div>
     </div>
-    <aside class="hero-command">
-      <div class="hero-command-head">
-        <div><small>PORTFOLIO COCKPIT</small><strong>持仓运行中心</strong></div>
-        <div class="hero-actions">
-          <button class="primary" id="refreshButton" onclick="refreshPricesSmart()">智能刷新行情</button>
-          <button id="installAppButton" class="install-button" onclick="installApp()">安装到手机</button>
-        </div>
-      </div>
+
+    <div class="brand-hero-rail">
+      <div class="brand-hero-intro"><span></span><b>PORTFOLIO COCKPIT</b><small>持仓运行中心</small></div>
       <section id="diagnosticsStrip" class="diagnostics-strip">
         <span id="versionStatus">版本：读取中</span>
         <span id="marketRouteStatus">行情：等待刷新</span>
         <span id="marketClockStatus">美股：计算中</span>
         <span id="cloudFreshStatus">账本：正在检测</span>
       </section>
-    </aside>
+    </div>
   </header>
+
+<main class="container">
 
   <section id="syncStrip" class="sync-strip">
     <span id="syncDot" class="sync-dot checking"></span>
@@ -261,8 +279,19 @@
     </div>
   </section>
 
-  <footer class="footer">♥ 送给最爱的宝贝</footer>
-</main>
+  </main>
+
+  <section class="brand-closing reveal-on-enter" aria-labelledby="closingTitle">
+    <img class="brand-closing-media" src="assets/closing-path.jpg" loading="lazy" decoding="async" alt="一晗站在城墙通道前">
+    <div class="brand-closing-shade" aria-hidden="true"></div>
+    <div class="brand-closing-copy">
+      <p class="brand-closing-kicker">FOR HER FUTURE</p>
+      <h2 id="closingTitle">把今天的认真，留给她的未来。</h2>
+      <p>每一笔记录，都是时间写给成长的答案。</p>
+      <a href="#overview" class="brand-closing-link">回到金库顶部</a>
+    </div>
+    <p class="brand-closing-signature">送给最爱的宝贝</p>
+  </section>
 
 <nav class="mobile-bottom-nav" aria-label="手机端主导航">
   <a href="#overview" class="active"><span>总览</span></a>
@@ -399,12 +428,13 @@
   </form>
 </dialog>
 
-<script src="myh88-core.js?v=11.5.0"></script>
-<script src="script.part1.js?v=11.5.0"></script>
-<script src="script.part2.js?v=11.5.0"></script>
-<script src="script.part3.js?v=11.5.0"></script>
-<script src="script.part4.js?v=11.5.0"></script>
-<script src="script.part5.js?v=11.5.0"></script>
-<script src="script.part6.js?v=11.5.0"></script>
+<script src="myh88-core.js?v=11.6.0"></script>
+<script src="script.part1.js?v=11.6.0"></script>
+<script src="script.part2.js?v=11.6.0"></script>
+<script src="script.part3.js?v=11.6.0"></script>
+<script src="script.part4.js?v=11.6.0"></script>
+<script src="script.part5.js?v=11.6.0"></script>
+<script src="script.part6.js?v=11.6.0"></script>
+<script src="brand-v11.6.js?v=11.6.0"></script>
 </body>
 </html>
