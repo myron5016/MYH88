@@ -372,7 +372,8 @@ body.brand-ready .brand-hero::after { transform: scaleX(1); }
 }
 
 .brand-closing-media {
-  object-position: center 26%;
+  /* The portrait source needs a top-biased crop on wide screens so her face stays whole. */
+  object-position: center 2%;
   transform: scale(1.06);
   transition: transform 1.6s cubic-bezier(.16,1,.3,1);
 }
