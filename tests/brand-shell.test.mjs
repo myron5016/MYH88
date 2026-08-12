@@ -20,9 +20,9 @@ test("V11.6 brand shell preserves functional anchors", async () => {
 
 test("V11.6 brand shell contains photo Hero and closing page", async () => {
   const index = await read("../index.html");
-  assert.match(index, /class="brand-hero"/);
+  assert.match(index, /class="[^"]*\bbrand-hero\b[^"]*"/);
   assert.match(index, /assets\/hero-orchard\.jpg/);
-  assert.match(index, /class="brand-closing reveal-on-enter"/);
+  assert.match(index, /class="[^"]*\bbrand-closing\b[^"]*\breveal-on-enter\b[^"]*"/);
   assert.match(index, /assets\/closing-path\.jpg/);
   assert.match(index, /把今天的认真，留给她的未来。/);
   assert.doesNotMatch(index, /<footer class="footer">/);

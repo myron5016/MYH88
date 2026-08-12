@@ -46,7 +46,7 @@ function companyLogoMarkup(label){
   const glyph=COMPANY_LOGO_GLYPHS[key]||key.slice(0,2)||".";
   const asset=COMPANY_LOGO_ASSETS[key];
   const domain=COMPANY_LOGO_DOMAINS[key];
-  const localSrc=asset?`logos/${asset}?v=11.6.0`:"";
+  const localSrc=asset?`logos/${asset}?v=11.7.0`:"";
   const officialSrc=domain?`https://www.google.com/s2/favicons?domain=${domain}&sz=128`:"";
   const alternateSrc=domain?`https://icons.duckduckgo.com/ip3/${domain}.ico`:"";
   const safeKey=key.toLowerCase().replace(/[^a-z0-9-]/g,"")||"asset";
@@ -64,13 +64,15 @@ function renderTreemap(){
   const height=mobile?Math.min(690,Math.max(500,430+Math.max(0,items.length-8)*20)):treemapHeight(items.length,width);
   box.style.height=`${height}px`;box.style.minHeight=`${height}px`;
   const tiles=squarifiedTreemap(items,0,0,layoutWidth,layoutHeight);
-  tiles.forEach(t=>{
+  tiles.forEach((t,index)=>{
     const d=document.createElement("div"),share=round(t.value/denom*100),size=treemapTileSize(t),showLogo=size!=="micro",wideCompact=t.w>=180&&t.h>=82&&t.h<175&&t.w/t.h>=1.5;
+    const position=state.positions.find(p=>String(p.symbol||"").toUpperCase()===String(t.label||"").toUpperCase());
     d.className=`tile tile-${size}`;
     if(wideCompact)d.classList.add("tile-wide-compact");
     if(mobile&&share>=35)d.classList.add("tile-dominant");
     Object.assign(d.style,{left:t.x+"px",top:t.y+"px",width:t.w+"px",height:t.h+"px",background:`radial-gradient(circle at 28% 18%, ${mixColor(t.color,"#ffffff",.28)}, transparent 58%), linear-gradient(145deg, ${mixColor(t.color,"#ffffff",.04)}, ${mixColor(t.color,"#000000",.18)})`,borderColor:mixColor(t.color,"#020617",.38),color:"white"});
     d.style.setProperty("--tile-x",t.x+"px");d.style.setProperty("--tile-y",t.y+"px");d.style.setProperty("--tile-w",t.w+"px");d.style.setProperty("--tile-h",t.h+"px");
+    d.dataset.symbol=t.label;d.dataset.sector=position?.sector||"";d.dataset.tileSize=size;d.setAttribute("data-symbol",t.label);d.setAttribute("data-sector",position?.sector||"");d.setAttribute("data-tile-size",size);d.tabIndex=0;d.style.setProperty("--v117-tile-index",String(index));
     d.title=`${t.label} ${money(t.value)} | ${share}%`;
     d.setAttribute("aria-label",`${t.label}，持仓成本 ${money(t.value)}，占比 ${share}%`);
     const meta=size==="large"||wideCompact?`${money(t.value)} | ${share}%`:`${share}%`;
