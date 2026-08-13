@@ -1,11 +1,13 @@
-const WORKER_VERSION = "10.55";
-const WORKER_BUILT_AT = "2026-08-13T00:00:00.000Z";
+const WORKER_VERSION = "10.56";
+const WORKER_BUILT_AT = "2026-08-13T14:10:00.000Z";
 // Provider calls are still protected by the per-symbol KV cache, but a live
 // quote must not be allowed to sit behind a half-hour edge cache.
-const CACHE_SECONDS = 30 * 60;
+// Eight Twelve symbols refreshed every five minutes use at most 624 credits
+// during a full 6.5-hour regular session, staying within the 800-credit plan.
+const CACHE_SECONDS = 5 * 60;
 const STALE_SECONDS = 6 * 60 * 60;
 const LIVE_QUOTE_MAX_AGE_SECONDS = 20 * 60;
-const LIVE_RETRY_COOLDOWN_SECONDS = 10 * 60;
+const LIVE_RETRY_COOLDOWN_SECONDS = 5 * 60;
 const LAST_CLOSE_CACHE_SECONDS = 8 * 24 * 60 * 60;
 const HISTORICAL_CACHE_SECONDS = 365 * 24 * 60 * 60;
 const MARKET_CLOCK_CACHE_SECONDS = 15 * 60;
