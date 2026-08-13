@@ -57,7 +57,7 @@ let lastQuoteCache="";
 let lastQuoteWarnings="";
 let tradeSectorAuto=true;
 let tradeColorAuto=true;
-let buildMeta={release:RELEASE,version:VERSION,serviceWorker:RELEASE,worker:"10.54"};
+let buildMeta={release:RELEASE,version:VERSION,serviceWorker:RELEASE,worker:"10.55"};
 let serviceWorkerVersion="";
 
 const SECTOR_RULES=[

@@ -53,7 +53,7 @@ test("Worker 可直接命中单只股票缓存且不请求整套持仓", async (
     ["quote:live:NVDA", {
       cachedAt: now,
       source: "twelve",
-      body: JSON.stringify({ symbol: "NVDA", close: "200", source: "twelve" }),
+      body: JSON.stringify({ symbol: "NVDA", close: "200", timestamp: Math.floor(now / 1000), source: "twelve" }),
     }],
   ]);
   const env = {
@@ -74,8 +74,78 @@ test("Worker 可直接命中单只股票缓存且不请求整套持仓", async (
   );
   assert.equal(response.status, 200);
   assert.equal(response.headers.get("X-MYH88-Cache"), "HIT-KV-PER-SYMBOL");
+  assert.equal(response.headers.get("Cache-Control"), "no-store, no-cache, must-revalidate, max-age=0");
   assert.deepEqual(await response.json(), {
-    NVDA: { symbol: "NVDA", close: "200", source: "twelve" },
+    NVDA: { symbol: "NVDA", close: "200", timestamp: Math.floor(now / 1000), source: "twelve" },
   });
+  await Promise.all(pending);
+});
+
+test("过旧实时报价不会被当成新鲜缓存继续延长", async () => {
+  const now = Date.now();
+  const records = new Map([
+    ["config:portfolio-symbols:v3", { cachedAt: now, body: JSON.stringify({ symbols: ["SPCH"] }) }],
+    ["quote:live:SPCH", {
+      cachedAt: now - 31 * 60 * 1000,
+      source: "twelve",
+      body: JSON.stringify({ symbol: "SPCH", close: "9.38", timestamp: Math.floor((now - 60 * 60 * 1000) / 1000), source: "twelve" }),
+    }],
+  ]);
+  const env = {
+    TWELVE_DATA_KEY: "configured-twelve-key",
+    FINNHUB_API_KEY: "configured-finnhub-key",
+    TWELVE_PRIORITY_SYMBOLS: "SPCH",
+    MYH88_CACHE: {
+      async get(key) { return records.get(key) || null; },
+      async put() {},
+    },
+    MYH88_QUOTE_LIMITER: { async limit() { return { success: true }; } },
+  };
+  const pending = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    assert.match(String(url), /twelvedata\.com/);
+    return new Response(JSON.stringify({ SPCH: { symbol: "SPCH", close: "9.5", timestamp: Math.floor((now - 60 * 60 * 1000) / 1000) } }), { status: 200 });
+  };
+  try {
+    const response = await worker.fetch(new Request("https://quote.myh88.com/quotes?symbols=SPCH"), env, { waitUntil(promise) { pending.push(promise); } });
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get("X-MYH88-Warnings") || "", /old|fallback/i);
+    assert.equal(response.headers.get("Cache-Control"), "no-store, no-cache, must-revalidate, max-age=0");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+  await Promise.all(pending);
+});
+
+test("没有逐股缓存记录时仍能请求 Provider", async () => {
+  const now = Date.now();
+  const records = new Map([
+    ["config:portfolio-symbols:v3", { cachedAt: now, body: JSON.stringify({ symbols: ["SPCH"] }) }],
+  ]);
+  const env = {
+    TWELVE_DATA_KEY: "configured-twelve-key",
+    FINNHUB_API_KEY: "configured-finnhub-key",
+    TWELVE_PRIORITY_SYMBOLS: "SPCH",
+    MYH88_CACHE: {
+      async get(key) { return records.get(key) || null; },
+      async put() {},
+    },
+    MYH88_QUOTE_LIMITER: { async limit() { return { success: true }; } },
+  };
+  const pending = [];
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    assert.match(String(url), /twelvedata\.com/);
+    return new Response(JSON.stringify({ SPCH: { symbol: "SPCH", close: "9.67", timestamp: Math.floor(now / 1000) } }), { status: 200 });
+  };
+  try {
+    const response = await worker.fetch(new Request("https://quote.myh88.com/quotes?symbols=SPCH"), env, { waitUntil(promise) { pending.push(promise); } });
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("X-MYH88-Source"), "twelve");
+    assert.deepEqual((await response.json()).SPCH.close, "9.67");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
   await Promise.all(pending);
 });

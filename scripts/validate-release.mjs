@@ -46,4 +46,4 @@ assert.match(files["service-worker.js"], /const RELEASE="11\.7\.0"/);
 assert.match(files["service-worker.js"], /assets\/hero-orchard\.jpg/);
 assert.match(files["service-worker.js"], /assets\/closing-path\.jpg/);
 assert.match(files["cloudflare-worker.js"], new RegExp(`const WORKER_VERSION = "${meta.worker.replace(".", "\\.")}"`));
-console.log("Release fingerprint is consistent: 11.7.0 (Worker 10.54)");
+console.log("Release fingerprint is consistent: 11.7.0 (Worker 10.55)");

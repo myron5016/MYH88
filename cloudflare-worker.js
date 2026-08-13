@@ -1,7 +1,11 @@
-const WORKER_VERSION = "10.54";
-const WORKER_BUILT_AT = "2026-08-07T03:45:00.000Z";
+const WORKER_VERSION = "10.55";
+const WORKER_BUILT_AT = "2026-08-13T00:00:00.000Z";
+// Provider calls are still protected by the per-symbol KV cache, but a live
+// quote must not be allowed to sit behind a half-hour edge cache.
 const CACHE_SECONDS = 30 * 60;
 const STALE_SECONDS = 6 * 60 * 60;
+const LIVE_QUOTE_MAX_AGE_SECONDS = 20 * 60;
+const LIVE_RETRY_COOLDOWN_SECONDS = 10 * 60;
 const LAST_CLOSE_CACHE_SECONDS = 8 * 24 * 60 * 60;
 const HISTORICAL_CACHE_SECONDS = 365 * 24 * 60 * 60;
 const MARKET_CLOCK_CACHE_SECONDS = 15 * 60;
@@ -31,6 +35,7 @@ const corsHeaders = {
   "Access-Control-Expose-Headers": "X-MYH88-Cache, X-MYH88-Source, X-MYH88-Fallback-Reason, X-MYH88-Warnings, X-MYH88-As-Of",
   "Cache-Control": `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=${STALE_SECONDS}`,
 };
+const NO_STORE_CACHE_CONTROL = "no-store, no-cache, must-revalidate, max-age=0";
 
 function json(data, status = 200, extraHeaders = {}) {
   return new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, "Content-Type": "application/json; charset=utf-8", ...extraHeaders } });
@@ -94,10 +99,18 @@ function responseFromCached(record, cacheLabel) {
 function jsonResponse(data, cacheLabel = "MISS", metadata = {}) {
   return json(data, 200, { "X-MYH88-Cache": safeHeaderValue(cacheLabel), "X-MYH88-Source": safeHeaderValue(metadata.source), "X-MYH88-As-Of": safeHeaderValue(metadata.asOf), ...(metadata.warnings ? { "X-MYH88-Warnings": safeHeaderValue(metadata.warnings) } : {}), ...(metadata.fallbackReason ? { "X-MYH88-Fallback-Reason": safeHeaderValue(metadata.fallbackReason, 120) } : {}) });
 }
+function quoteResponse(data, cacheLabel = "MISS", metadata = {}) {
+  const response = jsonResponse(data, cacheLabel, metadata);
+  response.headers.set("Cache-Control", NO_STORE_CACHE_CONTROL);
+  return response;
+}
 async function fetchJsonUpstream(url, timeoutMs = 8000) {
   const controller = new AbortController(), timer = setTimeout(() => controller.abort("upstream timeout"), timeoutMs);
   try {
-    const response = await fetch(url.toString(), { headers: { Accept: "application/json" }, signal: controller.signal, cf: { cacheTtl: CACHE_SECONDS, cacheEverything: true } });
+    // Do not let Cloudflare cache Twelve/Finnhub JSON. The KV layer below is
+    // the quota-aware cache; caching this subrequest can make a fresh KV write
+    // contain an already-old provider response.
+    const response = await fetch(url.toString(), { headers: { Accept: "application/json", "Cache-Control": "no-cache", Pragma: "no-cache" }, signal: controller.signal });
     const text = await response.text().catch(() => ""); let data = {};
     try { data = JSON.parse(text || "{}"); } catch {}
     if (!response.ok || data.code || data.status === "error") throw new Error(safeHeaderValue(data.message || data.error || text.slice(0, 160) || `Upstream error ${response.status}`, 320));
@@ -132,6 +145,19 @@ function normalizeHistoricalQuote(symbol, date, item, source) {
   if (!(close > 0)) throw new Error(`${source} historical close missing for ${symbol}`);
   return { symbol, name: symbol, currency: "USD", exchange: "", datetime: `${date}T20:00:00.000Z`, timestamp: Math.floor(Date.parse(`${date}T20:00:00.000Z`) / 1000), open: String(open), high: String(high), low: String(low), close: String(close), previous_close: String(close), change: "0", percent_change: "0", is_market_open: false, source, as_of: date };
 }
+function quoteTimestampMs(quote) {
+  const epoch = Number(quote?.last_quote_at || quote?.timestamp || 0);
+  if (Number.isFinite(epoch) && epoch > 0) return epoch > 1e12 ? epoch : epoch * 1000;
+  const parsed = Date.parse(String(quote?.datetime || ""));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+function quoteAgeSeconds(quote, now = Date.now()) {
+  const timestamp = quoteTimestampMs(quote);
+  return timestamp ? Math.max(0, (now - timestamp) / 1000) : Number.POSITIVE_INFINITY;
+}
+function isFreshLiveQuote(quote, now = Date.now()) {
+  return quoteAgeSeconds(quote, now) <= LIVE_QUOTE_MAX_AGE_SECONDS;
+}
 async function fetchTwelveHistoricalClose(symbol, date, key) {
   if (!key || key.length < 10) throw new Error("TWELVE_DATA_KEY is missing or invalid");
   const url = new URL(`${TWELVE_BASE}/time_series`);
@@ -162,24 +188,47 @@ async function fetchFinnhubPartial(symbols, key) {
   }
   return { quotes, errors };
 }
-async function fetchQuotesWithFallback(symbols, env, routingPlan) {
+async function fetchQuotesWithFallback(symbols, env, routingPlan, cachedQuotes = {}) {
   const twelveKey = String(env.TWELVE_DATA_KEY || "").trim(), finnhubKey = String(env.FINNHUB_API_KEY || "").trim(), warnings = [], quotes = {};
+  const staleTwelve = {};
   const twelveFirst = symbols.filter((symbol) => routingPlan.twelve.includes(symbol));
   const finnhubFirst = symbols.filter((symbol) => routingPlan.finnhub.includes(symbol));
   let twelveReason = "";
   const twelveBackoff = await providerBackedOff(env, "twelve");
   if (twelveFirst.length && !twelveBackoff) {
-    try { Object.assign(quotes, quoteMapFromProvider(await fetchTwelveQuotes(twelveFirst, twelveKey), twelveFirst, "twelve")); }
+    try {
+      const twelveQuotes = quoteMapFromProvider(await fetchTwelveQuotes(twelveFirst, twelveKey), twelveFirst, "twelve");
+      for (const symbol of twelveFirst) {
+        const quote = twelveQuotes[symbol];
+        if (!quote) continue;
+        if (isFreshLiveQuote(quote)) quotes[symbol] = quote;
+        else {
+          staleTwelve[symbol] = quote;
+          warnings.push(`${symbol}: Twelve quote is ${Math.round(quoteAgeSeconds(quote) / 60)}m old`);
+        }
+      }
+    }
     catch (error) { twelveReason = safeHeaderValue(error.message || "Twelve failed", 240); warnings.push(`Twelve: ${twelveReason}`); await backoffProvider(env, "twelve", error); }
   } else if (twelveFirst.length) { twelveReason = "Twelve temporarily backed off"; warnings.push(twelveReason); }
   const missing = [...finnhubFirst, ...twelveFirst.filter((symbol) => !quotes[symbol])];
   const finnhubBackoff = await providerBackedOff(env, "finnhub");
-  if (missing.length && !finnhubBackoff) {
-    const result = await fetchFinnhubPartial(missing, finnhubKey);
+  // During a Twelve backoff, do not repeatedly spend Finnhub calls for every
+  // symbol that already has a usable stale quote. Only symbols without any
+  // fallback value are allowed through to Finnhub.
+  const finnhubSymbols = missing.filter((symbol) => !(twelveBackoff && cachedQuotes[symbol]));
+  if (finnhubSymbols.length && !finnhubBackoff) {
+    const result = await fetchFinnhubPartial(finnhubSymbols, finnhubKey);
     Object.assign(quotes, result.quotes);
     warnings.push(...result.errors);
     if (result.errors.some((message) => isQuotaError(message))) await backoffProvider(env, "finnhub", new Error(result.errors.join("; ")));
   } else if (missing.length) warnings.push("Finnhub temporarily backed off");
+  for (const [symbol, quote] of Object.entries(staleTwelve)) {
+    const fallback = quotes[symbol];
+    if (!fallback || quoteTimestampMs(quote) > quoteTimestampMs(fallback)) {
+      quotes[symbol] = quote;
+      warnings.push(`${symbol}: fallback provider did not return a newer quote`);
+    }
+  }
   if (!Object.keys(quotes).length) throw new Error(warnings.join("; ") || "No usable quotes");
   const sources = new Set(Object.values(quotes).map((quote) => quote.source));
   return { quotes, source: sources.size > 1 ? "mixed" : sources.has("twelve") ? "twelve" : "finnhub", warnings, fallbackReason: twelveReason };
@@ -193,39 +242,50 @@ async function fetchQuotesWithCache(request, env, ctx, canonicalSymbols, request
     const key = quoteCacheKey(symbol, mode, asOf), record = await readSharedCache(env, key);
     let quote = null;
     try { quote = record?.body ? JSON.parse(record.body) : null; } catch {}
-    const fresh = Boolean(quote && Date.now() - Number(record.cachedAt || 0) < maxAge * 1000);
-    return { symbol, key, record, quote, fresh };
+    const cachedAtAge = Date.now() - Number(record?.cachedAt || 0);
+    const fresh = Boolean(quote && cachedAtAge < maxAge * 1000 && (isLastClose || isFreshLiveQuote(quote)));
+    const retryBlocked = Boolean(!isLastClose && quote && !fresh && cachedAtAge >= 0 && cachedAtAge < LIVE_RETRY_COOLDOWN_SECONDS * 1000);
+    return { symbol, key, record, quote, fresh, retryBlocked };
   }));
-  const body = Object.fromEntries(records.filter((item) => item.fresh).map((item) => [item.symbol, item.quote]));
-  const missing = records.filter((item) => !item.fresh).map((item) => item.symbol);
+  const body = Object.fromEntries(records.filter((item) => item.fresh || item.retryBlocked).map((item) => [item.symbol, item.quote]));
+  const missing = records.filter((item) => !item.fresh && !item.retryBlocked).map((item) => item.symbol);
   if (!missing.length) {
     const sources = new Set(Object.values(body).map((quote) => quote.source).filter(Boolean));
     const source = sources.size > 1 ? "mixed" : [...sources][0] || "cache";
-    return jsonResponse(body, isLastClose ? "HIT-LAST-CLOSE-PER-SYMBOL" : "HIT-KV-PER-SYMBOL", { source, asOf });
+    return isLastClose
+      ? jsonResponse(body, "HIT-LAST-CLOSE-PER-SYMBOL", { source, asOf })
+      : quoteResponse(body, records.some((item) => item.retryBlocked) ? "STALE-RETRY-COOLDOWN" : "HIT-KV-PER-SYMBOL", { source, asOf, warnings: records.some((item) => item.retryBlocked) ? "Provider quote timestamp is old; retry cooldown protects API quota" : "" });
   }
   const limit = await limitMiss(env, `quotes:${mode}`);
   if (!limit.success) {
     const stale = records.filter((item) => !item.fresh && item.quote);
     stale.forEach((item) => { body[item.symbol] = item.quote; });
-    if (Object.keys(body).length === requestedSymbols.length) return jsonResponse(body, "STALE-RATE-LIMIT", { source: "mixed", asOf, warnings: "Refresh rate limited; per-symbol stale cache used" });
+    if (Object.keys(body).length === requestedSymbols.length) return isLastClose
+      ? jsonResponse(body, "STALE-RATE-LIMIT", { source: "mixed", asOf, warnings: "Refresh rate limited; per-symbol stale cache used" })
+      : quoteResponse(body, "STALE-RATE-LIMIT", { source: "mixed", asOf, warnings: "Refresh rate limited; per-symbol stale cache used" });
     log("quote_rate_limited", { mode, missing: missing.join(",") });
     return noStoreJson({ error: "Quote refresh is temporarily busy. Please retry shortly." }, 429);
   }
   try {
     const routingPlan = buildProviderPlan(canonicalSymbols, configuredTwelvePriority(env), TWELVE_BATCH_LIMIT);
-    const result = await fetchQuotesWithFallback(missing, env, routingPlan);
+    const cachedQuotes = Object.fromEntries(records.filter((item) => item.quote).map((item) => [item.symbol, item.quote]));
+    const result = await fetchQuotesWithFallback(missing, env, routingPlan, cachedQuotes);
     Object.assign(body, result.quotes);
     const unresolved = records.filter((item) => !body[item.symbol] && item.quote);
     unresolved.forEach((item) => { body[item.symbol] = item.quote; });
     if (!Object.keys(body).length) throw new Error("No usable quotes");
     const cacheLabel = unresolved.length ? `PARTIAL-STALE-${result.source.toUpperCase()}` : `MISS-${result.source.toUpperCase()}`;
-    const response = jsonResponse(body, `${cacheLabel}${isLastClose ? "-LAST-CLOSE" : ""}`, { source: result.source, asOf, warnings: result.warnings.join(" | "), fallbackReason: result.fallbackReason });
-    response.headers.set("Cache-Control", `public, max-age=${maxAge}, stale-while-revalidate=${ttl}`);
+    const response = isLastClose
+      ? jsonResponse(body, `${cacheLabel}-LAST-CLOSE`, { source: result.source, asOf, warnings: result.warnings.join(" | "), fallbackReason: result.fallbackReason })
+      : quoteResponse(body, cacheLabel, { source: result.source, asOf, warnings: result.warnings.join(" | "), fallbackReason: result.fallbackReason });
+    response.headers.set("Cache-Control", isLastClose
+      ? `public, max-age=${maxAge}, stale-while-revalidate=${ttl}`
+      : NO_STORE_CACHE_CONTROL);
     const writes = Object.entries(result.quotes).map(([symbol, quote]) => writeSharedCache(
       env,
       quoteCacheKey(symbol, mode, asOf),
       jsonResponse(quote, "STORE-PER-SYMBOL", { source: quote.source, asOf }),
-      ttl,
+      isLastClose ? ttl : isFreshLiveQuote(quote) ? ttl : LIVE_RETRY_COOLDOWN_SECONDS,
     ));
     ctx.waitUntil(Promise.all(writes));
     log("quote_refresh", { source: result.source, fetched: Object.keys(result.quotes).join(","), served: Object.keys(body).length, mode });
@@ -234,7 +294,9 @@ async function fetchQuotesWithCache(request, env, ctx, canonicalSymbols, request
     const stale = records.filter((item) => item.quote);
     stale.forEach((item) => { body[item.symbol] = item.quote; });
     log("quote_refresh_failed", { mode, missing: missing.join(","), message: error.message });
-    if (Object.keys(body).length) return jsonResponse(body, "STALE-KV-PER-SYMBOL", { source: "mixed", asOf, warnings: error.message });
+    if (Object.keys(body).length) return isLastClose
+      ? jsonResponse(body, "STALE-KV-PER-SYMBOL", { source: "mixed", asOf, warnings: error.message })
+      : quoteResponse(body, "STALE-KV-PER-SYMBOL", { source: "mixed", asOf, warnings: error.message });
     return noStoreJson({ error: error.message || "Quote request failed" }, 502);
   }
 }
@@ -287,6 +349,8 @@ export default {
           cacheMode: "per-symbol",
           cacheSeconds: CACHE_SECONDS,
           staleSeconds: STALE_SECONDS,
+          liveQuoteMaxAgeSeconds: LIVE_QUOTE_MAX_AGE_SECONDS,
+          liveRetryCooldownSeconds: LIVE_RETRY_COOLDOWN_SECONDS,
           lastCloseCacheSeconds: LAST_CLOSE_CACHE_SECONDS,
           historicalCacheSeconds: HISTORICAL_CACHE_SECONDS,
           sharedCache: Boolean(env.MYH88_CACHE),

@@ -141,7 +141,6 @@ function kickAutoRefresh(force=false){
   const now=Date.now();
   if(!force&&now-lastAutoRefreshKick<RESUME_REFRESH_GAP_MS)return;
   if(!(marketClockState?.isOpen||marketClockState?.phase==="open")){lastAutoRefreshKick=now;refreshLastClosePrices(marketClockState||marketClock());return}
-  if(!force&&priceCacheValid()){applyPriceCache();renderAll();return}
   lastAutoRefreshKick=now;
   refreshPrices(false);
 }
