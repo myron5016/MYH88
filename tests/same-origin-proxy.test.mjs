@@ -12,7 +12,7 @@ test("same-origin quote fallback is routed only to API paths", async () => {
     read("../cloudflare-worker.js"),
   ]);
   const parsedRoutes = JSON.parse(routes);
-  assert.deepEqual(parsedRoutes, { version: 1, include: ["/api/*"] });
+  assert.deepEqual(parsedRoutes, { version: 1, include: ["/api/*"], exclude: [] });
   assert.match(functionSource, /quote\.myh88\.com/);
   assert.match(functionSource, /params\?\.path/);
   assert.match(runtime, /DEFAULT_PRICE_PROXY_URLS=\["\/api","https:\/\/quote\.myh88\.com"\]/);
