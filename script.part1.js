@@ -10,7 +10,7 @@ const MARKET_KEY="v9_market_key";
 const PAGE_SIZE=20;
 const FETCH_TIMEOUT_MS=20000;
 const PROXY_TIMEOUT_MS=25000;
-const DEFAULT_PRICE_PROXY_URLS=["https://quote.myh88.com"];
+const DEFAULT_PRICE_PROXY_URLS=["/api","https://quote.myh88.com"];
 const STATIC_QUOTES_URL="./kv-quotes-all-current.json";
 const AUTO_FX_PROXY=false;
 const AUTO_REFRESH_CHECK_MS=5*60000;
@@ -173,7 +173,7 @@ function normalizeProxyUrl(value){return String(value||"").trim().replace(/\/+$/
 function parseProxyUrls(value){return String(value||"").split(/[\n,，\s]+/).map(normalizeProxyUrl).filter(Boolean)}
 function priceProxyUrls(){
   const configured=[...(Array.isArray(state.settings?.priceProxyUrls)?state.settings.priceProxyUrls:[]),state.settings?.priceProxyUrl,localStorage.getItem("v10_price_proxy")];
-  const urls=[...configured.flatMap(parseProxyUrls),...DEFAULT_PRICE_PROXY_URLS];
+  const urls=[...DEFAULT_PRICE_PROXY_URLS,...configured.flatMap(parseProxyUrls)];
   return [...new Set(urls)];
 }
 function priceProxyUrl(){return priceProxyUrls()[0]||""}
