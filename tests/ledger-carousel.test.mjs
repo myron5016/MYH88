@@ -268,6 +268,27 @@ function extractTableOpeningTag(fragment, boundary) {
   return fragment.match(new RegExp(`<table\\b(?=[^>]*data-holdings-table="${boundary}")[^>]*>`))?.[0] || "";
 }
 
+function cssAtRuleBodies(css, atRule) {
+  const bodies = [];
+  let searchFrom = 0;
+  while (true) {
+    const start = css.indexOf(atRule, searchFrom);
+    if (start < 0) return bodies;
+    const open = css.indexOf("{", start + atRule.length);
+    assert.notEqual(open, -1, `${atRule} must open a CSS block`);
+    let depth = 1;
+    let cursor = open + 1;
+    while (cursor < css.length && depth > 0) {
+      if (css[cursor] === "{") depth += 1;
+      if (css[cursor] === "}") depth -= 1;
+      cursor += 1;
+    }
+    assert.equal(depth, 0, `${atRule} must close its CSS block`);
+    bodies.push(css.slice(open + 1, cursor - 1));
+    searchFrom = cursor;
+  }
+}
+
 function assertTask2Interface(harness, name) {
   assert.equal(harness.hasInterface(name), "function", `Task 2 interface ${name} must be defined`);
 }
@@ -431,6 +452,8 @@ test("carousel handlers execute guarded touch and directional keyboard navigatio
 
 test("ledger carousel CSS keeps page movement contained and accessible", async () => {
   const css = await read("brand-v11.7.css");
+  const mobileBlocks = cssAtRuleBodies(css, "@media (max-width: 700px)");
+  const ledgerMobile = mobileBlocks.find((block) => block.includes(".ledger-carousel-controls"));
 
   assert.match(css, /\.ledger-carousel-viewport\s*\{[^}]*\boverflow\s*:\s*hidden\b/s);
   assert.match(css, /\.ledger-carousel-track\s*\{[^}]*\bdisplay\s*:\s*flex\b[^}]*\bwidth\s*:\s*100%[^}]*\btransition\s*:\s*transform/s);
@@ -438,6 +461,10 @@ test("ledger carousel CSS keeps page movement contained and accessible", async (
   assert.match(css, /\.ledger-carousel-controls\s+button\s*\{[^}]*\bmin-width\s*:\s*44px[^}]*\bmin-height\s*:\s*44px/s);
   assert.match(css, /\.ledger-page-dot\s*\{[^}]*\bborder-radius\s*:\s*50%/s);
   assert.match(css, /\.ledger-carousel-viewport\s+\.table-wrap\s*\{[^}]*\boverflow-x\s*:\s*auto/s);
-  assert.match(css, /@media\s*\(max-width:\s*700px\)[\s\S]*?\.ledger-carousel-controls/s);
+  assert.ok(ledgerMobile, "a max-width: 700px media block must own the ledger mobile layout");
+  assert.match(ledgerMobile, /\.ledger-carousel-controls\s*\{[^}]*\bgrid-template-columns\s*:\s*minmax\(0,\s*1fr\)\s+44px\s+44px\s+minmax\(0,\s*1fr\)[^}]*\bgrid-template-rows\s*:\s*44px\s+44px/s);
+  assert.match(ledgerMobile, /\.ledger-page-dots\s*\{[^}]*\bgrid-column\s*:\s*1\s*\/\s*-1[^}]*\bgrid-row\s*:\s*1[^}]*\bwidth\s*:\s*100%/s);
+  assert.match(ledgerMobile, /\.ledger-carousel-controls\s*>\s*button:first-child\s*\{[^}]*\bgrid-column\s*:\s*2[^}]*\bgrid-row\s*:\s*2/s);
+  assert.match(ledgerMobile, /\.ledger-carousel-controls\s*>\s*button:last-child\s*\{[^}]*\bgrid-column\s*:\s*3[^}]*\bgrid-row\s*:\s*2/s);
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.ledger-carousel-track\s*\{[^}]*\btransition\s*:\s*none\s*!important/s);
 });

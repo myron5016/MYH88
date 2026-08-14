@@ -1,5 +1,5 @@
-const VERSION="V11.7.0 果园生长版";
-const RELEASE="11.7.0";
+const VERSION="V11.7.1 果园生长版";
+const RELEASE="11.7.1";
 const LEDGER_SCHEMA_VERSION="10.33";
 const STATE_KEY="v9_last_state";
 const RETURN_SNAPSHOT_KEY="v10_return_snapshots";

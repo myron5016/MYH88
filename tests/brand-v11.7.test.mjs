@@ -76,11 +76,14 @@ test("V11.7 map renderer exposes stable visual metadata", async () => {
 });
 
 test("V11.7 release fingerprint is consistent and keeps Worker 10.56", async () => {
-  const [worker, meta, pkg] = await Promise.all([
+  const [runtime, worker, meta, pkg] = await Promise.all([
+    read("../script.part1.js"),
     read("../service-worker.js"),
     read("../build-meta.json"),
     read("../package.json"),
   ]);
+  assert.match(runtime, /const VERSION=["']V11\.7\.1 果园生长版["']/);
+  assert.match(runtime, /const RELEASE=["']11\.7\.1["']/);
   assert.match(worker, /const RELEASE=["']11\.7\.1["']/);
   assert.match(worker, /brand-v11\.7\.css/);
   assert.match(worker, /brand-v11\.7\.js/);

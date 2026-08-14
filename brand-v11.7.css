@@ -407,8 +407,22 @@ body {
   .ledger-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .ledger-overview > div { min-height: 94px; padding: 14px; }
   .ledger-overview strong { font-size: 16px; }
-  .ledger-carousel-controls { gap: 6px; margin-top: 10px; }
-  .ledger-page-dots { gap: 0; }
+  .ledger-carousel-controls {
+    grid-template-columns: minmax(0, 1fr) 44px 44px minmax(0, 1fr);
+    grid-template-rows: 44px 44px;
+    column-gap: 8px;
+    row-gap: 8px;
+    margin-top: 10px;
+  }
+  .ledger-page-dots {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    width: 100%;
+    gap: 0;
+    justify-content: space-evenly;
+  }
+  .ledger-carousel-controls > button:first-child { grid-column: 2; grid-row: 2; }
+  .ledger-carousel-controls > button:last-child { grid-column: 3; grid-row: 2; }
 }
 
 @media (prefers-reduced-motion: reduce) {
