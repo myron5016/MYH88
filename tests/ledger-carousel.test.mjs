@@ -1,62 +1,176 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { createContext, runInContext } from "node:vm";
 
 const read = (name) => readFile(new URL(`../${name}`, import.meta.url), "utf8");
 const LEDGER_PAGES = ["overview", "transactions", "positions", "cashflows", "backup"];
 
-function extractFunctionBody(source, functionName) {
-  const signatureStart = source.indexOf(`function ${functionName}`);
-  if (signatureStart < 0) throw new Error(`Missing function: ${functionName}`);
-  const bodyStart = source.indexOf("{", signatureStart);
-  if (bodyStart < 0) throw new Error(`Missing function body: ${functionName}`);
-
-  let depth = 0;
-  let quote = "";
-  let escaped = false;
-  let lineComment = false;
-  let blockComment = false;
-  for (let index = bodyStart; index < source.length; index += 1) {
-    const char = source[index];
-    const next = source[index + 1];
-    if (lineComment) {
-      if (char === "\n") lineComment = false;
-      continue;
-    }
-    if (blockComment) {
-      if (char === "*" && next === "/") {
-        blockComment = false;
-        index += 1;
-      }
-      continue;
-    }
-    if (quote) {
-      if (escaped) escaped = false;
-      else if (char === "\\") escaped = true;
-      else if (char === quote) quote = "";
-      continue;
-    }
-    if (char === "/" && next === "/") {
-      lineComment = true;
-      index += 1;
-      continue;
-    }
-    if (char === "/" && next === "*") {
-      blockComment = true;
-      index += 1;
-      continue;
-    }
-    if (["'", "\"", "`"].includes(char)) {
-      quote = char;
-      continue;
-    }
-    if (char === "{") depth += 1;
-    if (char === "}") {
-      depth -= 1;
-      if (depth === 0) return source.slice(bodyStart + 1, index);
-    }
+class MockClassList {
+  constructor(names = []) {
+    this.names = new Set(names);
   }
-  throw new Error(`Unclosed function body: ${functionName}`);
+
+  add(...names) {
+    names.forEach((name) => this.names.add(name));
+  }
+
+  remove(...names) {
+    names.forEach((name) => this.names.delete(name));
+  }
+
+  contains(name) {
+    return this.names.has(name);
+  }
+
+  toggle(name, force) {
+    const enabled = force === undefined ? !this.names.has(name) : Boolean(force);
+    if (enabled) this.names.add(name);
+    else this.names.delete(name);
+    return enabled;
+  }
+}
+
+class MockElement {
+  constructor({ id = "", tagName = "div", classes = [], dataset = {} } = {}) {
+    this.id = id;
+    this.tagName = tagName.toUpperCase();
+    this.dataset = { ...dataset };
+    this.classList = new MockClassList(classes);
+    this.attributes = new Map();
+    this.listeners = new Map();
+    this.style = { setProperty(name, value) { this[name] = value; } };
+    this.hidden = false;
+    this.textContent = "";
+    this.innerHTML = "";
+    this.queryAll = () => [];
+  }
+
+  addEventListener(type, handler) {
+    const handlers = this.listeners.get(type) || [];
+    handlers.push(handler);
+    this.listeners.set(type, handlers);
+  }
+
+  dispatch(type, event = {}) {
+    for (const handler of this.listeners.get(type) || []) handler.call(this, event);
+  }
+
+  setAttribute(name, value) {
+    this.attributes.set(name, String(value));
+  }
+
+  getAttribute(name) {
+    return this.attributes.get(name) ?? null;
+  }
+
+  removeAttribute(name) {
+    this.attributes.delete(name);
+  }
+
+  toggleAttribute(name, force) {
+    if (force) this.setAttribute(name, "");
+    else this.removeAttribute(name);
+  }
+
+  matches(selector) {
+    return selector.split(",").some((part) => {
+      const simple = part.trim();
+      if (simple.startsWith(".")) return this.classList.contains(simple.slice(1));
+      const dataAttribute = simple.match(/^\[data-([a-z-]+)(?:=["']([^"']+)["'])?\]$/);
+      if (dataAttribute) {
+        const key = dataAttribute[1].replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+        return key in this.dataset && (dataAttribute[2] === undefined || this.dataset[key] === dataAttribute[2]);
+      }
+      return simple.toUpperCase() === this.tagName;
+    });
+  }
+
+  closest(selector) {
+    return this.matches(selector) ? this : null;
+  }
+
+  querySelectorAll(selector) {
+    return this.queryAll(selector);
+  }
+
+  querySelector(selector) {
+    return this.querySelectorAll(selector)[0] || null;
+  }
+
+  focus() {}
+}
+
+function createControllerHarness(controller, { admin = false } = {}) {
+  const pageControls = LEDGER_PAGES.map((page) => new MockElement({
+    tagName: "button",
+    classes: ["tab"],
+    dataset: { ledgerPage: page, tab: page },
+  }));
+  const pageDots = LEDGER_PAGES.map((page) => new MockElement({
+    tagName: "button",
+    classes: ["ledger-page-dot"],
+    dataset: { ledgerDot: page },
+  }));
+  const panes = LEDGER_PAGES.map((page) => new MockElement({
+    id: page === "overview" ? "ledgerOverviewPane" : `${page}Pane`,
+    classes: ["ledger-page"],
+    dataset: { ledgerPane: page },
+  }));
+  const carousel = new MockElement({ id: "ledgerCarousel", classes: ["ledger-carousel", "ledger-carousel-viewport"] });
+  const track = new MockElement({ id: "ledgerCarouselTrack", classes: ["ledger-carousel-track"] });
+  const elements = [carousel, track, ...pageControls, ...pageDots, ...panes];
+  const byId = new Map(elements.filter((element) => element.id).map((element) => [element.id, element]));
+  byId.set("ledgerCarouselViewport", carousel);
+
+  const querySelectorAll = (selector) => elements.filter((element) => element.matches(selector));
+  elements.forEach((element) => { element.queryAll = querySelectorAll; });
+  const document = {
+    getElementById(id) {
+      if (!byId.has(id)) byId.set(id, new MockElement({ id }));
+      return byId.get(id);
+    },
+    querySelectorAll,
+    querySelector(selector) {
+      return querySelectorAll(selector)[0] || null;
+    },
+    createElement(tagName) {
+      return new MockElement({ tagName });
+    },
+  };
+
+  let backupRenderCount = 0;
+  const context = createContext({
+    console,
+    document,
+    Element: MockElement,
+    HTMLElement: MockElement,
+    isAdminMode: admin,
+    activeLedgerTab: "overview",
+    state: { positions: [], transactions: [], cashFlows: [], snapshots: [], settings: {} },
+    $: (id) => document.getElementById(id),
+    escapeHtml: (value) => String(value ?? ""),
+    money: (value) => `$${Number(value) || 0}`,
+    renderBackupList: () => { backupRenderCount += 1; },
+    MYH88Core: {},
+  });
+  runInContext(controller, context, { filename: "script.part3.js" });
+
+  return {
+    context,
+    elements,
+    activePage: () => runInContext("activeLedgerTab", context),
+    backupRenderCount: () => backupRenderCount,
+    hasInterface(name) {
+      return runInContext(`typeof ${name}`, context);
+    },
+    readValue(name) {
+      return runInContext(name, context);
+    },
+    call(name, ...args) {
+      return context[name](...args);
+    },
+  };
 }
 
 function extractPaneFragment(html, page) {
@@ -71,6 +185,15 @@ function extractTableOpeningTag(fragment, boundary) {
   return fragment.match(new RegExp(`<table\\b(?=[^>]*data-holdings-table="${boundary}")[^>]*>`))?.[0] || "";
 }
 
+function assertTask2Interface(harness, name) {
+  assert.equal(harness.hasInterface(name), "function", `Task 2 interface ${name} must be defined`);
+}
+
+function touchEvent(target, clientX, clientY) {
+  const point = { clientX, clientY };
+  return { target, touches: [point], changedTouches: [point], preventDefault() {} };
+}
+
 test("ledger structure declares exact navigation and pane order", async () => {
   const [html, controller, renderer, brandCss] = await Promise.all([
     read("index.html"),
@@ -80,7 +203,6 @@ test("ledger structure declares exact navigation and pane order", async () => {
   ]);
   const navigationPages = [...html.matchAll(/<(?:button|a)[^>]*data-ledger-page="([^"]+)"[^>]*>/g)].map((match) => match[1]);
   const panePages = [...html.matchAll(/<[^>]*data-ledger-pane="([^"]+)"[^>]*>/g)].map((match) => match[1]);
-  const renderAllBody = extractFunctionBody(renderer, "renderAll");
 
   assert.deepEqual(navigationPages, LEDGER_PAGES);
   assert.deepEqual(panePages, LEDGER_PAGES);
@@ -89,19 +211,31 @@ test("ledger structure declares exact navigation and pane order", async () => {
   assert.match(html, />持仓批次管理</);
   assert.match(brandCss, /\.ledger-carousel/);
   assert.match(controller, /function renderLedgerOverview\(\)/);
-  assert.match(renderAllBody, /renderLedgerOverview\(\)/);
-  assert.match(renderAllBody, /switchLedgerTab\(activeLedgerTab/);
+  assert.match(renderer, /renderLedgerOverview\(\)/);
+  assert.match(renderer, /switchLedgerTab\(activeLedgerTab/);
 });
 
-test("ledger page permissions expose exact visitor and administrator matrices", async () => {
+test("ledger permissions and backup rendering follow the active user", async () => {
   const [html, controller] = await Promise.all([read("index.html"), read("script.part3.js")]);
-  const switchBody = extractFunctionBody(controller, "switchLedgerTab");
-  assert.match(controller, /const PUBLIC_LEDGER_PAGES=\["overview","transactions"\]/);
-  assert.match(controller, /const ADMIN_LEDGER_PAGES=\["overview","transactions","positions","cashflows","backup"\]/);
-  assert.match(controller, /activeLedgerTab="overview"/);
-  assert.match(switchBody, /allowedLedgerPages\(\)/);
-  assert.match(switchBody, /pages\.includes\(page\)/);
-  assert.match(switchBody, /page\s*=\s*["']overview["']/);
+  const visitor = createControllerHarness(controller);
+  const administrator = createControllerHarness(controller, { admin: true });
+
+  assertTask2Interface(visitor, "switchLedgerTab");
+  visitor.call("switchLedgerTab", "positions");
+  assert.equal(visitor.activePage(), "overview", "visitors must fall back to overview for an admin page");
+  administrator.call("switchLedgerTab", "positions");
+  assert.equal(administrator.activePage(), "positions", "administrators may open the positions page");
+
+  visitor.call("switchLedgerTab", "backup");
+  assert.equal(visitor.activePage(), "overview", "visitor backup requests must fall back to overview");
+  assert.equal(visitor.backupRenderCount(), 0, "backup must not render for an unauthorized request");
+  administrator.call("switchLedgerTab", "backup");
+  assert.equal(administrator.activePage(), "backup");
+  assert.equal(administrator.backupRenderCount(), 1, "backup renders on the legal backup page");
+
+  assert.equal(visitor.hasInterface("allowedLedgerPages"), "function", "Task 2 interface allowedLedgerPages must be defined");
+  assert.deepEqual(Array.from(visitor.readValue("PUBLIC_LEDGER_PAGES")), ["overview", "transactions"]);
+  assert.deepEqual(Array.from(administrator.readValue("ADMIN_LEDGER_PAGES")), LEDGER_PAGES);
 
   for (const page of ["overview", "transactions"]) {
     const tag = html.match(new RegExp(`<[^>]+data-ledger-page="${page}"[^>]*>`))?.[0] || "";
@@ -135,24 +269,47 @@ test("holdings tables have explicit public and admin boundaries", async () => {
   assert.match(positionsPane, /data-holdings-table="admin"[\s\S]*?id="positionBody"/);
 });
 
-test("carousel handlers use explicit gesture guards and navigation interfaces", async () => {
+test("carousel handlers execute guarded touch and directional keyboard navigation", async () => {
   const [html, controller, renderer] = await Promise.all([read("index.html"), read("script.part3.js"), read("script.part4.js")]);
-  const guardBody = extractFunctionBody(controller, "isLedgerGestureBlocked");
-  const initBody = extractFunctionBody(controller, "initLedgerCarousel");
-  const switchBody = extractFunctionBody(controller, "switchLedgerTab");
+  const harness = createControllerHarness(controller, { admin: true });
+  const shifts = [];
   const dotPages = [...html.matchAll(/<button[^>]*data-ledger-dot="([^"]+)"[^>]*>/g)].map((match) => match[1]);
 
-  for (const excludedTarget of [".table-wrap", "input", "select", "button", "dialog"]) {
-    assert.match(guardBody, new RegExp(excludedTarget.replace(".", "\\.")), `${excludedTarget} must be blocked by the helper`);
+  assertTask2Interface(harness, "shiftLedgerPage");
+  assertTask2Interface(harness, "initLedgerCarousel");
+  harness.context.__recordLedgerShift = (direction) => { shifts.push(direction); };
+  runInContext("shiftLedgerPage = __recordLedgerShift", harness.context);
+  harness.call("initLedgerCarousel");
+  const gestureSurface = harness.elements.find((element) => element.listeners.has("touchstart"));
+  assert.ok(gestureSurface, "initLedgerCarousel must register a touchstart handler");
+  assert.ok(gestureSurface.listeners.has("touchend"), "initLedgerCarousel must register a touchend handler");
+  assert.ok(gestureSurface.listeners.has("keydown"), "initLedgerCarousel must register a keydown handler");
+
+  const blockedTargets = [
+    new MockElement({ classes: ["table-wrap"] }),
+    ...["input", "select", "button", "dialog"].map((tagName) => new MockElement({ tagName })),
+  ];
+  for (const target of blockedTargets) {
+    gestureSurface.dispatch("touchstart", touchEvent(target, 100, 20));
+    gestureSurface.dispatch("touchend", touchEvent(target, 20, 20));
   }
-  assert.match(switchBody, /allowedLedgerPages\(\)/);
-  assert.match(switchBody, /pages\.includes\(page\)/);
-  assert.match(switchBody, /page\s*=\s*["']overview["']/);
-  assert.match(initBody, /touchstart[\s\S]*isLedgerGestureBlocked\(/);
-  assert.match(initBody, /touchend[\s\S]*isLedgerGestureBlocked\(/);
-  assert.match(initBody, /ArrowLeft[\s\S]*shiftLedgerPage\(-1\)/);
-  assert.match(initBody, /ArrowRight[\s\S]*shiftLedgerPage\(1\)/);
-  assert.match(controller, /function shiftLedgerPage\(direction\)/);
+  assert.deepEqual(shifts, [], "interactive and horizontally scrollable targets must not shift pages");
+
+  const plainTarget = new MockElement();
+  gestureSurface.dispatch("touchstart", touchEvent(plainTarget, 100, 20));
+  gestureSurface.dispatch("touchend", touchEvent(plainTarget, 45, 20));
+  gestureSurface.dispatch("touchstart", touchEvent(plainTarget, 100, 20));
+  gestureSurface.dispatch("touchend", touchEvent(plainTarget, 44, 90));
+  assert.deepEqual(shifts, [], "swipes below 56px or dominated by vertical travel must not shift pages");
+
+  gestureSurface.dispatch("touchstart", touchEvent(plainTarget, 100, 20));
+  gestureSurface.dispatch("touchend", touchEvent(plainTarget, 44, 30));
+  assert.deepEqual(shifts, [1], "a qualifying left swipe must shift one page forward");
+
+  gestureSurface.dispatch("keydown", { key: "ArrowLeft", target: gestureSurface, preventDefault() {} });
+  gestureSurface.dispatch("keydown", { key: "ArrowRight", target: gestureSurface, preventDefault() {} });
+  assert.deepEqual(shifts, [1, -1, 1], "ArrowLeft and ArrowRight must shift -1 and +1");
+
   assert.match(html, /onclick="shiftLedgerPage\(-1\)"/);
   assert.match(html, /onclick="shiftLedgerPage\(1\)"/);
   assert.deepEqual(dotPages, LEDGER_PAGES);
