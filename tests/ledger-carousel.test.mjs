@@ -32,7 +32,7 @@ class MockClassList {
 }
 
 class MockElement {
-  constructor({ id = "", tagName = "div", classes = [], dataset = {} } = {}) {
+  constructor({ id = "", tagName = "div", classes = [], dataset = {}, scrollHeight = 0 } = {}) {
     this.id = id;
     this.tagName = tagName.toUpperCase();
     this.dataset = { ...dataset };
@@ -46,6 +46,7 @@ class MockElement {
     this.parentElement = null;
     this.parentNode = null;
     this.children = [];
+    this.scrollHeight = scrollHeight;
     this.queryAll = () => [];
   }
 
@@ -117,6 +118,23 @@ class MockElement {
 }
 
 function createControllerHarness(controller, { admin = false } = {}) {
+  const resizeObservers = [];
+  class MockResizeObserver {
+    constructor(callback) {
+      this.callback = callback;
+      this.targets = [];
+      resizeObservers.push(this);
+    }
+
+    observe(target) {
+      this.targets.push(target);
+    }
+
+    trigger() {
+      this.callback(this.targets.map((target) => ({ target })), this);
+    }
+  }
+
   const pageControls = LEDGER_PAGES.map((page) => new MockElement({
     tagName: "button",
     classes: ["tab"],
@@ -160,6 +178,7 @@ function createControllerHarness(controller, { admin = false } = {}) {
     document,
     Element: MockElement,
     HTMLElement: MockElement,
+    ResizeObserver: MockResizeObserver,
     isAdminMode: admin,
     activeLedgerTab: "overview",
     state: { positions: [], transactions: [], cashFlows: [], snapshots: [], settings: {} },
@@ -177,6 +196,7 @@ function createControllerHarness(controller, { admin = false } = {}) {
     getElementById: (id) => byId.get(id) || null,
     activePage: () => runInContext("activeLedgerTab", context),
     backupRenderCount: () => backupRenderCount,
+    resizeObservers,
     hasInterface(name) {
       return runInContext(`typeof ${name}`, context);
     },
@@ -365,6 +385,45 @@ test("ledger permissions and backup rendering follow the active user", async () 
   }
 });
 
+test("inactive panes are inert and the track follows active pane height changes", async () => {
+  const controller = await read("script.part3.js");
+  const harness = createControllerHarness(controller, { admin: true });
+  const overview = harness.getElementById("ledgerOverviewPane");
+  const transactions = harness.getElementById("transactionsPane");
+  const track = harness.getElementById("ledgerCarouselTrack");
+  overview.scrollHeight = 176;
+  transactions.scrollHeight = 912;
+
+  harness.call("initLedgerCarousel");
+  assert.equal(overview.getAttribute("inert"), null, "the active overview must remain focusable");
+  assert.notEqual(transactions.getAttribute("inert"), null, "inactive transactions must be removed from focus order");
+  assert.equal(track.style.height, "176px", "the overview owns the initial track height");
+
+  harness.call("switchLedgerTab", "transactions");
+  assert.notEqual(overview.getAttribute("inert"), null, "the inactive overview must be removed from focus order");
+  assert.equal(transactions.getAttribute("inert"), null, "the active transaction pane must remain focusable");
+  assert.equal(track.style.height, "912px", "the transaction pane owns the selected track height");
+
+  transactions.scrollHeight = 1040;
+  harness.resizeObservers[0].trigger();
+  assert.equal(track.style.height, "1040px", "dynamic active content must resynchronize track height");
+});
+
+test("ledger overview chooses the later inserted trade when dates tie", async () => {
+  const controller = await read("script.part3.js");
+  const harness = createControllerHarness(controller);
+  harness.context.state.transactions = [
+    { id: "first", type: "buy", symbol: "FIRST", date: "2026-08-15", realizedPnlUSD: 0 },
+    { id: "later", type: "sell", symbol: "LATER", date: "2026-08-15", realizedPnlUSD: 25 },
+  ];
+
+  harness.call("renderLedgerOverview");
+  assert.equal(
+    harness.getElementById("ledgerOverviewLatestTrade").textContent,
+    "卖出 LATER · 2026-08-15",
+  );
+});
+
 test("holdings tables have explicit public and admin boundaries", async () => {
   const html = await read("index.html");
   const publicMapStart = html.indexOf('<section id="allocationMap"');
@@ -457,7 +516,9 @@ test("ledger carousel CSS keeps page movement contained and accessible", async (
 
   assert.match(css, /\.ledger-carousel-viewport\s*\{[^}]*\boverflow\s*:\s*hidden\b/s);
   assert.match(css, /\.ledger-carousel-track\s*\{[^}]*\bdisplay\s*:\s*flex\b[^}]*\bwidth\s*:\s*100%[^}]*\btransition\s*:\s*transform/s);
+  assert.match(css, /\.ledger-carousel-track\s*\{[^}]*\balign-items\s*:\s*flex-start/s);
   assert.match(css, /\.ledger-page\s*\{[^}]*\bflex\s*:\s*0\s+0\s+100%[^}]*\bwidth\s*:\s*100%/s);
+  assert.match(css, /\.ledger-page-navigation\s+\.tab\s*\{[^}]*\bmin-height\s*:\s*44px/s);
   assert.match(css, /\.ledger-carousel-controls\s+button\s*\{[^}]*\bmin-width\s*:\s*44px[^}]*\bmin-height\s*:\s*44px/s);
   assert.match(css, /\.ledger-page-dot\s*\{[^}]*\bborder-radius\s*:\s*50%/s);
   assert.match(css, /\.ledger-carousel-viewport\s+\.table-wrap\s*\{[^}]*\boverflow-x\s*:\s*auto/s);

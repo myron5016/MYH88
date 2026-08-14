@@ -105,12 +105,13 @@ const ADMIN_LEDGER_PAGES=["overview","transactions","positions","cashflows","bac
 function allowedLedgerPages(){return isAdminMode?ADMIN_LEDGER_PAGES:PUBLIC_LEDGER_PAGES}
 function renderLedgerOverview(){
   const transactions=state.transactions.filter(transaction=>!transaction.voided);
-  const latest=transactions.slice().sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")))[0];
+  const latest=transactions.reduce((current,transaction)=>!current||String(transaction.date||"")>=String(current.date||"")?transaction:current,null);
   $("ledgerOverviewPositionCount").textContent=state.positions.length;
   $("ledgerOverviewTransactionCount").textContent=transactions.length;
   $("ledgerOverviewRealizedPnl").textContent=money(transactions.reduce((total,transaction)=>total+(Number(transaction.realizedPnlUSD)||0),0));
   $("ledgerOverviewLatestTrade").textContent=latest?`${transactionLabel(latest)} ${latest.symbol||""} · ${latest.date||""}`:"暂无交易";
 }
+function syncLedgerHeight(){const t=$("ledgerCarouselTrack"),p=document.querySelector(`[data-ledger-pane="${activeLedgerTab}"]`);if(t&&p)t.style.height=p.scrollHeight+"px"}
 function switchLedgerTab(page,options={}){
   const pages=allowedLedgerPages();
   const tab=pages.includes(page)?page:"overview";
@@ -126,10 +127,11 @@ function switchLedgerTab(page,options={}){
     dot.classList.toggle("active",active);
     dot.setAttribute("aria-current",active?"page":"false");
   });
-  document.querySelectorAll("[data-ledger-pane]").forEach(pane=>pane.setAttribute("aria-hidden",String(pane.dataset.ledgerPane!==tab)));
+  document.querySelectorAll("[data-ledger-pane]").forEach(pane=>{const active=pane.dataset.ledgerPane===tab;pane.setAttribute("aria-hidden",String(!active));pane.toggleAttribute("inert",!active)});
   const track=$("ledgerCarouselTrack");
   if(track)track.style.transform=`translateX(${-index*100}%)`;
   if(tab==="backup"&&!options.skipBackupRender)renderBackupList();
+  syncLedgerHeight();
 }
 function shiftLedgerPage(direction){
   const pages=allowedLedgerPages(),index=Math.max(0,pages.indexOf(activeLedgerTab));
@@ -160,6 +162,7 @@ function initLedgerCarousel(){
     event.preventDefault();
     shiftLedgerPage(event.key==="ArrowLeft"?-1:1);
   });
+  if(typeof ResizeObserver==="function"){carousel.ro=new ResizeObserver(syncLedgerHeight);document.querySelectorAll("[data-ledger-pane]").forEach(pane=>carousel.ro.observe(pane))}
   switchLedgerTab("overview");
 }
 function fillTradeFromPosition(p){if(!p)return;$("tradeSymbol").value=p.symbol;$("tradeName").value=p.name;$("tradeCurrency").value=p.currency;$("tradeFx").value=fx(p.currency);$("tradePrice").value=p.price||p.avgCost;$("tradeSource").value=p.source;$("tradeSector").value=p.sector;$("tradeColor").value=p.color;updateTradePreview()}

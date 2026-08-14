@@ -311,12 +311,14 @@ body {
 }
 .ledger-carousel-track {
   display: flex;
+  align-items: flex-start;
   width: 100%;
   min-width: 100%;
   transform: translateX(0);
   transition: transform 260ms cubic-bezier(.2, .75, .2, 1);
   will-change: transform;
 }
+.ledger-page-navigation .tab { min-height: 44px; }
 .ledger-page {
   box-sizing: border-box;
   flex: 0 0 100%;

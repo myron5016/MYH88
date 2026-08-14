@@ -76,7 +76,8 @@ test("V11.7 map renderer exposes stable visual metadata", async () => {
 });
 
 test("V11.7 release fingerprint is consistent and keeps Worker 10.56", async () => {
-  const [runtime, worker, meta, pkg] = await Promise.all([
+  const [index, runtime, worker, meta, pkg] = await Promise.all([
+    read("../index.html"),
     read("../script.part1.js"),
     read("../service-worker.js"),
     read("../build-meta.json"),
@@ -87,6 +88,18 @@ test("V11.7 release fingerprint is consistent and keeps Worker 10.56", async () 
   assert.match(worker, /const RELEASE=["']11\.7\.1["']/);
   assert.match(worker, /brand-v11\.7\.css/);
   assert.match(worker, /brand-v11\.7\.js/);
+  for (const [name, version] of Object.entries({
+    "script.part1.js": "11.7.1",
+    "script.part2.js": "11.6.0",
+    "script.part3.js": "11.7.1",
+    "script.part4.js": "11.7.1",
+    "script.part5.js": "11.6.0",
+    "script.part6.js": "11.6.0",
+  })) {
+    const escaped = name.replaceAll(".", "\\.");
+    assert.match(index, new RegExp(`${escaped}\\?v=${version.replaceAll(".", "\\.")}`));
+    assert.match(worker, new RegExp(`\\./${escaped}\\?v=${version.replaceAll(".", "\\.")}`));
+  }
   assert.match(meta, /"release":\s*"11\.7\.1"/);
   assert.match(meta, /"worker":\s*"10\.56"/);
   assert.match(pkg, /"version":\s*"11\.7\.1"/);
