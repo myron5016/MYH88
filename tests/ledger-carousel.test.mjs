@@ -43,6 +43,9 @@ class MockElement {
     this.hidden = false;
     this.textContent = "";
     this.innerHTML = "";
+    this.parentElement = null;
+    this.parentNode = null;
+    this.children = [];
     this.queryAll = () => [];
   }
 
@@ -54,6 +57,13 @@ class MockElement {
 
   dispatch(type, event = {}) {
     for (const handler of this.listeners.get(type) || []) handler.call(this, event);
+  }
+
+  appendChild(child) {
+    child.parentElement = this;
+    child.parentNode = this;
+    this.children.push(child);
+    return child;
   }
 
   setAttribute(name, value) {
@@ -87,7 +97,12 @@ class MockElement {
   }
 
   closest(selector) {
-    return this.matches(selector) ? this : null;
+    let element = this;
+    while (element) {
+      if (typeof element.matches === "function" && element.matches(selector)) return element;
+      element = element.parentElement || element.parentNode;
+    }
+    return null;
   }
 
   querySelectorAll(selector) {
@@ -159,6 +174,7 @@ function createControllerHarness(controller, { admin = false } = {}) {
   return {
     context,
     elements,
+    getElementById: (id) => byId.get(id) || null,
     activePage: () => runInContext("activeLedgerTab", context),
     backupRenderCount: () => backupRenderCount,
     hasInterface(name) {
@@ -169,6 +185,73 @@ function createControllerHarness(controller, { admin = false } = {}) {
     },
     call(name, ...args) {
       return context[name](...args);
+    },
+  };
+}
+
+function createRendererHarness(renderer, { activeLedgerTab = "transactions" } = {}) {
+  const calls = [];
+  const elements = new Map();
+  const document = {
+    title: "",
+    addEventListener() {},
+  };
+  const context = createContext({
+    console,
+    document,
+    window: { addEventListener() {} },
+    activeLedgerTab,
+    state: {
+      positions: [],
+      transactions: [],
+      cashFlows: [],
+      settings: { title: "Harness", priceCacheMinutes: 15 },
+      fxRates: { EUR: 1 },
+    },
+    defaultState: { fxRates: { EUR: 1 } },
+    $: (id) => {
+      if (!elements.has(id)) elements.set(id, new MockElement({ id }));
+      return elements.get(id);
+    },
+    priceProxyUrl: () => "",
+    renderLedgerOverview() {},
+    switchLedgerTab() {},
+    updateNetworkStatus() {},
+  });
+  runInContext(renderer, context, { filename: "script.part4.js" });
+
+  context.__recordRendererCall = (name, ...args) => { calls.push({ name, args }); };
+  const dependencies = [
+    "renderKpis",
+    "renderTreemap",
+    "renderSectorsV2",
+    "renderMapHoldingTable",
+    "renderReturnDashboard",
+    "renderHoldingCardsV2",
+    "renderPositionTable",
+    "renderTransactionTable",
+    "renderCashFlowTable",
+    "renderBackupList",
+    "renderSectorAdminPanel",
+    "renderLedgerOverview",
+    "switchLedgerTab",
+    "renderSyncStatus",
+    "renderDiagnostics",
+  ];
+  for (const name of dependencies) {
+    runInContext(
+      `globalThis[${JSON.stringify(name)}] = (...args) => __recordRendererCall(${JSON.stringify(name)}, ...args)`,
+      context,
+    );
+  }
+
+  return {
+    calls,
+    hasInterface(name) {
+      return runInContext(`typeof ${name}`, context);
+    },
+    renderAll() {
+      return runInContext("renderAll()", context);
     },
   };
 }
@@ -195,10 +278,9 @@ function touchEvent(target, clientX, clientY) {
 }
 
 test("ledger structure declares exact navigation and pane order", async () => {
-  const [html, controller, renderer, brandCss] = await Promise.all([
+  const [html, controller, brandCss] = await Promise.all([
     read("index.html"),
     read("script.part3.js"),
-    read("script.part4.js"),
     read("brand-v11.7.css"),
   ]);
   const navigationPages = [...html.matchAll(/<(?:button|a)[^>]*data-ledger-page="([^"]+)"[^>]*>/g)].map((match) => match[1]);
@@ -211,8 +293,24 @@ test("ledger structure declares exact navigation and pane order", async () => {
   assert.match(html, />持仓批次管理</);
   assert.match(brandCss, /\.ledger-carousel/);
   assert.match(controller, /function renderLedgerOverview\(\)/);
-  assert.match(renderer, /renderLedgerOverview\(\)/);
-  assert.match(renderer, /switchLedgerTab\(activeLedgerTab/);
+});
+
+test("renderAll executes the ledger overview and restores the active carousel page", async () => {
+  const renderer = await read("script.part4.js");
+  const harness = createRendererHarness(renderer, { activeLedgerTab: "cashflows" });
+
+  assert.equal(harness.hasInterface("renderAll"), "function");
+  harness.renderAll();
+  assert.deepEqual(
+    harness.calls.filter(({ name }) => name === "switchLedgerTab").map(({ args }) => args),
+    [["cashflows"]],
+    "renderAll must restore the current activeLedgerTab",
+  );
+  assert.equal(
+    harness.calls.filter(({ name }) => name === "renderLedgerOverview").length,
+    1,
+    "renderAll must execute renderLedgerOverview exactly once",
+  );
 });
 
 test("ledger permissions and backup rendering follow the active user", async () => {
@@ -280,34 +378,43 @@ test("carousel handlers execute guarded touch and directional keyboard navigatio
   harness.context.__recordLedgerShift = (direction) => { shifts.push(direction); };
   runInContext("shiftLedgerPage = __recordLedgerShift", harness.context);
   harness.call("initLedgerCarousel");
-  const gestureSurface = harness.elements.find((element) => element.listeners.has("touchstart"));
-  assert.ok(gestureSurface, "initLedgerCarousel must register a touchstart handler");
-  assert.ok(gestureSurface.listeners.has("touchend"), "initLedgerCarousel must register a touchend handler");
-  assert.ok(gestureSurface.listeners.has("keydown"), "initLedgerCarousel must register a keydown handler");
+  const ledgerCarousel = harness.getElementById("ledgerCarousel");
+  assert.ok(ledgerCarousel, "the ledger carousel viewport must exist in the harness");
+  assert.equal(ledgerCarousel.id, "ledgerCarousel");
+  for (const eventType of ["touchstart", "touchend", "keydown"]) {
+    assert.ok(
+      ledgerCarousel.listeners.has(eventType),
+      `initLedgerCarousel must register ${eventType} on #ledgerCarousel`,
+    );
+  }
 
+  const tableWrap = new MockElement({ classes: ["table-wrap"] });
+  const tableChild = tableWrap.appendChild(new MockElement({ tagName: "span" }));
+  assert.equal(tableChild.matches(".table-wrap"), false, "the event target must not match the scroll container itself");
+  assert.equal(tableChild.closest(".table-wrap"), tableWrap, "closest must find the target's scroll-container ancestor");
   const blockedTargets = [
-    new MockElement({ classes: ["table-wrap"] }),
+    tableChild,
     ...["input", "select", "button", "dialog"].map((tagName) => new MockElement({ tagName })),
   ];
   for (const target of blockedTargets) {
-    gestureSurface.dispatch("touchstart", touchEvent(target, 100, 20));
-    gestureSurface.dispatch("touchend", touchEvent(target, 20, 20));
+    ledgerCarousel.dispatch("touchstart", touchEvent(target, 100, 20));
+    ledgerCarousel.dispatch("touchend", touchEvent(target, 20, 20));
   }
   assert.deepEqual(shifts, [], "interactive and horizontally scrollable targets must not shift pages");
 
   const plainTarget = new MockElement();
-  gestureSurface.dispatch("touchstart", touchEvent(plainTarget, 100, 20));
-  gestureSurface.dispatch("touchend", touchEvent(plainTarget, 45, 20));
-  gestureSurface.dispatch("touchstart", touchEvent(plainTarget, 100, 20));
-  gestureSurface.dispatch("touchend", touchEvent(plainTarget, 44, 90));
+  ledgerCarousel.dispatch("touchstart", touchEvent(plainTarget, 100, 20));
+  ledgerCarousel.dispatch("touchend", touchEvent(plainTarget, 45, 20));
+  ledgerCarousel.dispatch("touchstart", touchEvent(plainTarget, 100, 20));
+  ledgerCarousel.dispatch("touchend", touchEvent(plainTarget, 44, 90));
   assert.deepEqual(shifts, [], "swipes below 56px or dominated by vertical travel must not shift pages");
 
-  gestureSurface.dispatch("touchstart", touchEvent(plainTarget, 100, 20));
-  gestureSurface.dispatch("touchend", touchEvent(plainTarget, 44, 30));
+  ledgerCarousel.dispatch("touchstart", touchEvent(plainTarget, 100, 20));
+  ledgerCarousel.dispatch("touchend", touchEvent(plainTarget, 44, 30));
   assert.deepEqual(shifts, [1], "a qualifying left swipe must shift one page forward");
 
-  gestureSurface.dispatch("keydown", { key: "ArrowLeft", target: gestureSurface, preventDefault() {} });
-  gestureSurface.dispatch("keydown", { key: "ArrowRight", target: gestureSurface, preventDefault() {} });
+  ledgerCarousel.dispatch("keydown", { key: "ArrowLeft", target: ledgerCarousel, preventDefault() {} });
+  ledgerCarousel.dispatch("keydown", { key: "ArrowRight", target: ledgerCarousel, preventDefault() {} });
   assert.deepEqual(shifts, [1, -1, 1], "ArrowLeft and ArrowRight must shift -1 and +1");
 
   assert.match(html, /onclick="shiftLedgerPage\(-1\)"/);
