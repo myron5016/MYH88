@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-13T15:13:42.834Z",
+    "lastCloudSaveAt": "2026-08-14T16:36:16.507Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -1343,7 +1343,7 @@
       "date": "2026-07-17",
       "type": "buy",
       "symbol": "SKHX",
-      "name": "海力士2倍做多",
+      "name": "2倍做多海力士",
       "shares": 400,
       "price": 14.737,
       "currency": "USD",
@@ -1351,7 +1351,7 @@
       "fee": 2.67,
       "note": "",
       "source": "twelve",
-      "sector": "未分类",
+      "sector": "半导体",
       "color": "#627288",
       "schemaVersion": "10.6",
       "feeUSD": 2.67,
@@ -1365,7 +1365,7 @@
       "date": "2026-07-18",
       "type": "sell",
       "symbol": "SKHX",
-      "name": "海力士2倍做多",
+      "name": "2倍做多海力士",
       "shares": 400,
       "price": 15.2,
       "currency": "USD",
@@ -1373,7 +1373,7 @@
       "fee": 1.05,
       "note": "",
       "source": "twelve",
-      "sector": "未分类",
+      "sector": "半导体",
       "color": "#627288",
       "schemaVersion": "10.6",
       "feeUSD": 1.05,
@@ -2201,6 +2201,63 @@
       "costBasisNative": 1200.68,
       "grossUSD": 1406.1000000000001,
       "realizedPnlUSD": 205.03999999999996
+    },
+    {
+      "id": "tx_mst63zp4_jx6rv2",
+      "date": "2026-08-15",
+      "type": "buy",
+      "symbol": "SKHX",
+      "name": "2倍做多海力士",
+      "shares": 400,
+      "price": 14.77,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 1.24,
+      "note": "",
+      "source": "twelve",
+      "sector": "半导体",
+      "color": "#627288",
+      "schemaVersion": "10.48",
+      "feeUSD": 1.24,
+      "costBasisUSD": 5909.24,
+      "costBasisNative": 5909.24,
+      "grossUSD": 5908,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mst64zjw_xqyqt3",
+      "date": "2026-08-15",
+      "type": "sell",
+      "symbol": "SKHX",
+      "name": "2倍做多海力士",
+      "shares": 400,
+      "price": 15.5,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 1.05,
+      "note": "",
+      "source": "twelve",
+      "sector": "半导体",
+      "color": "#627288",
+      "schemaVersion": "10.48",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mst63zp4_jx6rv2",
+          "buyTransactionId": "tx_mst63zp4_jx6rv2",
+          "date": "2026-08-15",
+          "shares": 400,
+          "unitCostUSD": 14.7731,
+          "unitCostNative": 14.7731,
+          "costBasisUSD": 5909.24,
+          "costBasisNative": 5909.24
+        }
+      ],
+      "feeUSD": 1.05,
+      "costBasisUSD": 5909.24,
+      "costBasisNative": 5909.24,
+      "grossUSD": 6200,
+      "realizedPnlUSD": 289.71000000000004
     }
   ],
   "cashFlows": [
@@ -2440,6 +2497,22 @@
       "netAsset": 25352.25,
       "market": 12067.46,
       "cash": 13284.79
+    },
+    {
+      "scope": "active",
+      "date": "2026-08-14",
+      "capital": 22370,
+      "netAsset": 25329.88,
+      "market": 12045.09,
+      "cash": 13284.79
+    },
+    {
+      "scope": "active",
+      "date": "2026-08-15",
+      "capital": 22370,
+      "netAsset": 25527.61,
+      "market": 11953.11,
+      "cash": 13574.5
     }
   ],
   "dcaPlan": {
@@ -2452,12 +2525,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 714.58,
-        "priceAsOf": "2026-08-13T15:07:22.000Z",
-        "changePercent": 0.6209780756720338,
+        "price": 713.96,
+        "priceAsOf": "2026-08-14T16:25:29.000Z",
+        "changePercent": -0.13847122176376098,
         "priceSource": "finnhub",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-08-13T15:07:22.000Z"
+        "priceUpdatedAt": "2026-08-14T16:25:29.000Z"
       },
       {
         "symbol": "QQQM",
@@ -2465,12 +2538,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 301.62,
-        "priceAsOf": "2026-08-13T15:07:13.000Z",
-        "changePercent": 1.2215584938586437,
+        "price": 300.33,
+        "priceAsOf": "2026-08-14T16:34:09.000Z",
+        "changePercent": -0.35831591519858025,
         "priceSource": "finnhub",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-08-13T15:07:13.000Z"
+        "priceUpdatedAt": "2026-08-14T16:34:09.000Z"
       }
     ],
     "entries": [
@@ -2630,6 +2703,13 @@
         "marketValueUSD": 1543.372556,
         "pnlUSD": 40.718014,
         "returnPct": 2.709739
+      },
+      {
+        "date": "2026-08-15",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1539.933874,
+        "pnlUSD": 37.279332,
+        "returnPct": 2.480898
       }
     ]
   }
