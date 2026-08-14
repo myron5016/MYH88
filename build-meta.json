@@ -1,7 +1,7 @@
 {
-  "release": "11.7.0",
-  "version": "V11.7.0 果园生长版",
-  "serviceWorker": "11.7.0",
+  "release": "11.7.1",
+  "version": "V11.7.1 果园生长版",
+  "serviceWorker": "11.7.1",
   "worker": "10.56",
   "ledgerSchema": "10.48",
   "channel": "stable",

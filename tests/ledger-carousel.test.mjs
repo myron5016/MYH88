@@ -428,3 +428,16 @@ test("carousel handlers execute guarded touch and directional keyboard navigatio
   }
   assert.match(renderer, /initLedgerCarousel\(\)/);
 });
+
+test("ledger carousel CSS keeps page movement contained and accessible", async () => {
+  const css = await read("brand-v11.7.css");
+
+  assert.match(css, /\.ledger-carousel-viewport\s*\{[^}]*\boverflow\s*:\s*hidden\b/s);
+  assert.match(css, /\.ledger-carousel-track\s*\{[^}]*\bdisplay\s*:\s*flex\b[^}]*\bwidth\s*:\s*100%[^}]*\btransition\s*:\s*transform/s);
+  assert.match(css, /\.ledger-page\s*\{[^}]*\bflex\s*:\s*0\s+0\s+100%[^}]*\bwidth\s*:\s*100%/s);
+  assert.match(css, /\.ledger-carousel-controls\s+button\s*\{[^}]*\bmin-width\s*:\s*44px[^}]*\bmin-height\s*:\s*44px/s);
+  assert.match(css, /\.ledger-page-dot\s*\{[^}]*\bborder-radius\s*:\s*50%/s);
+  assert.match(css, /\.ledger-carousel-viewport\s+\.table-wrap\s*\{[^}]*\boverflow-x\s*:\s*auto/s);
+  assert.match(css, /@media\s*\(max-width:\s*700px\)[\s\S]*?\.ledger-carousel-controls/s);
+  assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.ledger-carousel-track\s*\{[^}]*\btransition\s*:\s*none\s*!important/s);
+});
