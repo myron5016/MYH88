@@ -411,9 +411,14 @@ test("carousel handlers execute guarded touch and directional keyboard navigatio
   ledgerCarousel.dispatch("touchend", touchEvent(plainTarget, 44, 30));
   assert.deepEqual(shifts, [1], "a qualifying left swipe must shift one page forward");
 
-  ledgerCarousel.dispatch("keydown", { key: "ArrowLeft", target: ledgerCarousel, preventDefault() {} });
+  const interactiveInput = new MockElement({ tagName: "input" });
+  ledgerCarousel.dispatch("keydown", { key: "ArrowRight", target: interactiveInput, preventDefault() {} });
+  assert.deepEqual(shifts, [1], "ArrowRight from an interactive descendant must not shift pages");
+
   ledgerCarousel.dispatch("keydown", { key: "ArrowRight", target: ledgerCarousel, preventDefault() {} });
-  assert.deepEqual(shifts, [1, -1, 1], "ArrowLeft and ArrowRight must shift -1 and +1");
+  assert.deepEqual(shifts, [1, 1], "ArrowRight on the carousel must shift one page forward");
+  ledgerCarousel.dispatch("keydown", { key: "ArrowLeft", target: ledgerCarousel, preventDefault() {} });
+  assert.deepEqual(shifts, [1, 1, -1], "ArrowLeft on the carousel must shift one page backward");
 
   assert.match(html, /onclick="shiftLedgerPage\(-1\)"/);
   assert.match(html, /onclick="shiftLedgerPage\(1\)"/);

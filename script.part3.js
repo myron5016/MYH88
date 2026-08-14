@@ -156,6 +156,7 @@ function initLedgerCarousel(){
   carousel.addEventListener("mouseup",end);
   carousel.addEventListener("keydown",event=>{
     if(event.key!=="ArrowLeft"&&event.key!=="ArrowRight")return;
+    if(isLedgerGestureBlocked(event.target))return;
     event.preventDefault();
     shiftLedgerPage(event.key==="ArrowLeft"?-1:1);
   });
