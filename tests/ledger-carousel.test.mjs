@@ -3,73 +3,93 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
 const read = (name) => readFile(new URL(`../${name}`, import.meta.url), "utf8");
+const LEDGER_PAGES = ["overview", "transactions", "positions", "cashflows", "backup"];
 
-test("ledger structure declares the overview-first page order", async () => {
+test("ledger structure declares exact navigation and pane order", async () => {
   const [html, controller, renderer, brandCss] = await Promise.all([
     read("index.html"),
     read("script.part3.js"),
     read("script.part4.js"),
     read("brand-v11.7.css"),
   ]);
-  const pagePositions = ["overview", "transactions", "positions", "cashflows", "backup"].map((page) => html.indexOf(`data-ledger-page="${page}"`));
+  const navigationPages = [...html.matchAll(/<(?:button|a)[^>]*data-ledger-page="([^"]+)"[^>]*>/g)].map((match) => match[1]);
+  const panePages = [...html.matchAll(/<[^>]*data-ledger-pane="([^"]+)"[^>]*>/g)].map((match) => match[1]);
+  const renderAllStart = renderer.indexOf("function renderAll");
+  const renderAllEnd = renderer.indexOf("function hasAdminSession", renderAllStart);
+  const renderAllSource = renderer.slice(renderAllStart, renderAllEnd);
 
-  assert.ok(pagePositions.every((position) => position >= 0), "all five ledger pages must be declared");
-  assert.deepEqual(pagePositions, [...pagePositions].sort((a, b) => a - b), "ledger pages must stay in canonical order");
+  assert.deepEqual(navigationPages, LEDGER_PAGES);
+  assert.deepEqual(panePages, LEDGER_PAGES);
   assert.match(html, /id="ledgerCarousel"/);
   assert.match(html, /id="ledgerOverviewPane"/);
   assert.match(html, />持仓批次管理</);
-  assert.match(brandCss, /\.v117-ledger/);
+  assert.match(brandCss, /\.ledger-carousel/);
   assert.match(controller, /function renderLedgerOverview\(\)/);
-  assert.match(renderer, /renderLedgerOverview\(\)/);
+  assert.match(renderAllSource, /renderLedgerOverview\(\)/);
+  assert.match(renderAllSource, /switchLedgerTab\(activeLedgerTab/);
 });
 
-test("ledger page permissions expose the exact visitor and administrator matrices", async () => {
+test("ledger page permissions expose exact visitor and administrator matrices", async () => {
   const [html, controller] = await Promise.all([read("index.html"), read("script.part3.js")]);
   assert.match(controller, /const PUBLIC_LEDGER_PAGES=\["overview","transactions"\]/);
   assert.match(controller, /const ADMIN_LEDGER_PAGES=\["overview","transactions","positions","cashflows","backup"\]/);
   assert.match(controller, /activeLedgerTab="overview"/);
+  assert.match(controller, /const pages=allowedLedgerPages\(\)/);
+  assert.match(controller, /!pages\.includes\(page\)/);
+  assert.match(controller, /page="overview"/);
 
   for (const page of ["overview", "transactions"]) {
     const tag = html.match(new RegExp(`<[^>]+data-ledger-page="${page}"[^>]*>`))?.[0] || "";
-    assert.doesNotMatch(tag, /admin-only/, `${page} must remain public`);
+    assert.doesNotMatch(tag, /admin-only/, `${page} navigation must remain public`);
   }
   for (const page of ["positions", "cashflows", "backup"]) {
     const tag = html.match(new RegExp(`<[^>]+data-ledger-page="${page}"[^>]*>`))?.[0] || "";
-    assert.match(tag, /admin-only/, `${page} navigation control must be admin-only`);
+    assert.match(tag, /admin-only/, `${page} navigation must be admin-only`);
   }
-  for (const pane of ["positionsPane", "cashflowsPane", "backupPane"]) {
-    assert.match(html, new RegExp(`id="${pane}"[^>]*admin-only`), `${pane} must be admin-only`);
+  for (const page of ["positions", "cashflows", "backup"]) {
+    assert.match(html, new RegExp(`data-ledger-pane="${page}"[^>]*admin-only`), `${page} pane must be admin-only`);
   }
 });
 
-test("the public holdings table is separate from the admin ledger positions page", async () => {
+test("holdings tables have explicit public and admin boundaries", async () => {
   const html = await read("index.html");
-  const publicMap = html.match(/<section id="allocationMap"[\s\S]*?<tbody id="mapHoldingBody">[\s\S]*?<\/table>/)?.[0] || "";
-  const ledgerPositions = html.match(/<div id="positionsPane"[\s\S]*?<div id="transactionsPane"/)?.[0] || "";
+  const publicTables = [...html.matchAll(/<[^>]*data-holdings-table="public"[^>]*>/g)].map((match) => match[0]);
+  const adminTables = [...html.matchAll(/<[^>]*data-holdings-table="admin"[^>]*>/g)].map((match) => match[0]);
+  const publicTableRegion = html.match(/<[^>]*data-holdings-table="public"[^>]*>[\s\S]*?<\/table>/)?.[0] || "";
+  const adminPositionsRegion = html.match(/<[^>]*data-ledger-pane="positions"[^>]*admin-only[\s\S]*?<\/table>/)?.[0] || "";
 
-  assert.equal((html.match(/id="mapHoldingBody"/g) || []).length, 1);
-  assert.match(publicMap, /class="map-holding-table"/);
-  assert.match(publicMap, /id="mapHoldingBody"/);
-  assert.doesNotMatch(publicMap, /id="ledgerPanel"/);
-  assert.match(html, /id="positionsPane"[^>]*admin-only/);
-  assert.match(ledgerPositions, /id="positionBody"/);
-  assert.match(ledgerPositions, /class="compact-table"/);
+  assert.equal(publicTables.length, 1);
+  assert.equal(adminTables.length, 1);
+  assert.equal((html.match(/data-holdings-table=/g) || []).length, 2);
+  assert.match(publicTableRegion, /id="mapHoldingBody"/);
+  assert.match(adminPositionsRegion, /id="positionsPane"/);
+  assert.match(adminPositionsRegion, /id="positionBody"/);
+  assert.match(adminPositionsRegion, /admin-only/);
 });
 
-test("ledger carousel exposes guarded touch and keyboard navigation", async () => {
-  const [controller, renderer] = await Promise.all([read("script.part3.js"), read("script.part4.js")]);
+test("carousel navigation binds controls, dots, and guarded gestures to explicit interfaces", async () => {
+  const [html, controller, renderer] = await Promise.all([read("index.html"), read("script.part3.js"), read("script.part4.js")]);
+  const guardStart = controller.indexOf("function isLedgerGestureBlocked(target)");
+  const guardEnd = controller.indexOf("function ", guardStart + 1);
+  const guardSource = controller.slice(guardStart, guardEnd < 0 ? undefined : guardEnd);
+  const dotPages = [...html.matchAll(/<button[^>]*data-ledger-dot="([^"]+)"[^>]*>/g)].map((match) => match[1]);
 
+  assert.ok(guardStart >= 0, "gesture guard helper must be explicit");
+  for (const excludedTarget of [".table-wrap", "input", "select", "button", "dialog"]) {
+    assert.match(guardSource, new RegExp(excludedTarget.replace(".", "\\.")), `${excludedTarget} must be blocked by the gesture helper`);
+  }
   assert.match(controller, /function switchLedgerTab\(page, options\)/);
   assert.match(controller, /function shiftLedgerPage\(direction\)/);
   assert.match(controller, /function initLedgerCarousel\(\)/);
-  const targetGuards = [...controller.matchAll(/(?:closest|matches)\(([^)]*)\)/g)].map((match) => match[1]).join(" ");
-  assert.match(targetGuards, /\.table-wrap/);
-  for (const excludedTarget of ["input", "select", "button", "dialog"]) {
-    assert.match(targetGuards, new RegExp(`\\b${excludedTarget}\\b`), `${excludedTarget} must not trigger page shifts`);
-  }
   assert.match(controller, /Math\.abs\(dx\)\s*[<>]=?\s*56/);
   assert.match(controller, /Math\.abs\(dx\)\s*[<>]=?\s*Math\.abs\(dy\)/);
   assert.match(controller, /ArrowLeft/);
   assert.match(controller, /ArrowRight/);
+  assert.match(html, /onclick="shiftLedgerPage\(-1\)"/);
+  assert.match(html, /onclick="shiftLedgerPage\(1\)"/);
+  assert.deepEqual(dotPages, LEDGER_PAGES);
+  for (const page of LEDGER_PAGES) {
+    assert.match(html, new RegExp(`data-ledger-dot="${page}"[^>]*onclick="switchLedgerTab\\(['"]${page}['"]\\)"`));
+  }
   assert.match(renderer, /initLedgerCarousel\(\)/);
 });
