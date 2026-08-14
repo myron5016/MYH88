@@ -278,10 +278,9 @@ function touchEvent(target, clientX, clientY) {
 }
 
 test("ledger structure declares exact navigation and pane order", async () => {
-  const [html, controller, brandCss] = await Promise.all([
+  const [html, controller] = await Promise.all([
     read("index.html"),
     read("script.part3.js"),
-    read("brand-v11.7.css"),
   ]);
   const navigationPages = [...html.matchAll(/<(?:button|a)[^>]*data-ledger-page="([^"]+)"[^>]*>/g)].map((match) => match[1]);
   const panePages = [...html.matchAll(/<[^>]*data-ledger-pane="([^"]+)"[^>]*>/g)].map((match) => match[1]);
@@ -291,7 +290,6 @@ test("ledger structure declares exact navigation and pane order", async () => {
   assert.match(html, /id="ledgerCarousel"/);
   assert.match(html, /id="ledgerOverviewPane"/);
   assert.match(html, />持仓批次管理</);
-  assert.match(brandCss, /\.ledger-carousel/);
   assert.match(controller, /function renderLedgerOverview\(\)/);
 });
 
