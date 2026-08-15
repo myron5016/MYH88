@@ -69,6 +69,7 @@ test("ledger summary exposes a focused render contract with current month contro
   assert.doesNotMatch(html, /操作日历/);
   assert.match(source, /function renderLedgerSummary\(/);
   assert.match(source, /function changeLedgerSummaryMonth\(/);
+  assert.match(source, /LEDGER_SUMMARY_MIN_MONTH/);
   assert.match(css, /\.ledger-summary-grid\s*\{/);
   assert.match(css, /\.ledger-summary-recent\s*\{/);
   assert.match(css, /@media\s*\(max-width:\s*700px\)/);
@@ -86,4 +87,24 @@ test("ledger summary renders recent trades without including a second transactio
   assert.match(harness.getElement("ledgerSummaryGrid").innerHTML, /买入金额/);
   assert.match(harness.getElement("ledgerSummaryRecent").innerHTML, /NVDA/);
   assert.doesNotMatch(harness.getElement("ledgerSummaryRecent").innerHTML, /transactionBody/);
+});
+
+test("ledger summary cannot navigate earlier than June 2026", async () => {
+  const source = await read("ledger-summary-v11.7.js");
+  const harness = createSummaryHarness(source, { now: "2026-06-15T12:00:00+08:00" });
+  harness.context.renderLedgerSummary();
+  assert.equal(harness.getElement("ledgerSummaryPrev").disabled, true);
+  harness.context.changeLedgerSummaryMonth(-1);
+  assert.equal(harness.getElement("ledgerSummaryMonth").textContent, "2026年6月");
+});
+
+test("ledger summary keeps mobile layout and panel-wide swipe hooks", async () => {
+  const [css, source] = await Promise.all([
+    read("brand-v11.7.css"),
+    read("script.part3.js"),
+  ]);
+  assert.match(css, /\.ledger-summary-grid[\s\S]*grid-template-columns:\s*repeat\(2/);
+  assert.match(css, /@media\s*\(max-width:\s*700px\)/);
+  assert.match(source, /renderLedgerSummary/);
+  assert.match(source, /isLedgerGestureBlocked/);
 });

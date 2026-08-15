@@ -1,3 +1,4 @@
+const LEDGER_SUMMARY_MIN_MONTH={year:2026,month:6};
 let ledgerSummaryMonth=(()=>{const now=new Date();return{year:now.getFullYear(),month:now.getMonth()+1}})();
 
 function ledgerSummaryPrefix(year,month){return`${year}-${String(month).padStart(2,"0")}-`}
@@ -21,7 +22,7 @@ function renderLedgerSummary(){
   if(!month||!grid||!net||!recent)return;
   const{year,month:monthNumber}=ledgerSummaryMonth,summary=ledgerSummaryForMonth(year,monthNumber),now=new Date(),currentMonth=new Date(now.getFullYear(),now.getMonth(),1),shownMonth=new Date(year,monthNumber-1,1);
   month.textContent=ledgerSummaryMonthLabel(year,monthNumber);
-  if(previous)previous.disabled=false;
+  if(previous)previous.disabled=year*12+monthNumber-1<=LEDGER_SUMMARY_MIN_MONTH.year*12+LEDGER_SUMMARY_MIN_MONTH.month-1;
   if(next)next.disabled=shownMonth>=currentMonth;
   const metrics=[
     ["买入金额",summary.buyUSD,"out"],
@@ -37,6 +38,6 @@ function renderLedgerSummary(){
 }
 function changeLedgerSummaryMonth(direction){
   const next=new Date(ledgerSummaryMonth.year,ledgerSummaryMonth.month-1+direction,1),now=new Date(),currentMonth=new Date(now.getFullYear(),now.getMonth(),1);
-  if(next>currentMonth)return;
+  if(next>currentMonth||next.getFullYear()*12+next.getMonth()<LEDGER_SUMMARY_MIN_MONTH.year*12+LEDGER_SUMMARY_MIN_MONTH.month-1)return;
   ledgerSummaryMonth={year:next.getFullYear(),month:next.getMonth()+1};renderLedgerSummary();
 }
