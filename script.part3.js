@@ -127,7 +127,7 @@ function shiftLedgerPage(direction){
   switchLedgerTab(pages[Math.min(pages.length-1,Math.max(0,index+direction))]);
 }
 function isLedgerGestureBlocked(target){
-  return Boolean(target?.closest?.(".table-wrap,input,select,dialog,a,button"));
+  return Boolean(target?.closest?.("input,select,dialog,a,button"));
 }
 function initLedgerCarousel(){
   const carousel=$("ledgerCarousel");

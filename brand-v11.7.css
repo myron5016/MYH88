@@ -237,7 +237,11 @@ body {
 .v117-nav .brand-nav-links a { color: rgba(255, 255, 255, .82) !important; border-radius: 999px; padding: 9px 14px; transition: color 180ms ease, background 180ms ease; }
 .v117-nav .brand-nav-links a:hover, .v117-nav .brand-nav-links a:focus-visible { color: var(--v117-ink) !important; background: var(--v117-accent); }
 .v117-nav .brand-nav-action { border-radius: 999px !important; background: var(--v117-accent) !important; color: var(--v117-ink) !important; border-color: var(--v117-accent) !important; }
-.v117-hero-copy { width: min(1480px, calc(100% - 80px)) !important; padding-bottom: 96px !important; }
+.v117-hero .brand-hero-media {
+  transform: scale(1.16) translateX(4%);
+  transform-origin: center center;
+}
+.v117-hero-copy { width: min(620px, 42vw) !important; padding-bottom: 96px !important; }
 .v117-hero-copy .brand-eyebrow { color: var(--v117-accent) !important; letter-spacing: .14em !important; }
 .v117-hero-copy h1 { max-width: 860px !important; font-size: clamp(58px, 7vw, 112px) !important; line-height: .98 !important; letter-spacing: -.06em !important; }
 .v117-hero-copy .subtitle { max-width: 560px; color: rgba(255, 255, 255, .84) !important; font-size: clamp(18px, 2vw, 27px) !important; }
@@ -279,12 +283,25 @@ body {
 .v117-ledger::before, .v117-dca::before { content: ""; display: block; width: 44px; height: 4px; margin-bottom: 16px; border-radius: 999px; background: var(--v117-accent); }
 .v117-closing { min-height: 88dvh !important; margin-top: 26px !important; border-radius: 28px 28px 0 0 !important; }
 
+@media (min-width: 701px) {
+  .v117-closing .brand-closing-media {
+    object-fit: contain;
+    object-position: right center;
+    transform: none !important;
+    background: #22382c;
+  }
+  .v117-closing .brand-closing-shade {
+    background: linear-gradient(90deg, rgba(4, 30, 24, .94) 0%, rgba(4, 30, 24, .72) 34%, rgba(4, 30, 24, .2) 68%, rgba(4, 30, 24, .08) 100%);
+  }
+}
+
 @media (max-width: 1100px) {
   .v117-kpi-deck { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
   .v117-hero-rail { right: 40px; }
 }
 @media (max-width: 700px) {
   .v117-hero { min-height: 760px !important; border-radius: 0 0 24px 24px !important; }
+  .v117-hero .brand-hero-media { transform: scale(1.08) translateX(3%); }
   .v117-nav, .v117-hero-copy { width: calc(100% - 32px) !important; }
   .v117-hero-copy { padding-bottom: 265px !important; }
   .v117-hero-copy h1 { font-size: clamp(46px, 14vw, 70px) !important; letter-spacing: -.045em !important; }
@@ -294,6 +311,7 @@ body {
   .v117-kpi-deck .kpi { min-height: 106px; padding: 14px !important; }
   .v117-map-shell, .v117-position-panel, .v117-return-shell .return-card, .v117-ledger, .v117-dca { border-radius: 16px !important; padding: 16px !important; }
   .v117-map-shell #treemap { height: 620px !important; min-height: 620px !important; max-height: 620px !important; }
+  .v117-closing .brand-closing-media { object-fit: cover; object-position: center center; }
   .v117-closing { min-height: 740px !important; border-radius: 20px 20px 0 0 !important; }
 }
 

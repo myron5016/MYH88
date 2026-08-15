@@ -457,7 +457,6 @@ test("ledger panel handlers execute guarded touch and directional keyboard navig
   assert.equal(tableChild.matches(".table-wrap"), false, "the event target must not match the scroll container itself");
   assert.equal(tableChild.closest(".table-wrap"), tableWrap, "closest must find the target's scroll-container ancestor");
   const blockedTargets = [
-    tableChild,
     ...["input", "select", "button", "dialog"].map((tagName) => new MockElement({ tagName })),
   ];
   for (const target of blockedTargets) {
@@ -482,14 +481,18 @@ test("ledger panel handlers execute guarded touch and directional keyboard navig
   ledgerPanel.dispatch("touchend", touchEvent(plainTarget, 44, 30));
   assert.deepEqual(shifts, [1, 1], "a qualifying left swipe must shift one page forward");
 
+  ledgerPanel.dispatch("touchstart", touchEvent(tableChild, 40, 20));
+  ledgerPanel.dispatch("touchend", touchEvent(tableChild, 100, 20));
+  assert.deepEqual(shifts, [1, 1, -1], "a right swipe from the transaction table must return to the summary");
+
   const interactiveInput = new MockElement({ tagName: "input" });
   ledgerPanel.dispatch("keydown", { key: "ArrowRight", target: interactiveInput, preventDefault() {} });
-  assert.deepEqual(shifts, [1, 1], "ArrowRight from an interactive descendant must not shift pages");
+  assert.deepEqual(shifts, [1, 1, -1], "ArrowRight from an interactive descendant must not shift pages");
 
   ledgerPanel.dispatch("keydown", { key: "ArrowRight", target: ledgerPanel, preventDefault() {} });
-  assert.deepEqual(shifts, [1, 1, 1], "ArrowRight on the carousel must shift one page forward");
+  assert.deepEqual(shifts, [1, 1, -1, 1], "ArrowRight on the carousel must shift one page forward");
   ledgerPanel.dispatch("keydown", { key: "ArrowLeft", target: ledgerPanel, preventDefault() {} });
-  assert.deepEqual(shifts, [1, 1, 1, -1], "ArrowLeft on the carousel must shift one page backward");
+  assert.deepEqual(shifts, [1, 1, -1, 1, -1], "ArrowLeft on the carousel must shift one page backward");
 
   assert.match(html, /onclick="shiftLedgerPage\(-1\)"/);
   assert.match(html, /onclick="shiftLedgerPage\(1\)"/);

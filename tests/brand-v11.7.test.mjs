@@ -49,6 +49,14 @@ test("V11.7 defines the green archive visual contract", async () => {
   assert.match(css, /prefers-reduced-motion:\s*reduce/);
 });
 
+test("V11.7 keeps the photo composition readable across desktop and mobile", async () => {
+  const css = await read("../brand-v11.7.css");
+  assert.match(css, /\.v117-hero\s+\.brand-hero-media\s*\{[^}]*transform:\s*scale\(/s);
+  assert.match(css, /\.v117-hero-copy\s*\{[^}]*width:\s*min\(620px,/s);
+  assert.match(css, /@media\s*\(min-width:\s*701px\)[\s\S]*?\.v117-closing\s+\.brand-closing-media\s*\{[^}]*object-fit:\s*contain/s);
+  assert.match(css, /@media\s*\(max-width:\s*700px\)[\s\S]*?\.v117-closing\s+\.brand-closing-media\s*\{[^}]*object-fit:\s*cover/s);
+});
+
 test("V11.7 uses the China-market red-up green-down convention", async () => {
   const [css, runtime] = await Promise.all([
     read("../brand-v11.7.css"),
