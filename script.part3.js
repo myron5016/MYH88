@@ -127,8 +127,7 @@ function shiftLedgerPage(direction){
   switchLedgerTab(pages[Math.min(pages.length-1,Math.max(0,index+direction))]);
 }
 function isLedgerGestureBlocked(target){
-  const button=target?.closest?.("button");
-  return Boolean(target?.closest?.(".table-wrap,input,select,dialog,a")||(button&&!button.classList.contains("ledger-calendar-day")));
+  return Boolean(target?.closest?.(".table-wrap,input,select,dialog,a,button"));
 }
 function initLedgerCarousel(){
   const carousel=$("ledgerCarousel");
@@ -156,7 +155,7 @@ function initLedgerCarousel(){
     shiftLedgerPage(event.key==="ArrowLeft"?-1:1);
   });
   if(typeof ResizeObserver==="function"){carousel.ro=new ResizeObserver(syncLedgerHeight);document.querySelectorAll("[data-ledger-pane]").forEach(pane=>carousel.ro.observe(pane))}
-  renderLedgerCalendar();switchLedgerTab("overview");
+  renderLedgerSummary();switchLedgerTab("overview");
 }
 function fillTradeFromPosition(p){if(!p)return;$("tradeSymbol").value=p.symbol;$("tradeName").value=p.name;$("tradeCurrency").value=p.currency;$("tradeFx").value=fx(p.currency);$("tradePrice").value=p.price||p.avgCost;$("tradeSource").value=p.source;$("tradeSector").value=p.sector;$("tradeColor").value=p.color;updateTradePreview()}
 function syncTradeSymbol(){const symbol=$("tradeSymbol").value.trim().toUpperCase(),p=state.positions.find(x=>x.symbol===symbol);if(p){tradeSectorAuto=false;tradeColorAuto=false;fillTradeFromPosition(p)}else{const sector=inferSector(symbol,$("tradeName").value,tradeSectorAuto?"":$("tradeSector").value);if(tradeSectorAuto)$("tradeSector").value=sector;if(tradeColorAuto)$("tradeColor").value=colorForSectorMember(sector,state.positions.filter(x=>inferSector(x.symbol,x.name,x.sector)===sector).length);$("tradeFx").value=fx($("tradeCurrency").value)}updateTradePreview()}

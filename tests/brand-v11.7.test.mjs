@@ -105,12 +105,12 @@ test("V11.7 release fingerprint is consistent and keeps Worker 10.56", async () 
   assert.match(pkg, /"version":\s*"11\.7\.1"/);
 });
 
-test("ledger calendar ships as a separately cached runtime chunk", async () => {
+test("ledger summary ships as a separately cached runtime chunk", async () => {
   const [index, worker] = await Promise.all([
     read("../index.html"),
     read("../service-worker.js"),
   ]);
 
-  assert.match(index, /ledger-calendar-v11\.7\.js\?v=11\.7\.1/);
-  assert.match(worker, /\.\/ledger-calendar-v11\.7\.js\?v=11\.7\.1/);
+  assert.match(index, /ledger-summary-v11\.7\.js\?v=11\.7\.1/);
+  assert.match(worker, /\.\/ledger-summary-v11\.7\.js\?v=11\.7\.1/);
 });
