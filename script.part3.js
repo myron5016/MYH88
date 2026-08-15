@@ -100,7 +100,71 @@ function transactionLabel(t){
 }
 function latestCorrectableTransaction(){return state.transactions.slice().reverse().find(t=>["buy","sell"].includes(t.type)&&!t.voided&&Object.prototype.hasOwnProperty.call(t,"positionBefore"))||null}
 function renderCashFlowTable(){$("cashFlowBody").innerHTML=state.cashFlows.slice().sort((a,b)=>String(b.date).localeCompare(String(a.date))).map(x=>`<tr class="${x.voided?"muted":""}"><td>${escapeHtml(x.date)}</td><td>${x.voided?"已作废":x.type==="withdraw"?"提取本金":"追加本金"}</td><td class="${x.voided?"muted":x.type==="withdraw"?"red":"green"}">${x.type==="withdraw"?"-":"+"}${money(x.amountUSD)}</td><td>${escapeHtml(x.note||"")}</td><td>${x.migration||x.voided?"—":`<button class="danger" onclick="deleteCashFlow('${x.id}')">作废</button>`}</td></tr>`).join("")}
-function switchLedgerTab(tab){if(!isAdminMode&&["cashflows","backup"].includes(tab))tab="transactions";activeLedgerTab=tab;document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));["positions","transactions","cashflows","backup"].forEach(x=>$(x+"Pane").classList.toggle("hidden",x!==tab));if(tab==="backup")renderBackupList()}
+const PUBLIC_LEDGER_PAGES=["overview","transactions"];
+const ADMIN_LEDGER_PAGES=["overview","transactions","positions","cashflows","backup"];
+function allowedLedgerPages(){return isAdminMode?ADMIN_LEDGER_PAGES:PUBLIC_LEDGER_PAGES}
+function renderLedgerOverview(){
+  const transactions=state.transactions.filter(transaction=>!transaction.voided);
+  const latest=transactions.reduce((current,transaction)=>!current||String(transaction.date||"")>=String(current.date||"")?transaction:current,null);
+  $("ledgerOverviewPositionCount").textContent=state.positions.length;
+  $("ledgerOverviewTransactionCount").textContent=transactions.length;
+  $("ledgerOverviewRealizedPnl").textContent=money(transactions.reduce((total,transaction)=>total+(Number(transaction.realizedPnlUSD)||0),0));
+  $("ledgerOverviewLatestTrade").textContent=latest?`${transactionLabel(latest)} ${latest.symbol||""} · ${latest.date||""}`:"暂无交易";
+}
+function syncLedgerHeight(){const t=$("ledgerCarouselTrack"),p=document.querySelector(`[data-ledger-pane="${activeLedgerTab}"]`);if(t&&p)t.style.height=p.scrollHeight+"px"}
+function switchLedgerTab(page,options={}){
+  const pages=allowedLedgerPages();
+  const tab=pages.includes(page)?page:"overview";
+  const index=pages.indexOf(tab);
+  activeLedgerTab=tab;
+  document.querySelectorAll("[data-ledger-page]").forEach(control=>{
+    const active=control.dataset.ledgerPage===tab;
+    control.classList.toggle("active",active);
+    control.setAttribute("aria-current",active?"page":"false");
+  });
+  document.querySelectorAll("[data-ledger-dot]").forEach(dot=>{
+    const active=dot.dataset.ledgerDot===tab;
+    dot.classList.toggle("active",active);
+    dot.setAttribute("aria-current",active?"page":"false");
+  });
+  document.querySelectorAll("[data-ledger-pane]").forEach(pane=>{const active=pane.dataset.ledgerPane===tab;pane.setAttribute("aria-hidden",String(!active));pane.toggleAttribute("inert",!active)});
+  const track=$("ledgerCarouselTrack");
+  if(track)track.style.transform=`translateX(${-index*100}%)`;
+  if(tab==="backup"&&!options.skipBackupRender)renderBackupList();
+  syncLedgerHeight();
+}
+function shiftLedgerPage(direction){
+  const pages=allowedLedgerPages(),index=Math.max(0,pages.indexOf(activeLedgerTab));
+  switchLedgerTab(pages[Math.min(pages.length-1,Math.max(0,index+direction))]);
+}
+function isLedgerGestureBlocked(target){return Boolean(target?.closest?.(".table-wrap,input,select,button,dialog"))}
+function initLedgerCarousel(){
+  const carousel=$("ledgerCarousel");
+  if(!carousel||carousel.dataset.ledgerCarouselInitialized)return;
+  carousel.dataset.ledgerCarouselInitialized="true";
+  let gestureStart=null;
+  const point=event=>event.touches?.[0]||event.changedTouches?.[0]||event;
+  const begin=event=>{if(isLedgerGestureBlocked(event.target))return;const start=point(event);gestureStart={x:start.clientX,y:start.clientY,target:event.target}};
+  const end=event=>{
+    if(!gestureStart||isLedgerGestureBlocked(event.target)){gestureStart=null;return}
+    const finish=point(event),deltaX=finish.clientX-gestureStart.x,deltaY=finish.clientY-gestureStart.y;
+    gestureStart=null;
+    if(Math.abs(deltaX)<56||Math.abs(deltaX)<=Math.abs(deltaY))return;
+    shiftLedgerPage(deltaX<0?1:-1);
+  };
+  carousel.addEventListener("touchstart",begin,{passive:true});
+  carousel.addEventListener("touchend",end,{passive:true});
+  carousel.addEventListener("mousedown",begin);
+  carousel.addEventListener("mouseup",end);
+  carousel.addEventListener("keydown",event=>{
+    if(event.key!=="ArrowLeft"&&event.key!=="ArrowRight")return;
+    if(isLedgerGestureBlocked(event.target))return;
+    event.preventDefault();
+    shiftLedgerPage(event.key==="ArrowLeft"?-1:1);
+  });
+  if(typeof ResizeObserver==="function"){carousel.ro=new ResizeObserver(syncLedgerHeight);document.querySelectorAll("[data-ledger-pane]").forEach(pane=>carousel.ro.observe(pane))}
+  switchLedgerTab("overview");
+}
 function fillTradeFromPosition(p){if(!p)return;$("tradeSymbol").value=p.symbol;$("tradeName").value=p.name;$("tradeCurrency").value=p.currency;$("tradeFx").value=fx(p.currency);$("tradePrice").value=p.price||p.avgCost;$("tradeSource").value=p.source;$("tradeSector").value=p.sector;$("tradeColor").value=p.color;updateTradePreview()}
 function syncTradeSymbol(){const symbol=$("tradeSymbol").value.trim().toUpperCase(),p=state.positions.find(x=>x.symbol===symbol);if(p){tradeSectorAuto=false;tradeColorAuto=false;fillTradeFromPosition(p)}else{const sector=inferSector(symbol,$("tradeName").value,tradeSectorAuto?"":$("tradeSector").value);if(tradeSectorAuto)$("tradeSector").value=sector;if(tradeColorAuto)$("tradeColor").value=colorForSectorMember(sector,state.positions.filter(x=>inferSector(x.symbol,x.name,x.sector)===sector).length);$("tradeFx").value=fx($("tradeCurrency").value)}updateTradePreview()}
 function updateTradePreview(){const type=$("tradeType").value,qty=num($("tradeShares").value),price=num($("tradePrice").value),rate=num($("tradeFx").value),fee=num($("tradeFee").value),symbol=$("tradeSymbol").value.trim().toUpperCase(),p=state.positions.find(x=>x.symbol===symbol),cashBefore=cashBalance(),buyCost=(qty*price+fee)*rate,sellGross=qty*price*rate,sellFee=fee*rate,sellCash=Math.max(0,sellGross-sellFee),sharesBefore=num(p?.shares),costBefore=num(p?.costBasisUSD);let cashAfter=cashBefore,sharesAfter=sharesBefore,costAfter=costBefore,avgAfter=p?num(p.avgCost):0,extraTitle=type==="sell"?"预计已实现":"买后均价",extraValue="—",extraClass="";if(type==="buy"){cashAfter=cashBefore-buyCost;sharesAfter=sharesBefore+qty;costAfter=costBefore+buyCost;avgAfter=sharesAfter?((num(p?.avgCost)*sharesBefore)+(qty*price+fee))/sharesAfter:0;extraValue=`${round(avgAfter,4)} ${$("tradeCurrency").value}`}else{const basis=sharesBefore?costBefore/sharesBefore*qty:0,realized=sellGross-sellFee-basis;cashAfter=cashBefore+sellCash;sharesAfter=Math.max(0,sharesBefore-qty);costAfter=Math.max(0,costBefore-basis);extraValue=money(realized);extraClass=cls(realized)}$("tradePreview").innerHTML=`<div class="trade-preview-grid"><div><span>现金变化</span><strong class="${cls(cashAfter-cashBefore)}">${money(cashAfter-cashBefore)}</strong><small>${money(cashBefore)} → ${money(cashAfter)}</small></div><div><span>持仓数量</span><strong>${round(sharesBefore,4)} → ${round(sharesAfter,4)}</strong><small>${symbol||"未选择资产"}</small></div><div><span>持仓成本</span><strong>${money(costAfter-costBefore)}</strong><small>${money(costBefore)} → ${money(costAfter)}</small></div><div><span>${extraTitle}</span><strong class="${extraClass}">${extraValue}</strong><small>${type==="sell"?`收入 ${money(sellCash)}`:`占用 ${money(buyCost)}`}</small></div></div>`}

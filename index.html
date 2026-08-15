@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="dca-v10.53.css?v=11.6.0">
   <link rel="stylesheet" href="v11-cockpit.css?v=11.6.0">
   <link rel="stylesheet" href="brand-v11.6.css?v=11.6.0">
-  <link rel="stylesheet" href="brand-v11.7.css?v=11.7.0">
+  <link rel="stylesheet" href="brand-v11.7.css?v=11.7.1">
 </head>
 <body>
   <header id="overview" class="brand-hero v117-hero">
@@ -165,7 +165,7 @@
     <aside class="card map-side-card cockpit-panel v117-position-panel">
       <div class="section-head compact-head"><div><span class="section-kicker">POSITION BOOK</span><h2>持仓明细</h2><p class="section-note">按持仓市值排序；价格、盈亏统一折算为 USD</p></div></div>
       <div class="map-table-wrap">
-        <table class="map-holding-table">
+        <table class="map-holding-table" data-holdings-table="public">
           <colgroup><col class="col-symbol"><col class="col-name"><col class="col-shares"><col class="col-market"><col class="col-weight"><col class="col-cost"><col class="col-current"><col class="col-pnl"><col class="col-return"><col class="col-action admin-only hidden"></colgroup>
           <thead><tr><th>代码</th><th>名称</th><th>持仓数量</th><th>持仓市值 (USD)</th><th>持仓占比</th><th>成本价 (USD)</th><th>当前价 (USD)</th><th>浮动盈亏 (USD)</th><th>浮动盈亏率</th><th class="admin-only hidden">操作</th></tr></thead>
           <tbody id="mapHoldingBody"></tbody>
@@ -213,37 +213,63 @@
       </div>
     </div>
 
-    <div class="tabs" role="tablist">
-      <button class="tab active" data-tab="positions" onclick="switchLedgerTab('positions')">当前持仓 <b id="positionCount">0</b></button>
-      <button class="tab" data-tab="transactions" onclick="switchLedgerTab('transactions')">交易流水 <b id="transactionCount">0</b></button>
-      <button class="tab admin-only hidden" data-tab="cashflows" onclick="switchLedgerTab('cashflows')">资金流水 <b id="cashFlowCount">0</b></button>
-      <button class="tab admin-only hidden" data-tab="backup" onclick="switchLedgerTab('backup')">备份与恢复</button>
+    <div class="tabs ledger-page-navigation" role="navigation" aria-label="账本页面">
+      <button class="tab active" data-tab="overview" data-ledger-page="overview" aria-current="page" onclick="switchLedgerTab('overview')">账本总览</button>
+      <button class="tab" data-tab="transactions" data-ledger-page="transactions" onclick="switchLedgerTab('transactions')">交易流水 <b id="transactionCount">0</b></button>
+      <button class="tab admin-only hidden" data-tab="positions" data-ledger-page="positions" onclick="switchLedgerTab('positions')">持仓批次管理</button>
+      <button class="tab admin-only hidden" data-tab="cashflows" data-ledger-page="cashflows" onclick="switchLedgerTab('cashflows')">资金流水 <b id="cashFlowCount">0</b></button>
+      <button class="tab admin-only hidden" data-tab="backup" data-ledger-page="backup" onclick="switchLedgerTab('backup')">备份与恢复</button>
     </div>
 
-    <div id="positionsPane" class="tab-pane">
+    <div id="ledgerCarousel" class="ledger-carousel ledger-carousel-viewport" tabindex="0" aria-label="账本轮播">
+      <div id="ledgerCarouselTrack" class="ledger-carousel-track">
+        <section data-ledger-pane="overview" id="ledgerOverviewPane" class="ledger-page">
+          <div class="ledger-overview">
+            <div><span>当前持仓</span><strong id="ledgerOverviewPositionCount">0</strong></div>
+            <div><span>交易记录</span><strong id="ledgerOverviewTransactionCount">0</strong></div>
+            <div><span>已实现盈亏</span><strong id="ledgerOverviewRealizedPnl">$0</strong></div>
+            <div><span>最近交易</span><strong id="ledgerOverviewLatestTrade">暂无交易</strong></div>
+          </div>
+        </section>
+
+        <section data-ledger-pane="transactions" id="transactionsPane" class="ledger-page">
+          <div class="table-tools">
+            <input id="transactionSearch" placeholder="搜索代码" oninput="transactionPage=1;renderTransactionTable()">
+            <select id="transactionTypeFilter" onchange="transactionPage=1;renderTransactionTable()"><option value="all">全部类型</option><option value="buy">仅买入</option><option value="sell">仅卖出</option><option value="opening">V8 迁移记录</option></select>
+          </div>
+          <div class="table-wrap"><table class="compact-table"><thead><tr><th>日期</th><th>类型</th><th>代码</th><th>数量</th><th>成交价</th><th>手续费</th><th>成交汇率</th><th>已实现盈亏 USD</th><th>备注</th><th>操作</th></tr></thead><tbody id="transactionBody"></tbody></table></div>
+          <div id="transactionPager" class="pager"></div>
+        </section>
+
+        <section data-ledger-pane="positions" id="positionsPane" class="ledger-page admin-only hidden">
       <div class="table-tools"><input id="positionSearch" placeholder="搜索代码或名称" oninput="renderPositionTable()"></div>
-      <div class="table-wrap"><table class="compact-table"><thead><tr><th>资产</th><th>数量</th><th>平均成本</th><th>总成本 USD</th><th>市值 USD</th><th>浮动盈亏</th><th>行情来源</th><th>板块</th><th>操作</th></tr></thead><tbody id="positionBody"></tbody></table></div>
-    </div>
+      <div class="table-wrap"><table class="compact-table" data-holdings-table="admin"><thead><tr><th>资产</th><th>数量</th><th>平均成本</th><th>总成本 USD</th><th>市值 USD</th><th>浮动盈亏</th><th>行情来源</th><th>板块</th><th>操作</th></tr></thead><tbody id="positionBody"></tbody></table></div>
+        </section>
 
-    <div id="transactionsPane" class="tab-pane hidden">
-      <div class="table-tools">
-        <input id="transactionSearch" placeholder="搜索代码" oninput="transactionPage=1;renderTransactionTable()">
-        <select id="transactionTypeFilter" onchange="transactionPage=1;renderTransactionTable()"><option value="all">全部类型</option><option value="buy">仅买入</option><option value="sell">仅卖出</option><option value="opening">V8 迁移记录</option></select>
-      </div>
-      <div class="table-wrap"><table class="compact-table"><thead><tr><th>日期</th><th>类型</th><th>代码</th><th>数量</th><th>成交价</th><th>手续费</th><th>成交汇率</th><th>已实现盈亏 USD</th><th>备注</th><th>操作</th></tr></thead><tbody id="transactionBody"></tbody></table></div>
-      <div id="transactionPager" class="pager"></div>
-    </div>
-
-    <div id="cashflowsPane" class="tab-pane hidden">
+        <section data-ledger-pane="cashflows" id="cashflowsPane" class="ledger-page admin-only hidden">
       <div class="table-wrap"><table class="compact-table"><thead><tr><th>日期</th><th>类型</th><th>金额 USD</th><th>备注</th><th>操作</th></tr></thead><tbody id="cashFlowBody"></tbody></table></div>
-    </div>
+        </section>
 
-    <div id="backupPane" class="tab-pane hidden">
+        <section data-ledger-pane="backup" id="backupPane" class="ledger-page admin-only hidden">
       <div class="backup-grid">
         <div><h3>导出与导入</h3><p class="note">导出完整 V10 数据；导入前会自动创建恢复点。</p><div class="buttons"><button onclick="downloadJson()">导出 data.json</button><label class="file-btn">导入 data.json<input type="file" accept=".json" onchange="importJson(event)"></label></div></div>
         <div><h3>本地恢复点</h3><p class="note">最多保留最近10份，只保存在当前浏览器。</p><div id="backupList"></div></div>
         <div><h3>GitHub 云端备份</h3><p class="note">每次安全保存前，V9.1 会先把旧的云端 data.json 复制到 backups 文件夹；备份失败时不会覆盖主账本。</p><div id="cloudBackupStatus" class="cloud-backup-status">尚未执行本次会话的云端备份</div></div>
       </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="ledger-carousel-controls" aria-label="账本轮播控制">
+      <button type="button" aria-label="上一页" onclick="shiftLedgerPage(-1)">&#8592;</button>
+      <div class="ledger-page-dots" aria-label="账本页码">
+        <button type="button" data-ledger-dot="overview" aria-label="转到账本总览" onclick="switchLedgerTab('overview')"></button>
+        <button type="button" data-ledger-dot="transactions" aria-label="转到交易流水" onclick="switchLedgerTab('transactions')"></button>
+        <button type="button" class="admin-only hidden" data-ledger-dot="positions" aria-label="转到持仓批次管理" onclick="switchLedgerTab('positions')"></button>
+        <button type="button" class="admin-only hidden" data-ledger-dot="cashflows" aria-label="转到资金流水" onclick="switchLedgerTab('cashflows')"></button>
+        <button type="button" class="admin-only hidden" data-ledger-dot="backup" aria-label="转到备份与恢复" onclick="switchLedgerTab('backup')"></button>
+      </div>
+      <button type="button" aria-label="下一页" onclick="shiftLedgerPage(1)">&#8594;</button>
     </div>
   </section>
 
@@ -430,13 +456,13 @@
 </dialog>
 
 <script src="myh88-core.js?v=11.6.0"></script>
-<script src="script.part1.js?v=11.6.0"></script>
+<script src="script.part1.js?v=11.7.1"></script>
 <script src="script.part2.js?v=11.6.0"></script>
-<script src="script.part3.js?v=11.6.0"></script>
-<script src="script.part4.js?v=11.6.0"></script>
+<script src="script.part3.js?v=11.7.1"></script>
+<script src="script.part4.js?v=11.7.1"></script>
 <script src="script.part5.js?v=11.6.0"></script>
 <script src="script.part6.js?v=11.6.0"></script>
 <script src="brand-v11.6.js?v=11.6.0"></script>
-<script src="brand-v11.7.js?v=11.7.0"></script>
+<script src="brand-v11.7.js?v=11.7.1"></script>
 </body>
 </html>
