@@ -117,7 +117,7 @@ class MockElement {
   focus() {}
 }
 
-function createControllerHarness(controller, { admin = false } = {}) {
+function createControllerHarness(controller, { admin = false, calendar = "" } = {}) {
   const resizeObservers = [];
   class MockResizeObserver {
     constructor(callback) {
@@ -140,11 +140,6 @@ function createControllerHarness(controller, { admin = false } = {}) {
     classes: ["tab"],
     dataset: { ledgerPage: page, tab: page },
   }));
-  const pageDots = LEDGER_PAGES.map((page) => new MockElement({
-    tagName: "button",
-    classes: ["ledger-page-dot"],
-    dataset: { ledgerDot: page },
-  }));
   const panes = LEDGER_PAGES.map((page) => new MockElement({
     id: page === "overview" ? "ledgerOverviewPane" : `${page}Pane`,
     classes: ["ledger-page"],
@@ -152,7 +147,8 @@ function createControllerHarness(controller, { admin = false } = {}) {
   }));
   const carousel = new MockElement({ id: "ledgerCarousel", classes: ["ledger-carousel", "ledger-carousel-viewport"] });
   const track = new MockElement({ id: "ledgerCarouselTrack", classes: ["ledger-carousel-track"] });
-  const elements = [carousel, track, ...pageControls, ...pageDots, ...panes];
+  const panel = new MockElement({ id: "ledgerPanel", classes: ["v117-ledger"] });
+  const elements = [panel, carousel, track, ...pageControls, ...panes];
   const byId = new Map(elements.filter((element) => element.id).map((element) => [element.id, element]));
   byId.set("ledgerCarouselViewport", carousel);
 
@@ -185,10 +181,13 @@ function createControllerHarness(controller, { admin = false } = {}) {
     $: (id) => document.getElementById(id),
     escapeHtml: (value) => String(value ?? ""),
     money: (value) => `$${Number(value) || 0}`,
+    num: (value) => Number(value) || 0,
+    round: (value, digits = 2) => Number(Number(value || 0).toFixed(digits)),
     renderBackupList: () => { backupRenderCount += 1; },
     MYH88Core: {},
   });
   runInContext(controller, context, { filename: "script.part3.js" });
+  if (calendar) runInContext(calendar, context, { filename: "ledger-calendar-v11.7.js" });
 
   return {
     context,
@@ -234,7 +233,7 @@ function createRendererHarness(renderer, { activeLedgerTab = "transactions" } = 
       return elements.get(id);
     },
     priceProxyUrl: () => "",
-    renderLedgerOverview() {},
+    renderLedgerCalendar() {},
     switchLedgerTab() {},
     updateNetworkStatus() {},
   });
@@ -253,7 +252,7 @@ function createRendererHarness(renderer, { activeLedgerTab = "transactions" } = 
     "renderCashFlowTable",
     "renderBackupList",
     "renderSectorAdminPanel",
-    "renderLedgerOverview",
+    "renderLedgerCalendar",
     "switchLedgerTab",
     "renderSyncStatus",
     "renderDiagnostics",
@@ -319,9 +318,10 @@ function touchEvent(target, clientX, clientY) {
 }
 
 test("ledger structure declares exact navigation and pane order", async () => {
-  const [html, controller] = await Promise.all([
+  const [html, controller, calendar] = await Promise.all([
     read("index.html"),
     read("script.part3.js"),
+    read("ledger-calendar-v11.7.js"),
   ]);
   const navigationPages = [...html.matchAll(/<(?:button|a)[^>]*data-ledger-page="([^"]+)"[^>]*>/g)].map((match) => match[1]);
   const panePages = [...html.matchAll(/<[^>]*data-ledger-pane="([^"]+)"[^>]*>/g)].map((match) => match[1]);
@@ -331,10 +331,13 @@ test("ledger structure declares exact navigation and pane order", async () => {
   assert.match(html, /id="ledgerCarousel"/);
   assert.match(html, /id="ledgerOverviewPane"/);
   assert.match(html, />持仓批次管理</);
-  assert.match(controller, /function renderLedgerOverview\(\)/);
+  assert.match(html, /data-ledger-page="overview"[^>]*>操作日历/);
+  assert.match(html, /id="ledgerCalendarGrid"/);
+  assert.match(html, /id="ledgerCalendarDetails"/);
+  assert.match(calendar, /function ledgerCalendarEvents\(/);
 });
 
-test("renderAll executes the ledger overview and restores the active carousel page", async () => {
+test("renderAll renders the operation calendar and restores the active carousel page", async () => {
   const renderer = await read("script.part4.js");
   const harness = createRendererHarness(renderer, { activeLedgerTab: "cashflows" });
 
@@ -346,16 +349,16 @@ test("renderAll executes the ledger overview and restores the active carousel pa
     "renderAll must restore the current activeLedgerTab",
   );
   assert.equal(
-    harness.calls.filter(({ name }) => name === "renderLedgerOverview").length,
+    harness.calls.filter(({ name }) => name === "renderLedgerCalendar").length,
     1,
-    "renderAll must execute renderLedgerOverview exactly once",
+    "renderAll must execute renderLedgerCalendar exactly once",
   );
 });
 
 test("ledger permissions and backup rendering follow the active user", async () => {
-  const [html, controller] = await Promise.all([read("index.html"), read("script.part3.js")]);
-  const visitor = createControllerHarness(controller);
-  const administrator = createControllerHarness(controller, { admin: true });
+  const [html, controller, calendar] = await Promise.all([read("index.html"), read("script.part3.js"), read("ledger-calendar-v11.7.js")]);
+  const visitor = createControllerHarness(controller, { calendar });
+  const administrator = createControllerHarness(controller, { admin: true, calendar });
 
   assertTask2Interface(visitor, "switchLedgerTab");
   visitor.call("switchLedgerTab", "positions");
@@ -386,8 +389,8 @@ test("ledger permissions and backup rendering follow the active user", async () 
 });
 
 test("inactive panes are inert and the track follows active pane height changes", async () => {
-  const controller = await read("script.part3.js");
-  const harness = createControllerHarness(controller, { admin: true });
+  const [controller, calendar] = await Promise.all([read("script.part3.js"), read("ledger-calendar-v11.7.js")]);
+  const harness = createControllerHarness(controller, { admin: true, calendar });
   const overview = harness.getElementById("ledgerOverviewPane");
   const transactions = harness.getElementById("transactionsPane");
   const track = harness.getElementById("ledgerCarouselTrack");
@@ -409,19 +412,27 @@ test("inactive panes are inert and the track follows active pane height changes"
   assert.equal(track.style.height, "1040px", "dynamic active content must resynchronize track height");
 });
 
-test("ledger overview chooses the later inserted trade when dates tie", async () => {
-  const controller = await read("script.part3.js");
-  const harness = createControllerHarness(controller);
+test("operation calendar derives in and out flows from valid ledger entries", async () => {
+  const [controller, calendar] = await Promise.all([read("script.part3.js"), read("ledger-calendar-v11.7.js")]);
+  const harness = createControllerHarness(controller, { calendar });
   harness.context.state.transactions = [
-    { id: "first", type: "buy", symbol: "FIRST", date: "2026-08-15", realizedPnlUSD: 0 },
-    { id: "later", type: "sell", symbol: "LATER", date: "2026-08-15", realizedPnlUSD: 25 },
+    { id: "buy", type: "buy", symbol: "NVDA", date: "2026-08-05", shares: 2, price: 250, fee: 1.25, fxRate: 1 },
+    { id: "sell", type: "sell", symbol: "GOOGL", date: "2026-08-05", shares: 2.5, price: 380, fee: 1.5, fxRate: 1 },
+    { id: "voided", type: "buy", symbol: "VOID", date: "2026-08-06", shares: 1, price: 1, voided: true },
+  ];
+  harness.context.state.cashFlows = [
+    { id: "deposit", type: "deposit", date: "2026-08-03", amountUSD: 7370 },
+    { id: "withdraw", type: "withdraw", date: "2026-08-08", amountUSD: 300 },
+    { id: "voided-cash", type: "deposit", date: "2026-08-09", amountUSD: 10, voided: true },
   ];
 
-  harness.call("renderLedgerOverview");
-  assert.equal(
-    harness.getElementById("ledgerOverviewLatestTrade").textContent,
-    "卖出 LATER · 2026-08-15",
+  const events = harness.call("ledgerCalendarEvents", 2026, 8);
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(events.map(({ date, kind, direction }) => [date, kind, direction]))),
+    [["2026-08-03", "deposit", "in"], ["2026-08-05", "buy", "out"], ["2026-08-05", "sell", "in"], ["2026-08-08", "withdraw", "out"]],
   );
+  assert.equal(events.find((event) => event.kind === "buy").amountUSD, 501.25);
+  assert.equal(events.find((event) => event.kind === "sell").amountUSD, 948.5);
 });
 
 test("holdings tables have explicit public and admin boundaries", async () => {
@@ -445,24 +456,23 @@ test("holdings tables have explicit public and admin boundaries", async () => {
   assert.match(positionsPane, /data-holdings-table="admin"[\s\S]*?id="positionBody"/);
 });
 
-test("carousel handlers execute guarded touch and directional keyboard navigation", async () => {
-  const [html, controller, renderer] = await Promise.all([read("index.html"), read("script.part3.js"), read("script.part4.js")]);
-  const harness = createControllerHarness(controller, { admin: true });
+test("ledger panel handlers execute guarded touch and directional keyboard navigation", async () => {
+  const [html, controller, calendar, renderer] = await Promise.all([read("index.html"), read("script.part3.js"), read("ledger-calendar-v11.7.js"), read("script.part4.js")]);
+  const harness = createControllerHarness(controller, { admin: true, calendar });
   const shifts = [];
-  const dotPages = [...html.matchAll(/<button[^>]*data-ledger-dot="([^"]+)"[^>]*>/g)].map((match) => match[1]);
 
   assertTask2Interface(harness, "shiftLedgerPage");
   assertTask2Interface(harness, "initLedgerCarousel");
   harness.context.__recordLedgerShift = (direction) => { shifts.push(direction); };
   runInContext("shiftLedgerPage = __recordLedgerShift", harness.context);
   harness.call("initLedgerCarousel");
-  const ledgerCarousel = harness.getElementById("ledgerCarousel");
-  assert.ok(ledgerCarousel, "the ledger carousel viewport must exist in the harness");
-  assert.equal(ledgerCarousel.id, "ledgerCarousel");
+  const ledgerPanel = harness.getElementById("ledgerPanel");
+  assert.ok(ledgerPanel, "the complete ledger panel must exist in the harness");
+  assert.equal(ledgerPanel.id, "ledgerPanel");
   for (const eventType of ["touchstart", "touchend", "keydown"]) {
     assert.ok(
-      ledgerCarousel.listeners.has(eventType),
-      `initLedgerCarousel must register ${eventType} on #ledgerCarousel`,
+      ledgerPanel.listeners.has(eventType),
+      `initLedgerCarousel must register ${eventType} on #ledgerPanel`,
     );
   }
 
@@ -475,37 +485,40 @@ test("carousel handlers execute guarded touch and directional keyboard navigatio
     ...["input", "select", "button", "dialog"].map((tagName) => new MockElement({ tagName })),
   ];
   for (const target of blockedTargets) {
-    ledgerCarousel.dispatch("touchstart", touchEvent(target, 100, 20));
-    ledgerCarousel.dispatch("touchend", touchEvent(target, 20, 20));
+    ledgerPanel.dispatch("touchstart", touchEvent(target, 100, 20));
+    ledgerPanel.dispatch("touchend", touchEvent(target, 20, 20));
   }
   assert.deepEqual(shifts, [], "interactive and horizontally scrollable targets must not shift pages");
 
-  const plainTarget = new MockElement();
-  ledgerCarousel.dispatch("touchstart", touchEvent(plainTarget, 100, 20));
-  ledgerCarousel.dispatch("touchend", touchEvent(plainTarget, 45, 20));
-  ledgerCarousel.dispatch("touchstart", touchEvent(plainTarget, 100, 20));
-  ledgerCarousel.dispatch("touchend", touchEvent(plainTarget, 44, 90));
-  assert.deepEqual(shifts, [], "swipes below 56px or dominated by vertical travel must not shift pages");
+  const calendarDay = new MockElement({ tagName: "button", classes: ["ledger-calendar-day"] });
+  ledgerPanel.dispatch("touchstart", touchEvent(calendarDay, 100, 20));
+  ledgerPanel.dispatch("touchend", touchEvent(calendarDay, 40, 20));
+  assert.deepEqual(shifts, [1], "calendar dates must still allow a panel-wide swipe gesture");
 
-  ledgerCarousel.dispatch("touchstart", touchEvent(plainTarget, 100, 20));
-  ledgerCarousel.dispatch("touchend", touchEvent(plainTarget, 44, 30));
-  assert.deepEqual(shifts, [1], "a qualifying left swipe must shift one page forward");
+  const plainTarget = new MockElement();
+  ledgerPanel.dispatch("touchstart", touchEvent(plainTarget, 100, 20));
+  ledgerPanel.dispatch("touchend", touchEvent(plainTarget, 45, 20));
+  ledgerPanel.dispatch("touchstart", touchEvent(plainTarget, 100, 20));
+  ledgerPanel.dispatch("touchend", touchEvent(plainTarget, 44, 90));
+  assert.deepEqual(shifts, [1], "swipes below 56px or dominated by vertical travel must not shift pages");
+
+  ledgerPanel.dispatch("touchstart", touchEvent(plainTarget, 100, 20));
+  ledgerPanel.dispatch("touchend", touchEvent(plainTarget, 44, 30));
+  assert.deepEqual(shifts, [1, 1], "a qualifying left swipe must shift one page forward");
 
   const interactiveInput = new MockElement({ tagName: "input" });
-  ledgerCarousel.dispatch("keydown", { key: "ArrowRight", target: interactiveInput, preventDefault() {} });
-  assert.deepEqual(shifts, [1], "ArrowRight from an interactive descendant must not shift pages");
+  ledgerPanel.dispatch("keydown", { key: "ArrowRight", target: interactiveInput, preventDefault() {} });
+  assert.deepEqual(shifts, [1, 1], "ArrowRight from an interactive descendant must not shift pages");
 
-  ledgerCarousel.dispatch("keydown", { key: "ArrowRight", target: ledgerCarousel, preventDefault() {} });
-  assert.deepEqual(shifts, [1, 1], "ArrowRight on the carousel must shift one page forward");
-  ledgerCarousel.dispatch("keydown", { key: "ArrowLeft", target: ledgerCarousel, preventDefault() {} });
-  assert.deepEqual(shifts, [1, 1, -1], "ArrowLeft on the carousel must shift one page backward");
+  ledgerPanel.dispatch("keydown", { key: "ArrowRight", target: ledgerPanel, preventDefault() {} });
+  assert.deepEqual(shifts, [1, 1, 1], "ArrowRight on the carousel must shift one page forward");
+  ledgerPanel.dispatch("keydown", { key: "ArrowLeft", target: ledgerPanel, preventDefault() {} });
+  assert.deepEqual(shifts, [1, 1, 1, -1], "ArrowLeft on the carousel must shift one page backward");
 
   assert.match(html, /onclick="shiftLedgerPage\(-1\)"/);
   assert.match(html, /onclick="shiftLedgerPage\(1\)"/);
-  assert.deepEqual(dotPages, LEDGER_PAGES);
-  for (const page of LEDGER_PAGES) {
-    assert.match(html, new RegExp(`data-ledger-dot="${page}"[^>]*onclick="switchLedgerTab\\(['"]${page}['"]\\)"`));
-  }
+  assert.doesNotMatch(html, /data-ledger-dot=/);
+  assert.match(html, /id="ledgerPagerStatus"/);
   assert.match(renderer, /initLedgerCarousel\(\)/);
 });
 
@@ -520,12 +533,9 @@ test("ledger carousel CSS keeps page movement contained and accessible", async (
   assert.match(css, /\.ledger-page\s*\{[^}]*\bflex\s*:\s*0\s+0\s+100%[^}]*\bwidth\s*:\s*100%/s);
   assert.match(css, /\.ledger-page-navigation\s+\.tab\s*\{[^}]*\bmin-height\s*:\s*44px/s);
   assert.match(css, /\.ledger-carousel-controls\s+button\s*\{[^}]*\bmin-width\s*:\s*44px[^}]*\bmin-height\s*:\s*44px/s);
-  assert.match(css, /\.ledger-page-dot\s*\{[^}]*\bborder-radius\s*:\s*50%/s);
+  assert.match(css, /\.ledger-pager-status\s*\{/);
   assert.match(css, /\.ledger-carousel-viewport\s+\.table-wrap\s*\{[^}]*\boverflow-x\s*:\s*auto/s);
   assert.ok(ledgerMobile, "a max-width: 700px media block must own the ledger mobile layout");
-  assert.match(ledgerMobile, /\.ledger-carousel-controls\s*\{[^}]*\bgrid-template-columns\s*:\s*minmax\(0,\s*1fr\)\s+44px\s+44px\s+minmax\(0,\s*1fr\)[^}]*\bgrid-template-rows\s*:\s*44px\s+44px/s);
-  assert.match(ledgerMobile, /\.ledger-page-dots\s*\{[^}]*\bgrid-column\s*:\s*1\s*\/\s*-1[^}]*\bgrid-row\s*:\s*1[^}]*\bwidth\s*:\s*100%/s);
-  assert.match(ledgerMobile, /\.ledger-carousel-controls\s*>\s*button:first-child\s*\{[^}]*\bgrid-column\s*:\s*2[^}]*\bgrid-row\s*:\s*2/s);
-  assert.match(ledgerMobile, /\.ledger-carousel-controls\s*>\s*button:last-child\s*\{[^}]*\bgrid-column\s*:\s*3[^}]*\bgrid-row\s*:\s*2/s);
+  assert.match(ledgerMobile, /\.ledger-carousel-controls\s*\{[^}]*\bgrid-template-columns\s*:\s*44px\s+auto\s+44px/s);
   assert.match(css, /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*?\.ledger-carousel-track\s*\{[^}]*\btransition\s*:\s*none\s*!important/s);
 });

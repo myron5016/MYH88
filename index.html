@@ -136,6 +136,11 @@
     <div id="sectorRuleGrid" class="sector-rule-grid"></div>
   </section>
 
+  <section id="fundOverview" class="section-title-block fund-overview-title">
+    <span class="section-kicker">FUND OVERVIEW</span>
+    <h2>资金总览</h2>
+    <p class="section-note">本金、资产与盈亏的实时概览</p>
+  </section>
   <section class="kpis v117-kpi-deck">
     <div class="kpi pink"><span>累计投入本金</span><strong id="kpiCapital">$0</strong></div>
     <div class="kpi gold"><span>当前总资产</span><strong id="kpiNetAsset">$0</strong></div>
@@ -214,7 +219,7 @@
     </div>
 
     <div class="tabs ledger-page-navigation" role="navigation" aria-label="账本页面">
-      <button class="tab active" data-tab="overview" data-ledger-page="overview" aria-current="page" onclick="switchLedgerTab('overview')">账本总览</button>
+      <button class="tab active" data-tab="overview" data-ledger-page="overview" aria-current="page" onclick="switchLedgerTab('overview')">操作日历</button>
       <button class="tab" data-tab="transactions" data-ledger-page="transactions" onclick="switchLedgerTab('transactions')">交易流水 <b id="transactionCount">0</b></button>
       <button class="tab admin-only hidden" data-tab="positions" data-ledger-page="positions" onclick="switchLedgerTab('positions')">持仓批次管理</button>
       <button class="tab admin-only hidden" data-tab="cashflows" data-ledger-page="cashflows" onclick="switchLedgerTab('cashflows')">资金流水 <b id="cashFlowCount">0</b></button>
@@ -224,12 +229,14 @@
     <div id="ledgerCarousel" class="ledger-carousel ledger-carousel-viewport" tabindex="0" aria-label="账本轮播">
       <div id="ledgerCarouselTrack" class="ledger-carousel-track">
         <section data-ledger-pane="overview" id="ledgerOverviewPane" class="ledger-page">
-          <div class="ledger-overview">
-            <div><span>当前持仓</span><strong id="ledgerOverviewPositionCount">0</strong></div>
-            <div><span>交易记录</span><strong id="ledgerOverviewTransactionCount">0</strong></div>
-            <div><span>已实现盈亏</span><strong id="ledgerOverviewRealizedPnl">$0</strong></div>
-            <div><span>最近交易</span><strong id="ledgerOverviewLatestTrade">暂无交易</strong></div>
+          <div class="ledger-calendar-head">
+            <button id="ledgerCalendarPrev" type="button" onclick="changeLedgerCalendarMonth(-1)" aria-label="上个月">‹</button>
+            <strong id="ledgerCalendarMonth"></strong>
+            <button id="ledgerCalendarNext" type="button" onclick="changeLedgerCalendarMonth(1)" aria-label="下个月">›</button>
           </div>
+          <div class="ledger-calendar-weekdays" aria-hidden="true"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+          <div id="ledgerCalendarGrid" class="ledger-calendar-grid"></div>
+          <div id="ledgerCalendarDetails" class="ledger-calendar-details" aria-live="polite"></div>
         </section>
 
         <section data-ledger-pane="transactions" id="transactionsPane" class="ledger-page">
@@ -260,16 +267,10 @@
       </div>
     </div>
 
-    <div class="ledger-carousel-controls" aria-label="账本轮播控制">
-      <button type="button" aria-label="上一页" onclick="shiftLedgerPage(-1)">&#8592;</button>
-      <div class="ledger-page-dots" aria-label="账本页码">
-        <button type="button" data-ledger-dot="overview" aria-label="转到账本总览" onclick="switchLedgerTab('overview')"></button>
-        <button type="button" data-ledger-dot="transactions" aria-label="转到交易流水" onclick="switchLedgerTab('transactions')"></button>
-        <button type="button" class="admin-only hidden" data-ledger-dot="positions" aria-label="转到持仓批次管理" onclick="switchLedgerTab('positions')"></button>
-        <button type="button" class="admin-only hidden" data-ledger-dot="cashflows" aria-label="转到资金流水" onclick="switchLedgerTab('cashflows')"></button>
-        <button type="button" class="admin-only hidden" data-ledger-dot="backup" aria-label="转到备份与恢复" onclick="switchLedgerTab('backup')"></button>
-      </div>
-      <button type="button" aria-label="下一页" onclick="shiftLedgerPage(1)">&#8594;</button>
+    <div class="ledger-carousel-controls" aria-label="账本页切换">
+      <button id="ledgerPagePrev" type="button" aria-label="上一页" onclick="shiftLedgerPage(-1)">&#8592;</button>
+      <span id="ledgerPagerStatus" class="ledger-pager-status" aria-live="polite"></span>
+      <button id="ledgerPageNext" type="button" aria-label="下一页" onclick="shiftLedgerPage(1)">&#8594;</button>
     </div>
   </section>
 
@@ -285,13 +286,13 @@
       </div>
     </div>
     <div class="dca-layout">
+      <div id="dcaFundGrid" class="dca-fund-grid"></div>
       <div class="dca-progress-panel">
         <div class="dca-progress-title"><div><small id="dcaMonthTitle">本月定投</small><strong id="dcaProgressValue">$0 / $500</strong></div><b id="dcaProgressPercent">0%</b></div>
         <div class="dca-progress-track"><i id="dcaProgressBar"></i></div>
         <div class="dca-plan-split"><span><i class="voo-dot"></i>VOO <b>60%</b></span><span><i class="qqqm-dot"></i>QQQM <b>40%</b></span></div>
         <div class="dca-streak"><span>每月计划 <b>$500</b></span><span id="dcaStreak">连续完成 0 期</span></div>
       </div>
-      <div id="dcaFundGrid" class="dca-fund-grid"></div>
     </div>
     <div class="dca-summary">
       <span>定投成本 <b id="dcaTotalCost">$0</b></span>
@@ -459,6 +460,7 @@
 <script src="script.part1.js?v=11.7.1"></script>
 <script src="script.part2.js?v=11.6.0"></script>
 <script src="script.part3.js?v=11.7.1"></script>
+<script src="ledger-calendar-v11.7.js?v=11.7.1"></script>
 <script src="script.part4.js?v=11.7.1"></script>
 <script src="script.part5.js?v=11.6.0"></script>
 <script src="script.part6.js?v=11.6.0"></script>
