@@ -219,7 +219,7 @@
     </div>
 
     <div class="tabs ledger-page-navigation" role="navigation" aria-label="账本页面">
-      <button class="tab active" data-tab="overview" data-ledger-page="overview" aria-current="page" onclick="switchLedgerTab('overview')">操作日历</button>
+      <button class="tab active" data-tab="overview" data-ledger-page="overview" aria-current="page" onclick="switchLedgerTab('overview')">账本摘要</button>
       <button class="tab" data-tab="transactions" data-ledger-page="transactions" onclick="switchLedgerTab('transactions')">交易流水 <b id="transactionCount">0</b></button>
       <button class="tab admin-only hidden" data-tab="positions" data-ledger-page="positions" onclick="switchLedgerTab('positions')">持仓批次管理</button>
       <button class="tab admin-only hidden" data-tab="cashflows" data-ledger-page="cashflows" onclick="switchLedgerTab('cashflows')">资金流水 <b id="cashFlowCount">0</b></button>
@@ -229,14 +229,24 @@
     <div id="ledgerCarousel" class="ledger-carousel ledger-carousel-viewport" tabindex="0" aria-label="账本轮播">
       <div id="ledgerCarouselTrack" class="ledger-carousel-track">
         <section data-ledger-pane="overview" id="ledgerOverviewPane" class="ledger-page">
-          <div class="ledger-calendar-head">
-            <button id="ledgerCalendarPrev" type="button" onclick="changeLedgerCalendarMonth(-1)" aria-label="上个月">‹</button>
-            <strong id="ledgerCalendarMonth"></strong>
-            <button id="ledgerCalendarNext" type="button" onclick="changeLedgerCalendarMonth(1)" aria-label="下个月">›</button>
+          <div class="ledger-summary-head">
+            <div>
+              <span class="section-kicker">MONTHLY LEDGER</span>
+              <h3>账本摘要</h3>
+              <p class="section-note">把本月真正影响现金和已实现盈亏的动作放在一起看</p>
+            </div>
+            <div class="ledger-summary-period" aria-label="账本月份切换">
+              <button id="ledgerSummaryPrev" type="button" onclick="changeLedgerSummaryMonth(-1)" aria-label="上个月">‹</button>
+              <strong id="ledgerSummaryMonth"></strong>
+              <button id="ledgerSummaryNext" type="button" onclick="changeLedgerSummaryMonth(1)" aria-label="下个月">›</button>
+            </div>
           </div>
-          <div class="ledger-calendar-weekdays" aria-hidden="true"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
-          <div id="ledgerCalendarGrid" class="ledger-calendar-grid"></div>
-          <div id="ledgerCalendarDetails" class="ledger-calendar-details" aria-live="polite"></div>
+          <div id="ledgerSummaryGrid" class="ledger-summary-grid"></div>
+          <div id="ledgerSummaryNet" class="ledger-summary-net" aria-live="polite"></div>
+          <div class="ledger-summary-recent-wrap">
+            <div class="ledger-summary-recent-head"><h3>最近操作</h3><span>仅显示本月最新 5 笔买卖</span></div>
+            <div id="ledgerSummaryRecent" class="ledger-summary-recent"></div>
+          </div>
         </section>
 
         <section data-ledger-pane="transactions" id="transactionsPane" class="ledger-page">
@@ -460,7 +470,7 @@
 <script src="script.part1.js?v=11.7.1"></script>
 <script src="script.part2.js?v=11.6.0"></script>
 <script src="script.part3.js?v=11.7.1"></script>
-<script src="ledger-calendar-v11.7.js?v=11.7.1"></script>
+<script src="ledger-summary-v11.7.js?v=11.7.1"></script>
 <script src="script.part4.js?v=11.7.1"></script>
 <script src="script.part5.js?v=11.6.0"></script>
 <script src="script.part6.js?v=11.6.0"></script>
