@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-14T16:36:16.507Z",
+    "lastCloudSaveAt": "2026-08-17T06:26:07.000Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -2258,6 +2258,63 @@
       "costBasisNative": 5909.24,
       "grossUSD": 6200,
       "realizedPnlUSD": 289.71000000000004
+    },
+    {
+      "id": "tx_mswulfk3_sdmhwr",
+      "date": "2026-08-17",
+      "type": "buy",
+      "symbol": "MUZ",
+      "name": "美光2倍做空",
+      "shares": 800,
+      "price": 9.4,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 1.68,
+      "note": "",
+      "source": "twelve",
+      "sector": "半导体",
+      "color": "#ff9a58",
+      "schemaVersion": "10.48",
+      "feeUSD": 1.68,
+      "costBasisUSD": 7521.68,
+      "costBasisNative": 7521.68,
+      "grossUSD": 7520,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mswunmol_9a2aem",
+      "date": "2026-08-17",
+      "type": "sell",
+      "symbol": "MUZ",
+      "name": "美光2倍做空",
+      "shares": 800,
+      "price": 8.69,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 4.86,
+      "note": "",
+      "source": "twelve",
+      "sector": "半导体",
+      "color": "#ff9a58",
+      "schemaVersion": "10.48",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mswulfk3_sdmhwr",
+          "buyTransactionId": "tx_mswulfk3_sdmhwr",
+          "date": "2026-08-17",
+          "shares": 800,
+          "unitCostUSD": 9.4021,
+          "unitCostNative": 9.4021,
+          "costBasisUSD": 7521.68,
+          "costBasisNative": 7521.68
+        }
+      ],
+      "feeUSD": 4.86,
+      "costBasisUSD": 7521.68,
+      "costBasisNative": 7521.68,
+      "grossUSD": 6952,
+      "realizedPnlUSD": -574.54
     }
   ],
   "cashFlows": [
@@ -2513,6 +2570,22 @@
       "netAsset": 25527.61,
       "market": 11953.11,
       "cash": 13574.5
+    },
+    {
+      "scope": "active",
+      "date": "2026-08-16",
+      "capital": 22370,
+      "netAsset": 25577.83,
+      "market": 12003.33,
+      "cash": 13574.5
+    },
+    {
+      "scope": "active",
+      "date": "2026-08-17",
+      "capital": 22370,
+      "netAsset": 25003.29,
+      "market": 12003.33,
+      "cash": 12999.96
     }
   ],
   "dcaPlan": {
@@ -2525,12 +2598,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 713.96,
-        "priceAsOf": "2026-08-14T16:25:29.000Z",
-        "changePercent": -0.13847122176376098,
-        "priceSource": "finnhub",
+        "price": 713.61,
+        "priceAsOf": "2026-08-14T20:00:00.000Z",
+        "changePercent": -0.18742569410448728,
+        "priceSource": "last-close",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-08-14T16:25:29.000Z"
+        "priceUpdatedAt": "2026-08-14T20:00:00.000Z"
       },
       {
         "symbol": "QQQM",
@@ -2538,12 +2611,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 300.33,
-        "priceAsOf": "2026-08-14T16:34:09.000Z",
-        "changePercent": -0.35831591519858025,
-        "priceSource": "finnhub",
+        "price": 301.01,
+        "priceAsOf": "2026-08-14T20:00:00.000Z",
+        "changePercent": -0.1327095982217027,
+        "priceSource": "last-close",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-08-14T16:34:09.000Z"
+        "priceUpdatedAt": "2026-08-14T20:00:00.000Z"
       }
     ],
     "entries": [
@@ -2710,6 +2783,13 @@
         "marketValueUSD": 1539.933874,
         "pnlUSD": 37.279332,
         "returnPct": 2.480898
+      },
+      {
+        "date": "2026-08-17",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1540.867998,
+        "pnlUSD": 38.213456,
+        "returnPct": 2.543063
       }
     ]
   }
