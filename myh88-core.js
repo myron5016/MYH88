@@ -292,6 +292,22 @@
     return Number.isFinite(distance) && distance <= Math.max(0, num(maxSessions));
   }
 
+  function quoteCacheCoversSymbols(cache = {}, symbols = []) {
+    const prices = cache?.prices || {};
+    return [...new Set((Array.isArray(symbols) ? symbols : [])
+      .map((symbol) => String(symbol || "").trim().toUpperCase())
+      .filter(Boolean))]
+      .every((symbol) => num(prices[symbol]?.price) > 0);
+  }
+
+  function quoteSymbolsChanged(previous = [], next = []) {
+    const normalize = (symbols) => [...new Set((Array.isArray(symbols) ? symbols : [])
+      .map((symbol) => String(symbol || "").trim().toUpperCase())
+      .filter(Boolean))].sort();
+    const before = normalize(previous), after = normalize(next);
+    return before.length !== after.length || before.some((symbol, index) => symbol !== after[index]);
+  }
+
   function scheduleBackgroundTasks(tasks = [], onError = () => {}) {
     return (Array.isArray(tasks) ? tasks : []).map((entry, index) => {
       const label = typeof entry === "function" ? `background task ${index + 1}` : String(entry?.label || `background task ${index + 1}`);
@@ -659,6 +675,8 @@
     marketUSD,
     parseStaticQuoteCache,
     quoteTradingDay,
+    quoteCacheCoversSymbols,
+    quoteSymbolsChanged,
     isStaticQuoteFresh,
     scheduleBackgroundTasks,
     summarizeLots,

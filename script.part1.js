@@ -340,7 +340,9 @@ async function checkSharedDataUpdate(force=false){
     const raw=await fetchSharedText();
     if(!lastSharedRaw){lastSharedRaw=raw;renderSyncStatus();return}
     if(raw!==lastSharedRaw){
+      const previousQuoteSymbols=automaticQuoteSymbols();
       applySharedDataText(raw,"已自动载入最新云端账本");
+      if(MYH88Core.quoteSymbolsChanged(previousQuoteSymbols,automaticQuoteSymbols()))startInitialLoadTasks(true);
       return;
     }
     renderSyncStatus();

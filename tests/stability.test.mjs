@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 
 await import("../myh88-core.js");
-const { parseStaticQuoteCache, isStaticQuoteFresh, scheduleBackgroundTasks } = globalThis.MYH88Core;
+const { parseStaticQuoteCache, isStaticQuoteFresh, scheduleBackgroundTasks, quoteCacheCoversSymbols, quoteSymbolsChanged } = globalThis.MYH88Core;
 
 const holidays = { "2026-07-03": "Independence Day observed" };
 const quote = (date) => ({
@@ -25,6 +25,19 @@ test("rejects a static quote older than two completed sessions", () => {
 test("rejects malformed static cache data", () => {
   assert.equal(parseStaticQuoteCache({ cachedAt: Date.now(), body: "not-json" }), null);
   assert.equal(isStaticQuoteFresh(null, "2026-08-09", {}, 2), false);
+});
+
+test("requires every automatic symbol to exist in the price cache", () => {
+  const partial = { prices: { NVDA: { price: 200 } } };
+  const complete = { prices: { NVDA: { price: 200 }, SSPC: { price: 10.71 } } };
+  assert.equal(quoteCacheCoversSymbols(partial, ["NVDA", "SSPC"]), false);
+  assert.equal(quoteCacheCoversSymbols(complete, ["NVDA", "SSPC"]), true);
+});
+
+test("detects newly added automatic quote symbols", () => {
+  assert.equal(quoteSymbolsChanged(["NVDA", "GOOGL"], ["NVDA", "GOOGL"]), false);
+  assert.equal(quoteSymbolsChanged(["NVDA", "GOOGL"], ["NVDA", "GOOGL", "SSPC"]), true);
+  assert.equal(quoteSymbolsChanged(["nvda", "GOOGL"], ["GOOGL", "NVDA"]), false);
 });
 
 test("background tasks start independently instead of waiting on the snapshot", async () => {
@@ -51,6 +64,9 @@ test("production scripts include the static freshness gate and non-blocking star
   const frontend = `${part1}\n${part2}`;
   assert.match(frontend, /MYH88Core\.parseStaticQuoteCache/);
   assert.match(frontend, /MYH88Core\.isStaticQuoteFresh/);
+  assert.match(part1, /quoteSymbolsChanged/);
+  assert.match(part1, /smartRefreshPricesOnLoad\(\)/);
+  assert.match(part2, /MYH88Core\.quoteCacheCoversSymbols/);
   assert.match(part1, /scheduleBackgroundTasks/);
   assert.doesNotMatch(part1, /applySharedDataText\(raw\);await ensureCurrentMonthOpeningSnapshot\(\)/);
 });

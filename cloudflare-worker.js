@@ -214,10 +214,10 @@ async function fetchQuotesWithFallback(symbols, env, routingPlan, cachedQuotes =
   } else if (twelveFirst.length) { twelveReason = "Twelve temporarily backed off"; warnings.push(twelveReason); }
   const missing = [...finnhubFirst, ...twelveFirst.filter((symbol) => !quotes[symbol])];
   const finnhubBackoff = await providerBackedOff(env, "finnhub");
-  // During a Twelve backoff, do not repeatedly spend Finnhub calls for every
-  // symbol that already has a usable stale quote. Only symbols without any
-  // fallback value are allowed through to Finnhub.
-  const finnhubSymbols = missing.filter((symbol) => !(twelveBackoff && cachedQuotes[symbol]));
+  // A stale Twelve quote must not block the fallback provider. In particular,
+  // a newly added holding can arrive with yesterday's cached quote while
+  // Twelve is backed off; Finnhub is the recovery path for that symbol.
+  const finnhubSymbols = missing;
   if (finnhubSymbols.length && !finnhubBackoff) {
     const result = await fetchFinnhubPartial(finnhubSymbols, finnhubKey);
     Object.assign(quotes, result.quotes);

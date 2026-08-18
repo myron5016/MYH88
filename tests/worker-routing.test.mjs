@@ -156,6 +156,48 @@ test("过旧实时报价不会被当成新鲜缓存继续延长", async () => {
   await Promise.all(pending);
 });
 
+test("Twelve 暂时不可用时，旧缓存的新票仍会切到 Finnhub", async () => {
+  const now = Date.now();
+  const records = new Map([
+    ["config:portfolio-symbols:v3", { cachedAt: now, body: JSON.stringify({ symbols: ["SSPC"] }) }],
+    ["provider:twelve:backoff", { cachedAt: now, body: JSON.stringify({ until: now + 60_000, message: "Twelve temporarily backed off" }) }],
+    ["quote:live:SSPC", {
+      cachedAt: now - 6 * 60 * 1000,
+      source: "twelve",
+      body: JSON.stringify({ symbol: "SSPC", close: "10.01", timestamp: Math.floor((now - 24 * 60 * 60 * 1000) / 1000), source: "twelve" }),
+    }],
+  ]);
+  const env = {
+    TWELVE_DATA_KEY: "configured-twelve-key",
+    FINNHUB_API_KEY: "configured-finnhub-key",
+    TWELVE_PRIORITY_SYMBOLS: "SSPC",
+    MYH88_CACHE: {
+      async get(key) { return records.get(key) || null; },
+      async put() {},
+    },
+    MYH88_QUOTE_LIMITER: { async limit() { return { success: true }; } },
+  };
+  const pending = [];
+  const originalFetch = globalThis.fetch;
+  let finnhubRequests = 0;
+  globalThis.fetch = async (url) => {
+    const target = String(url);
+    assert.match(target, /finnhub\.io\/api\/v1\/quote/);
+    finnhubRequests += 1;
+    return new Response(JSON.stringify({ c: 10.71, pc: 10.01, t: Math.floor(now / 1000), o: 10.2, h: 10.8, l: 10.1 }), { status: 200 });
+  };
+  try {
+    const response = await worker.fetch(new Request("https://quote.myh88.com/quotes?symbols=SSPC"), env, { waitUntil(promise) { pending.push(promise); } });
+    assert.equal(response.status, 200);
+    assert.equal(finnhubRequests, 1);
+    assert.equal((await response.json()).SSPC.close, "10.71");
+    assert.equal(response.headers.get("X-MYH88-Source"), "finnhub");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+  await Promise.all(pending);
+});
+
 test("没有逐股缓存记录时仍能请求 Provider", async () => {
   const now = Date.now();
   const records = new Map([
