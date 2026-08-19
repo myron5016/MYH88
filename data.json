@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-18T10:17:22.107Z",
+    "lastCloudSaveAt": "2026-08-19T00:50:18.780Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -314,37 +314,6 @@
           "remainingCostBasisNative": 1080.35,
           "currency": "USD",
           "price": 1080
-        }
-      ]
-    },
-    {
-      "id": "pos_msyid052_i1c7c6",
-      "symbol": "SSPC",
-      "name": "2倍做空SpaceX",
-      "currency": "USD",
-      "source": "twelve",
-      "shares": 440,
-      "avgCost": 10.256704545454545,
-      "sector": "太空",
-      "color": "#d03e61",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "",
-      "costBasisUSD": 4512.95,
-      "lots": [
-        {
-          "lotId": "tx_msyid04r_p1yg0l",
-          "buyTransactionId": "tx_msyid04r_p1yg0l",
-          "date": "2026-08-18",
-          "order": 74,
-          "shares": 440,
-          "remainingShares": 440,
-          "costBasisUSD": 4512.95,
-          "remainingCostBasisUSD": 4512.95,
-          "costBasisNative": 4512.95,
-          "remainingCostBasisNative": 4512.95,
-          "currency": "USD",
-          "price": 10.25
         }
       ]
     }
@@ -2368,6 +2337,41 @@
       "costBasisNative": 4512.95,
       "grossUSD": 4510,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mszdjj8b_36mayo",
+      "date": "2026-08-19",
+      "type": "sell",
+      "symbol": "SSPC",
+      "name": "2倍做空SpaceX",
+      "shares": 440,
+      "price": 10.24,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 2.88,
+      "note": "",
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#d03e61",
+      "schemaVersion": "10.48",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_msyid04r_p1yg0l",
+          "buyTransactionId": "tx_msyid04r_p1yg0l",
+          "date": "2026-08-18",
+          "shares": 440,
+          "unitCostUSD": 10.256704545454545,
+          "unitCostNative": 10.256704545454545,
+          "costBasisUSD": 4512.95,
+          "costBasisNative": 4512.95
+        }
+      ],
+      "feeUSD": 2.88,
+      "costBasisUSD": 4512.95,
+      "costBasisNative": 4512.95,
+      "grossUSD": 4505.6,
+      "realizedPnlUSD": -10.229999999999563
     }
   ],
   "cashFlows": [
@@ -2647,6 +2651,14 @@
       "netAsset": 25236.16,
       "market": 16749.15,
       "cash": 8487.01
+    },
+    {
+      "scope": "active",
+      "date": "2026-08-19",
+      "capital": 22370,
+      "netAsset": 24807.04,
+      "market": 11817.31,
+      "cash": 12989.73
     }
   ],
   "dcaPlan": {
@@ -2659,12 +2671,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 710.27,
-        "priceAsOf": "2026-08-17T20:00:00.000Z",
-        "changePercent": -0.46804276845896664,
-        "priceSource": "last-close",
+        "price": 706.33,
+        "priceAsOf": "2026-08-18T14:48:24.000Z",
+        "changePercent": -0.5547186281273235,
+        "priceSource": "finnhub",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-08-17T20:00:00.000Z"
+        "priceUpdatedAt": "2026-08-18T14:48:24.000Z"
       },
       {
         "symbol": "QQQM",
@@ -2672,12 +2684,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 300.52,
-        "priceAsOf": "2026-08-17T20:00:00.000Z",
-        "changePercent": -0.16278528952526797,
-        "priceSource": "last-close",
+        "price": 295.64,
+        "priceAsOf": "2026-08-18T14:52:36.000Z",
+        "changePercent": -1.6238519898841994,
+        "priceSource": "finnhub",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-08-17T20:00:00.000Z"
+        "priceUpdatedAt": "2026-08-18T14:52:36.000Z"
       }
     ],
     "entries": [
@@ -2858,6 +2870,13 @@
         "marketValueUSD": 1535.532196,
         "pnlUSD": 32.877654,
         "returnPct": 2.187972
+      },
+      {
+        "date": "2026-08-19",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1520.454092,
+        "pnlUSD": 17.79955,
+        "returnPct": 1.18454
       }
     ]
   }
