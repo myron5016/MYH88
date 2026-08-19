@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-19T09:00:34.061Z",
+    "lastCloudSaveAt": "2026-08-19T09:26:45.632Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -314,6 +314,37 @@
           "remainingCostBasisNative": 1080.35,
           "currency": "USD",
           "price": 1080
+        }
+      ]
+    },
+    {
+      "id": "pos_mszw00yp_5xh16o",
+      "symbol": "SKHX",
+      "name": "2倍做多海力士",
+      "currency": "USD",
+      "source": "twelve",
+      "shares": 400,
+      "avgCost": 13.98705,
+      "sector": "未分类",
+      "color": "#627288",
+      "sectorLocked": false,
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 5594.82,
+      "lots": [
+        {
+          "lotId": "tx_mszw00ye_zlj8fa",
+          "buyTransactionId": "tx_mszw00ye_zlj8fa",
+          "date": "2026-08-19",
+          "order": 78,
+          "shares": 400,
+          "remainingShares": 400,
+          "costBasisUSD": 5594.82,
+          "remainingCostBasisUSD": 5594.82,
+          "costBasisNative": 5594.82,
+          "remainingCostBasisNative": 5594.82,
+          "currency": "USD",
+          "price": 13.98
         }
       ]
     }
@@ -1351,7 +1382,7 @@
       "fee": 2.67,
       "note": "",
       "source": "twelve",
-      "sector": "半导体",
+      "sector": "未分类",
       "color": "#627288",
       "schemaVersion": "10.6",
       "feeUSD": 2.67,
@@ -1373,7 +1404,7 @@
       "fee": 1.05,
       "note": "",
       "source": "twelve",
-      "sector": "半导体",
+      "sector": "未分类",
       "color": "#627288",
       "schemaVersion": "10.6",
       "feeUSD": 1.05,
@@ -2215,7 +2246,7 @@
       "fee": 1.24,
       "note": "",
       "source": "twelve",
-      "sector": "半导体",
+      "sector": "未分类",
       "color": "#627288",
       "schemaVersion": "10.48",
       "feeUSD": 1.24,
@@ -2237,7 +2268,7 @@
       "fee": 1.05,
       "note": "",
       "source": "twelve",
-      "sector": "半导体",
+      "sector": "未分类",
       "color": "#627288",
       "schemaVersion": "10.48",
       "lotMethod": "specific",
@@ -2429,6 +2460,28 @@
       "costBasisNative": 7976.05,
       "grossUSD": 8175.000000000001,
       "realizedPnlUSD": 197.63000000000102
+    },
+    {
+      "id": "tx_mszw00ye_zlj8fa",
+      "date": "2026-08-19",
+      "type": "buy",
+      "symbol": "SKHX",
+      "name": "2倍做多海力士",
+      "shares": 400,
+      "price": 13.98,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 2.82,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "10.48",
+      "feeUSD": 2.82,
+      "costBasisUSD": 5594.82,
+      "costBasisNative": 5594.82,
+      "grossUSD": 5592,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -2713,9 +2766,9 @@
       "scope": "active",
       "date": "2026-08-19",
       "capital": 22370,
-      "netAsset": 25004.67,
-      "market": 11817.31,
-      "cash": 13187.36
+      "netAsset": 24493.85,
+      "market": 16901.31,
+      "cash": 7592.54
     }
   ],
   "dcaPlan": {
