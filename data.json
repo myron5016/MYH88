@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-19T00:50:18.780Z",
+    "lastCloudSaveAt": "2026-08-19T09:00:34.061Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -2372,6 +2372,63 @@
       "costBasisNative": 4512.95,
       "grossUSD": 4505.6,
       "realizedPnlUSD": -10.229999999999563
+    },
+    {
+      "id": "tx_mszv1pyx_vzpu9k",
+      "date": "2026-08-19",
+      "type": "buy",
+      "symbol": "SNXX",
+      "name": "2倍做多闪迪",
+      "shares": 500,
+      "price": 15.95,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 1.05,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "10.48",
+      "feeUSD": 1.05,
+      "costBasisUSD": 7976.05,
+      "costBasisNative": 7976.05,
+      "grossUSD": 7975,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mszv2i9y_ciajue",
+      "date": "2026-08-19",
+      "type": "sell",
+      "symbol": "SNXX",
+      "name": "2倍做多闪迪",
+      "shares": 500,
+      "price": 16.35,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 1.32,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "10.48",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mszv1pyx_vzpu9k",
+          "buyTransactionId": "tx_mszv1pyx_vzpu9k",
+          "date": "2026-08-19",
+          "shares": 500,
+          "unitCostUSD": 15.9521,
+          "unitCostNative": 15.9521,
+          "costBasisUSD": 7976.05,
+          "costBasisNative": 7976.05
+        }
+      ],
+      "feeUSD": 1.32,
+      "costBasisUSD": 7976.05,
+      "costBasisNative": 7976.05,
+      "grossUSD": 8175.000000000001,
+      "realizedPnlUSD": 197.63000000000102
     }
   ],
   "cashFlows": [
@@ -2656,9 +2713,9 @@
       "scope": "active",
       "date": "2026-08-19",
       "capital": 22370,
-      "netAsset": 24807.04,
+      "netAsset": 25004.67,
       "market": 11817.31,
-      "cash": 12989.73
+      "cash": 13187.36
     }
   ],
   "dcaPlan": {
@@ -2671,12 +2728,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 706.33,
-        "priceAsOf": "2026-08-18T14:48:24.000Z",
-        "changePercent": -0.5547186281273235,
-        "priceSource": "finnhub",
+        "price": 705.4,
+        "priceAsOf": "2026-08-18T20:00:00.000Z",
+        "changePercent": -0.6856547510101798,
+        "priceSource": "last-close",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-08-18T14:48:24.000Z"
+        "priceUpdatedAt": "2026-08-18T20:00:00.000Z"
       },
       {
         "symbol": "QQQM",
@@ -2684,12 +2741,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 295.64,
-        "priceAsOf": "2026-08-18T14:52:36.000Z",
-        "changePercent": -1.6238519898841994,
-        "priceSource": "finnhub",
+        "price": 295.45,
+        "priceAsOf": "2026-08-18T20:00:00.000Z",
+        "changePercent": -1.6870757353919852,
+        "priceSource": "last-close",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-08-18T14:52:36.000Z"
+        "priceUpdatedAt": "2026-08-18T20:00:00.000Z"
       }
     ],
     "entries": [
@@ -2874,9 +2931,9 @@
       {
         "date": "2026-08-19",
         "costBasisUSD": 1502.654542,
-        "marketValueUSD": 1520.454092,
-        "pnlUSD": 17.79955,
-        "returnPct": 1.18454
+        "marketValueUSD": 1518.85901,
+        "pnlUSD": 16.204468,
+        "returnPct": 1.078389
       }
     ]
   }
