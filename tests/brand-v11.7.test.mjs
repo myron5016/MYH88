@@ -83,7 +83,7 @@ test("V11.7 map renderer exposes stable visual metadata", async () => {
   assert.match(source, /aria-label/);
 });
 
-test("V11.7 release fingerprint is consistent and keeps Worker 10.56", async () => {
+test("V11.7 release fingerprint is consistent and keeps Worker 10.57", async () => {
   const [index, runtime, worker, meta, pkg] = await Promise.all([
     read("../index.html"),
     read("../script.part1.js"),
@@ -91,26 +91,26 @@ test("V11.7 release fingerprint is consistent and keeps Worker 10.56", async () 
     read("../build-meta.json"),
     read("../package.json"),
   ]);
-  assert.match(runtime, /const VERSION=["']V11\.7\.1 果园生长版["']/);
-  assert.match(runtime, /const RELEASE=["']11\.7\.1["']/);
-  assert.match(worker, /const RELEASE=["']11\.7\.1["']/);
+  assert.match(runtime, /const VERSION=["']V11\.7\.2 果园生长版["']/);
+  assert.match(runtime, /const RELEASE=["']11\.7\.2["']/);
+  assert.match(worker, /const RELEASE=["']11\.7\.2["']/);
   assert.match(worker, /brand-v11\.7\.css/);
   assert.match(worker, /brand-v11\.7\.js/);
   for (const [name, version] of Object.entries({
-    "script.part1.js": "11.7.1",
-    "script.part2.js": "11.6.0",
+    "script.part1.js": "11.7.2",
+    "script.part2.js": "11.7.2",
     "script.part3.js": "11.7.1",
     "script.part4.js": "11.7.1",
     "script.part5.js": "11.6.0",
-    "script.part6.js": "11.6.0",
+    "script.part6.js": "11.7.2",
   })) {
     const escaped = name.replaceAll(".", "\\.");
     assert.match(index, new RegExp(`${escaped}\\?v=${version.replaceAll(".", "\\.")}`));
     assert.match(worker, new RegExp(`\\./${escaped}\\?v=${version.replaceAll(".", "\\.")}`));
   }
-  assert.match(meta, /"release":\s*"11\.7\.1"/);
-  assert.match(meta, /"worker":\s*"10\.56"/);
-  assert.match(pkg, /"version":\s*"11\.7\.1"/);
+  assert.match(meta, /"release":\s*"11\.7\.2"/);
+  assert.match(meta, /"worker":\s*"10\.57"/);
+  assert.match(pkg, /"version":\s*"11\.7\.2"/);
 });
 
 test("ledger summary ships as a separately cached runtime chunk", async () => {

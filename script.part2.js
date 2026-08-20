@@ -246,7 +246,7 @@ async function fetchQuoteBatchResilient(symbols,mode="live"){
   if(!proxies.length)throw new Error("Missing Cloudflare Worker price proxy URL");
   for(const proxy of proxies){
     try{
-      const modeParam=mode==="last-close"?"&mode=last-close":"";
+      const modeParam=mode==="last-close"?"&mode=last-close":"&cache=only";
       const meta=await fetchJsonWithHeaders(`${proxy}/quotes?symbols=${encodeURIComponent(symbols.join(","))}${modeParam}`,{timeout:PROXY_TIMEOUT_MS});
       const res=meta.data;
       lastQuoteCache=meta.headers.get("X-MYH88-Cache")||"";

@@ -14,6 +14,9 @@ enabled = true
 enabled = true
 head_sampling_rate = 0.1
 
+[triggers]
+crons = [ "*/5 * * * *" ]
+
 [[routes]]
 pattern = "quote.myh88.com"
 custom_domain = true

@@ -46,7 +46,8 @@ function trackedQuoteItems(){
 }
 function automaticQuoteGroups(){
   const valid=items=>(Array.isArray(items)?items:[]).filter(item=>item.source==="twelve"&&item.symbol);
-  return[valid(state.positions),valid(state.dcaPlan?.funds)].filter(group=>group.length);
+  const merged=[...valid(state.positions),...valid(state.dcaPlan?.funds)];
+  return merged.length?[merged]:[];
 }
 
 function dcaMetrics(){return MYH88Core.computeDcaPlan(state.dcaPlan,today())}

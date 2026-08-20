@@ -229,3 +229,88 @@ test("没有逐股缓存记录时仍能请求 Provider", async () => {
   }
   await Promise.all(pending);
 });
+
+test("只读行情请求即使缓存过期也不会直接消耗上游额度", async () => {
+  const now = Date.now();
+  const records = new Map([
+    ["config:portfolio-symbols:v3", { cachedAt: now, body: JSON.stringify({ symbols: ["SPCH"] }) }],
+    ["quote:live:SPCH", {
+      cachedAt: now - 30 * 60 * 1000,
+      source: "twelve",
+      body: JSON.stringify({ symbol: "SPCH", close: "9.88", timestamp: Math.floor((now - 30 * 60 * 1000) / 1000), source: "twelve" }),
+    }],
+  ]);
+  const env = {
+    TWELVE_DATA_KEY: "configured-twelve-key",
+    FINNHUB_API_KEY: "configured-finnhub-key",
+    TWELVE_PRIORITY_SYMBOLS: "SPCH",
+    MYH88_CACHE: {
+      async get(key) { return records.get(key) || null; },
+      async put() {},
+    },
+    MYH88_QUOTE_LIMITER: { async limit() { return { success: true }; } },
+  };
+  const originalFetch = globalThis.fetch;
+  let providerRequests = 0;
+  globalThis.fetch = async () => {
+    providerRequests += 1;
+    throw new Error("cache-only request must not call a provider");
+  };
+  try {
+    const response = await worker.fetch(new Request("https://quote.myh88.com/quotes?symbols=SPCH&cache=only"), env, { waitUntil() {} });
+    assert.equal(response.status, 200);
+    assert.equal(providerRequests, 0);
+    assert.equal(response.headers.get("X-MYH88-Cache"), "CACHE-ONLY-STALE");
+    assert.equal((await response.json()).SPCH.close, "9.88");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("定时刷新只抓当前持仓和定投，不浪费额度刷新历史已卖出股票", async () => {
+  const writes = new Map();
+  const env = {
+    TWELVE_DATA_KEY: "configured-twelve-key",
+    FINNHUB_API_KEY: "configured-finnhub-key",
+    TWELVE_PRIORITY_SYMBOLS: "NVDA,VOO",
+    MYH88_CACHE: {
+      async get(key) { return writes.get(key) || null; },
+      async put(key, value) { writes.set(key, JSON.parse(value)); },
+    },
+  };
+  const originalFetch = globalThis.fetch;
+  const providerSymbols = [];
+  globalThis.fetch = async (url) => {
+    const target = new URL(String(url));
+    if (target.hostname === "myh88.com") {
+      return new Response(JSON.stringify({
+        positions: [
+          { symbol: "NVDA", source: "twelve" },
+          { symbol: "XFAB", source: "manual" },
+        ],
+        transactions: [{ symbol: "SOLD", source: "twelve" }],
+        dcaPlan: { funds: [{ symbol: "VOO", source: "twelve" }] },
+      }), { status: 200 });
+    }
+    if (target.hostname === "api.twelvedata.com") {
+      const symbols = target.searchParams.get("symbol").split(",");
+      providerSymbols.push(...symbols);
+      return new Response(JSON.stringify(Object.fromEntries(symbols.map((symbol) => [symbol, {
+        symbol,
+        close: symbol === "NVDA" ? "225" : "714",
+        timestamp: Math.floor(Date.parse("2026-08-20T14:35:00Z") / 1000),
+      }]))), { status: 200 });
+    }
+    throw new Error(`unexpected request: ${target}`);
+  };
+  try {
+    await worker.scheduled({ scheduledTime: Date.parse("2026-08-20T14:35:00Z"), cron: "*/5 * * * *" }, env, { waitUntil() {} });
+    assert.deepEqual(providerSymbols.sort(), ["NVDA", "VOO"]);
+    assert.ok(writes.has("quote:live:NVDA"));
+    assert.ok(writes.has("quote:live:VOO"));
+    assert.equal(writes.has("quote:live:SOLD"), false);
+    assert.equal(writes.has("quote:live:XFAB"), false);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

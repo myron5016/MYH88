@@ -1,5 +1,5 @@
-const WORKER_VERSION = "10.56";
-const WORKER_BUILT_AT = "2026-08-13T14:10:00.000Z";
+const WORKER_VERSION = "10.57";
+const WORKER_BUILT_AT = "2026-08-20T14:55:00.000Z";
 // Provider calls are still protected by the per-symbol KV cache, but a live
 // quote must not be allowed to sit behind a half-hour edge cache.
 // Eight Twelve symbols refreshed every five minutes use at most 624 credits
@@ -12,7 +12,7 @@ const LAST_CLOSE_CACHE_SECONDS = 8 * 24 * 60 * 60;
 const HISTORICAL_CACHE_SECONDS = 365 * 24 * 60 * 60;
 const MARKET_CLOCK_CACHE_SECONDS = 15 * 60;
 const PORTFOLIO_CACHE_SECONDS = 5 * 60;
-const PROVIDER_BACKOFF_SECONDS = 30 * 60;
+const PROVIDER_BACKOFF_SECONDS = 75;
 const FINNHUB_BACKOFF_SECONDS = 90;
 const TWELVE_BATCH_LIMIT = 8;
 const TWELVE_BASE = "https://api.twelvedata.com";
@@ -123,6 +123,12 @@ function portfolioSymbolsFromData(data = {}) {
   return normalizeSymbols([
     ...(data.positions || []).filter((item) => item?.source !== "manual").map((item) => item.symbol),
     ...(data.transactions || []).filter((item) => !item?.voided && item?.source !== "manual").map((item) => item.symbol),
+    ...(data.dcaPlan?.funds || []).filter((item) => item?.source !== "manual").map((item) => item.symbol),
+  ].join(","));
+}
+function currentPortfolioSymbolsFromData(data = {}) {
+  return normalizeSymbols([
+    ...(data.positions || []).filter((item) => item?.source !== "manual").map((item) => item.symbol),
     ...(data.dcaPlan?.funds || []).filter((item) => item?.source !== "manual").map((item) => item.symbol),
   ].join(","));
 }
@@ -237,6 +243,7 @@ async function fetchQuotesWithFallback(symbols, env, routingPlan, cachedQuotes =
 }
 async function limitMiss(env, key) { return env.MYH88_QUOTE_LIMITER ? env.MYH88_QUOTE_LIMITER.limit({ key }) : { success: true }; }
 async function fetchQuotesWithCache(request, env, ctx, canonicalSymbols, requestedSymbols, mode) {
+  const cacheOnly = new URL(request.url).searchParams.get("cache") === "only";
   const isLastClose = mode === "last-close", asOf = isLastClose ? previousTradingDate() : "";
   const maxAge = isLastClose ? LAST_CLOSE_CACHE_SECONDS : CACHE_SECONDS;
   const ttl = isLastClose ? LAST_CLOSE_CACHE_SECONDS * 2 : CACHE_SECONDS + STALE_SECONDS;
@@ -251,6 +258,18 @@ async function fetchQuotesWithCache(request, env, ctx, canonicalSymbols, request
   }));
   const body = Object.fromEntries(records.filter((item) => item.fresh || item.retryBlocked).map((item) => [item.symbol, item.quote]));
   const missing = records.filter((item) => !item.fresh && !item.retryBlocked).map((item) => item.symbol);
+  if (cacheOnly && !isLastClose) {
+    records.filter((item) => item.quote).forEach((item) => { body[item.symbol] = item.quote; });
+    if (!Object.keys(body).length) return noStoreJson({ error: "Scheduled quote cache is warming up. Please retry shortly." }, 503);
+    const complete = Object.keys(body).length === requestedSymbols.length;
+    const hasStale = records.some((item) => item.quote && !item.fresh);
+    const sources = new Set(Object.values(body).map((quote) => quote.source).filter(Boolean));
+    const source = sources.size > 1 ? "mixed" : [...sources][0] || "cache";
+    return quoteResponse(body, complete ? (hasStale ? "CACHE-ONLY-STALE" : "CACHE-ONLY-FRESH") : "CACHE-ONLY-PARTIAL", {
+      source,
+      warnings: complete ? "" : `Scheduled cache is still missing: ${requestedSymbols.filter((symbol) => !body[symbol]).join(",")}`,
+    });
+  }
   if (!missing.length) {
     const sources = new Set(Object.values(body).map((quote) => quote.source).filter(Boolean));
     const source = sources.size > 1 ? "mixed" : [...sources][0] || "cache";
@@ -302,6 +321,39 @@ async function fetchQuotesWithCache(request, env, ctx, canonicalSymbols, request
     return noStoreJson({ error: error.message || "Quote request failed" }, 502);
   }
 }
+
+async function refreshScheduledQuotes(env, scheduledTime = Date.now()) {
+  const clock = localMarketClock(new Date(Number(scheduledTime) || Date.now()));
+  const statusKey = "system:last-scheduled-refresh";
+  if (!clock.isOpen) {
+    await env.MYH88_CACHE?.put(statusKey, JSON.stringify({ cachedAt: Date.now(), body: JSON.stringify({ status: "skipped", phase: clock.phase, checkedAt: clock.checkedAt }) }), { expirationTtl: 24 * 60 * 60 });
+    log("scheduled_quote_refresh_skipped", { phase: clock.phase, date: clock.date });
+    return { status: "skipped", phase: clock.phase };
+  }
+  const data = await fetchJsonUpstream(PORTFOLIO_DATA_URL, 5000);
+  const symbols = currentPortfolioSymbolsFromData(data);
+  if (!symbols.length) throw new Error("No current automatic portfolio symbols");
+  const routingPlan = buildProviderPlan(symbols, configuredTwelvePriority(env), TWELVE_BATCH_LIMIT);
+  const result = await fetchQuotesWithFallback(symbols, env, routingPlan);
+  await Promise.all(Object.entries(result.quotes).map(([symbol, quote]) => writeSharedCache(
+    env,
+    quoteCacheKey(symbol, "live"),
+    jsonResponse(quote, "STORE-SCHEDULED", { source: quote.source }),
+    isFreshLiveQuote(quote) ? CACHE_SECONDS + STALE_SECONDS : LIVE_RETRY_COOLDOWN_SECONDS,
+  )));
+  const summary = {
+    status: "ok",
+    checkedAt: new Date().toISOString(),
+    quoteAsOf: new Date(Math.max(...Object.values(result.quotes).map(quoteTimestampMs))).toISOString(),
+    requested: symbols.length,
+    updated: Object.keys(result.quotes).length,
+    source: result.source,
+    warnings: result.warnings,
+  };
+  await env.MYH88_CACHE?.put(statusKey, JSON.stringify({ cachedAt: Date.now(), body: JSON.stringify(summary) }), { expirationTtl: 24 * 60 * 60 });
+  log("scheduled_quote_refresh", summary);
+  return summary;
+}
 async function fetchHistoricalCloseWithCache(env, ctx, canonicalSymbols, requestedSymbols, date) {
   const records = await Promise.all(requestedSymbols.map(async (symbol) => {
     const key = quoteCacheKey(symbol, "historical-close", date), record = await readSharedCache(env, key);let quote = null;
@@ -334,6 +386,9 @@ async function fetchMarketClockWithCache(env, ctx) {
   const local = localMarketClock(), response = jsonResponse(local, "LOCAL-MARKET-CLOCK", { source: "local" }); response.headers.set("Cache-Control", `public, max-age=${MARKET_CLOCK_CACHE_SECONDS}`); ctx.waitUntil(writeSharedCache(env, key, response.clone(), 24 * 60 * 60)); return response;
 }
 export default {
+  async scheduled(controller, env, ctx) {
+    return refreshScheduledQuotes(env, controller.scheduledTime);
+  },
   async fetch(request, env, ctx) {
     if (request.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
     if (request.method !== "GET") return noStoreJson({ error: "Method not allowed" }, 405);
@@ -342,7 +397,7 @@ export default {
       if (path === "/") {
         const portfolio = await livePortfolioSymbols(env);
         const routing = buildProviderPlan(portfolio, configuredTwelvePriority(env), TWELVE_BATCH_LIMIT);
-        const [twelveBackoff, finnhubBackoff] = await Promise.all([providerBackedOff(env, "twelve"), providerBackedOff(env, "finnhub")]);
+        const [twelveBackoff, finnhubBackoff, scheduledRefresh] = await Promise.all([providerBackedOff(env, "twelve"), providerBackedOff(env, "finnhub"), readSharedCache(env, "system:last-scheduled-refresh")]);
         return json({
           ok: true,
           service: "MYH88 price proxy",
@@ -358,6 +413,7 @@ export default {
           sharedCache: Boolean(env.MYH88_CACHE),
           providers: { twelve: Boolean(String(env.TWELVE_DATA_KEY || "").trim()), finnhub: Boolean(String(env.FINNHUB_API_KEY || "").trim()) },
           providerBackoff: { twelve: twelveBackoff || null, finnhub: finnhubBackoff || null },
+          scheduledRefresh: scheduledRefresh?.body ? JSON.parse(scheduledRefresh.body) : null,
           routing,
           rateLimitConfigured: Boolean(env.MYH88_QUOTE_LIMITER),
           portfolioSymbols: portfolio.length,
@@ -381,4 +437,4 @@ export default {
   },
 };
 
-export { buildProviderPlan, localMarketClock, portfolioSymbolsFromData, previousTradingDate, quoteCacheKey };
+export { buildProviderPlan, currentPortfolioSymbolsFromData, localMarketClock, portfolioSymbolsFromData, previousTradingDate, quoteCacheKey, refreshScheduledQuotes };
