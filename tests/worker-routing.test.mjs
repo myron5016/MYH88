@@ -314,3 +314,50 @@ test("定时刷新只抓当前持仓和定投，不浪费额度刷新历史已�
     globalThis.fetch = originalFetch;
   }
 });
+
+test("Twelve 返回旧的新标的且 Finnhub 限流时由腾讯行情救援", async () => {
+  const writes = new Map();
+  const env = {
+    TWELVE_DATA_KEY: "configured-twelve-key",
+    FINNHUB_API_KEY: "configured-finnhub-key",
+    TWELVE_PRIORITY_SYMBOLS: "SSPC",
+    MYH88_CACHE: {
+      async get(key) { return writes.get(key) || null; },
+      async put(key, value) { writes.set(key, JSON.parse(value)); },
+    },
+  };
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    const target = new URL(String(url));
+    if (target.hostname === "myh88.com") {
+      return new Response(JSON.stringify({ positions: [{ symbol: "SSPC", source: "twelve" }] }), { status: 200 });
+    }
+    if (target.hostname === "api.twelvedata.com") {
+      return new Response(JSON.stringify({
+        symbol: "SSPC",
+        close: "10.93",
+        timestamp: Math.floor(Date.parse("2026-08-19T20:00:00Z") / 1000),
+      }), { status: 200 });
+    }
+    if (target.hostname === "finnhub.io") {
+      return new Response("429 Too Many Requests", { status: 429 });
+    }
+    if (target.hostname === "qt.gtimg.cn") {
+      const fields = Array(50).fill("");
+      Object.assign(fields, { 0: "200", 1: "2X Short SpaceX", 2: "SSPC.AM", 3: "12.05", 4: "10.93", 5: "11.30", 30: "2026-08-20 11:12:59", 31: "1.12", 32: "10.25", 33: "12.10", 34: "11.23", 35: "USD" });
+      return new Response(`v_usSSPC="${fields.join("~")}";`, { status: 200 });
+    }
+    throw new Error(`unexpected request: ${target}`);
+  };
+  try {
+    const summary = await worker.scheduled({ scheduledTime: Date.parse("2026-08-20T15:13:00Z"), cron: "*/5 * * * *" }, env, { waitUntil() {} });
+    assert.equal(summary.updated, 1);
+    assert.equal(summary.source, "tencent");
+    const cached = writes.get("quote:live:SSPC");
+    const quote = JSON.parse(cached.body);
+    assert.equal(quote.close, "12.05");
+    assert.equal(quote.source, "tencent");
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

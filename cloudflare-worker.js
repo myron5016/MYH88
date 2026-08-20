@@ -1,5 +1,5 @@
-const WORKER_VERSION = "10.57";
-const WORKER_BUILT_AT = "2026-08-20T14:55:00.000Z";
+const WORKER_VERSION = "10.58";
+const WORKER_BUILT_AT = "2026-08-20T15:16:00.000Z";
 // Provider calls are still protected by the per-symbol KV cache, but a live
 // quote must not be allowed to sit behind a half-hour edge cache.
 // Eight Twelve symbols refreshed every five minutes use at most 624 credits
@@ -17,6 +17,7 @@ const FINNHUB_BACKOFF_SECONDS = 90;
 const TWELVE_BATCH_LIMIT = 8;
 const TWELVE_BASE = "https://api.twelvedata.com";
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
+const TENCENT_QUOTE_BASE = "https://qt.gtimg.cn/q=";
 const PORTFOLIO_DATA_URL = "https://myh88.com/data.json";
 const US_MARKET_TZ = "America/New_York";
 const US_MARKET_OPEN_MIN = 9 * 60 + 30;
@@ -148,6 +149,39 @@ function normalizeFinnhubQuote(symbol, data) {
 }
 async function fetchFinnhubQuote(symbol, key) { if (!key) throw new Error("FINNHUB_API_KEY is not configured"); const url = new URL(`${FINNHUB_BASE}/quote`); url.searchParams.set("symbol", symbol); url.searchParams.set("token", key); const data = await fetchJsonUpstream(url); if (!(Number(data.c) > 0)) throw new Error(`Finnhub quote missing for ${symbol}`); return normalizeFinnhubQuote(symbol, data); }
 async function fetchTwelveQuotes(symbols, key) { if (!key || key.length < 10) throw new Error("TWELVE_DATA_KEY is missing or invalid"); const url = new URL(`${TWELVE_BASE}/quote`); url.searchParams.set("symbol", symbols.join(",")); url.searchParams.set("apikey", key); return fetchJsonUpstream(url); }
+function newYorkWallTimeEpoch(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})$/);
+  if (!match) return 0;
+  const [, year, month, day, hour, minute, second] = match.map(Number);
+  const wallUtc = Date.UTC(year, month - 1, day, hour, minute, second);
+  const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: US_MARKET_TZ, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23" }).formatToParts(new Date(wallUtc)).filter((item) => item.type !== "literal").map((item) => [item.type, Number(item.value)]));
+  const representedUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute, parts.second);
+  return Math.floor((wallUtc - (representedUtc - wallUtc)) / 1000);
+}
+function parseTencentQuotes(text, symbols) {
+  const requested = new Set(symbols), quotes = {};
+  for (const match of String(text || "").matchAll(/v_us([A-Z0-9.-]+)="([^"]*)"/gi)) {
+    const symbol = String(match[1] || "").toUpperCase();
+    if (!requested.has(symbol)) continue;
+    const fields = match[2].split("~"), close = Number(fields[3] || 0), previous = Number(fields[4] || close || 0);
+    const timestamp = newYorkWallTimeEpoch(fields[30]);
+    if (!(close > 0) || !timestamp) continue;
+    const change = Number(fields[31] || close - previous), percent = Number(fields[32] || (previous ? change / previous * 100 : 0));
+    quotes[symbol] = { symbol, name: symbol, currency: fields[35] || "USD", exchange: "", datetime: new Date(timestamp * 1000).toISOString(), timestamp, open: String(Number(fields[5] || close)), high: String(Number(fields[33] || close)), low: String(Number(fields[34] || close)), close: String(close), previous_close: String(previous), change: String(change), percent_change: String(percent), is_market_open: localMarketClock(new Date(timestamp * 1000)).isOpen, source: "tencent" };
+  }
+  return quotes;
+}
+async function fetchTencentQuotes(symbols) {
+  if (!symbols.length) return {};
+  const controller = new AbortController(), timer = setTimeout(() => controller.abort("Tencent quote timeout"), 8000);
+  try {
+    const url = `${TENCENT_QUOTE_BASE}${symbols.map((symbol) => `us${symbol}`).join(",")}`;
+    const response = await fetch(url, { headers: { Accept: "text/plain,*/*", Referer: "https://finance.qq.com/", "Cache-Control": "no-cache" }, signal: controller.signal });
+    const text = await response.text();
+    if (!response.ok) throw new Error(`Tencent quote error ${response.status}`);
+    return parseTencentQuotes(text, symbols);
+  } finally { clearTimeout(timer); }
+}
 function normalizeHistoricalQuote(symbol, date, item, source) {
   const close = Number(item?.close || 0), open = Number(item?.open || close), high = Number(item?.high || close), low = Number(item?.low || close);
   if (!(close > 0)) throw new Error(`${source} historical close missing for ${symbol}`);
@@ -230,6 +264,17 @@ async function fetchQuotesWithFallback(symbols, env, routingPlan, cachedQuotes =
     warnings.push(...result.errors);
     if (result.errors.some((message) => isQuotaError(message))) await backoffProvider(env, "finnhub", new Error(result.errors.join("; ")));
   } else if (missing.length) warnings.push("Finnhub temporarily backed off");
+  const rescueSymbols = symbols.filter((symbol) => !quotes[symbol] || !isFreshLiveQuote(quotes[symbol]));
+  if (rescueSymbols.length) {
+    try {
+      const tencentQuotes = await fetchTencentQuotes(rescueSymbols);
+      for (const symbol of rescueSymbols) {
+        const quote = tencentQuotes[symbol];
+        if (quote && isFreshLiveQuote(quote)) quotes[symbol] = quote;
+        else if (!quotes[symbol]) warnings.push(`${symbol}: Tencent quote unavailable`);
+      }
+    } catch (error) { warnings.push(`Tencent: ${safeHeaderValue(error.message || "quote failed", 160)}`); }
+  }
   for (const [symbol, quote] of Object.entries(staleTwelve)) {
     const fallback = quotes[symbol];
     if (!fallback || quoteTimestampMs(quote) > quoteTimestampMs(fallback)) {
@@ -239,7 +284,7 @@ async function fetchQuotesWithFallback(symbols, env, routingPlan, cachedQuotes =
   }
   if (!Object.keys(quotes).length) throw new Error(warnings.join("; ") || "No usable quotes");
   const sources = new Set(Object.values(quotes).map((quote) => quote.source));
-  return { quotes, source: sources.size > 1 ? "mixed" : sources.has("twelve") ? "twelve" : "finnhub", warnings, fallbackReason: twelveReason };
+  return { quotes, source: sources.size > 1 ? "mixed" : [...sources][0] || "cache", warnings, fallbackReason: twelveReason };
 }
 async function limitMiss(env, key) { return env.MYH88_QUOTE_LIMITER ? env.MYH88_QUOTE_LIMITER.limit({ key }) : { success: true }; }
 async function fetchQuotesWithCache(request, env, ctx, canonicalSymbols, requestedSymbols, mode) {
@@ -411,7 +456,7 @@ export default {
           lastCloseCacheSeconds: LAST_CLOSE_CACHE_SECONDS,
           historicalCacheSeconds: HISTORICAL_CACHE_SECONDS,
           sharedCache: Boolean(env.MYH88_CACHE),
-          providers: { twelve: Boolean(String(env.TWELVE_DATA_KEY || "").trim()), finnhub: Boolean(String(env.FINNHUB_API_KEY || "").trim()) },
+          providers: { twelve: Boolean(String(env.TWELVE_DATA_KEY || "").trim()), finnhub: Boolean(String(env.FINNHUB_API_KEY || "").trim()), tencent: true },
           providerBackoff: { twelve: twelveBackoff || null, finnhub: finnhubBackoff || null },
           scheduledRefresh: scheduledRefresh?.body ? JSON.parse(scheduledRefresh.body) : null,
           routing,

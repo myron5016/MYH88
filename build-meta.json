@@ -2,7 +2,7 @@
   "release": "11.7.2",
   "version": "V11.7.2 果园生长版",
   "serviceWorker": "11.7.2",
-  "worker": "10.57",
+  "worker": "10.58",
   "ledgerSchema": "10.48",
   "channel": "stable",
   "builtAt": "2026-08-20T15:05:00.000Z"
