@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-19T14:15:07.624Z",
+    "lastCloudSaveAt": "2026-08-20T14:10:36.846Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -314,37 +314,6 @@
           "remainingCostBasisNative": 1080.35,
           "currency": "USD",
           "price": 1080
-        }
-      ]
-    },
-    {
-      "id": "pos_mszw00yp_5xh16o",
-      "symbol": "SKHX",
-      "name": "2倍做多海力士",
-      "currency": "USD",
-      "source": "twelve",
-      "shares": 400,
-      "avgCost": 13.98705,
-      "sector": "未分类",
-      "color": "#627288",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "",
-      "costBasisUSD": 5594.82,
-      "lots": [
-        {
-          "lotId": "tx_mszw00ye_zlj8fa",
-          "buyTransactionId": "tx_mszw00ye_zlj8fa",
-          "date": "2026-08-19",
-          "order": 78,
-          "shares": 400,
-          "remainingShares": 400,
-          "costBasisUSD": 5594.82,
-          "remainingCostBasisUSD": 5594.82,
-          "costBasisNative": 5594.82,
-          "remainingCostBasisNative": 5594.82,
-          "currency": "USD",
-          "price": 13.98
         }
       ]
     },
@@ -2535,6 +2504,41 @@
       "costBasisNative": 8961.68,
       "grossUSD": 8960,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mt1ll1f0_ysubk2",
+      "date": "2026-08-20",
+      "type": "sell",
+      "symbol": "SKHX",
+      "name": "2倍做多海力士",
+      "shares": 400,
+      "price": 14.2,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 1.03,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "10.48",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mszw00ye_zlj8fa",
+          "buyTransactionId": "tx_mszw00ye_zlj8fa",
+          "date": "2026-08-19",
+          "shares": 400,
+          "unitCostUSD": 13.98705,
+          "unitCostNative": 13.98705,
+          "costBasisUSD": 5594.82,
+          "costBasisNative": 5594.82
+        }
+      ],
+      "feeUSD": 1.03,
+      "costBasisUSD": 5594.82,
+      "costBasisNative": 5594.82,
+      "grossUSD": 5680,
+      "realizedPnlUSD": 84.15000000000055
     }
   ],
   "cashFlows": [
@@ -2822,6 +2826,14 @@
       "netAsset": 24386.87,
       "market": 25756.01,
       "cash": -1369.14
+    },
+    {
+      "scope": "active",
+      "date": "2026-08-20",
+      "capital": 22370,
+      "netAsset": 25385.36,
+      "market": 21075.53,
+      "cash": 4309.83
     }
   ],
   "dcaPlan": {
@@ -2834,12 +2846,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 707.06,
-        "priceAsOf": "2026-08-19T14:12:34.000Z",
-        "changePercent": 0.2353274737737409,
+        "price": 704.51,
+        "priceAsOf": "2026-08-20T14:08:51.000Z",
+        "changePercent": -0.3395057362323319,
         "priceSource": "finnhub",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-08-19T14:12:34.000Z"
+        "priceUpdatedAt": "2026-08-20T14:08:51.000Z"
       },
       {
         "symbol": "QQQM",
@@ -3040,6 +3052,13 @@
         "marketValueUSD": 1521.01369,
         "pnlUSD": 18.359148,
         "returnPct": 1.221781
+      },
+      {
+        "date": "2026-08-20",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1517.70379,
+        "pnlUSD": 15.049248,
+        "returnPct": 1.001511
       }
     ]
   }
