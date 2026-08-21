@@ -269,13 +269,14 @@ test("只读行情请求即使缓存过期也不会直接消耗上游额度", as
 
 test("定时刷新只抓当前持仓和定投，不浪费额度刷新历史已卖出股票", async () => {
   const writes = new Map();
+  let writeCount = 0;
   const env = {
     TWELVE_DATA_KEY: "configured-twelve-key",
     FINNHUB_API_KEY: "configured-finnhub-key",
     TWELVE_PRIORITY_SYMBOLS: "NVDA,VOO",
     MYH88_CACHE: {
       async get(key) { return writes.get(key) || null; },
-      async put(key, value) { writes.set(key, JSON.parse(value)); },
+      async put(key, value) { writeCount += 1; writes.set(key, JSON.parse(value)); },
     },
   };
   const originalFetch = globalThis.fetch;
@@ -306,8 +307,10 @@ test("定时刷新只抓当前持仓和定投，不浪费额度刷新历史已�
   try {
     await worker.scheduled({ scheduledTime: Date.parse("2026-08-20T14:35:00Z"), cron: "*/5 * * * *" }, env, { waitUntil() {} });
     assert.deepEqual(providerSymbols.sort(), ["NVDA", "VOO"]);
-    assert.ok(writes.has("quote:live:NVDA"));
-    assert.ok(writes.has("quote:live:VOO"));
+    assert.equal(writeCount, 1);
+    const bundle = writes.get("quotes:scheduled:current:v1");
+    assert.equal(bundle.quotes.NVDA.close, "225");
+    assert.equal(bundle.quotes.VOO.close, "714");
     assert.equal(writes.has("quote:live:SOLD"), false);
     assert.equal(writes.has("quote:live:XFAB"), false);
   } finally {
@@ -344,7 +347,7 @@ test("Twelve 返回旧的新标的且 Finnhub 限流时由腾讯行情救援", a
     }
     if (target.hostname === "qt.gtimg.cn") {
       const fields = Array(50).fill("");
-      Object.assign(fields, { 0: "200", 1: "2X Short SpaceX", 2: "SSPC.AM", 3: "12.05", 4: "10.93", 5: "11.30", 30: "2026-08-20 11:12:59", 31: "1.12", 32: "10.25", 33: "12.10", 34: "11.23", 35: "USD" });
+      Object.assign(fields, { 0: "200", 1: "2X Short SpaceX", 2: "SSPC.AM", 3: "12.05", 4: "10.93", 5: "11.30", 30: "2099-08-20 11:12:59", 31: "1.12", 32: "10.25", 33: "12.10", 34: "11.23", 35: "USD" });
       return new Response(`v_usSSPC="${fields.join("~")}";`, { status: 200 });
     }
     throw new Error(`unexpected request: ${target}`);
@@ -353,11 +356,61 @@ test("Twelve 返回旧的新标的且 Finnhub 限流时由腾讯行情救援", a
     const summary = await worker.scheduled({ scheduledTime: Date.parse("2026-08-20T15:13:00Z"), cron: "*/5 * * * *" }, env, { waitUntil() {} });
     assert.equal(summary.updated, 1);
     assert.equal(summary.source, "tencent");
-    const cached = writes.get("quote:live:SSPC");
-    const quote = JSON.parse(cached.body);
+    const cached = writes.get("quotes:scheduled:current:v1");
+    const quote = cached.quotes.SSPC;
     assert.equal(quote.close, "12.05");
     assert.equal(quote.source, "tencent");
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+test("休市时定时任务不写 KV", async () => {
+  let writeCount = 0;
+  const env = {
+    MYH88_CACHE: {
+      async get() { return null; },
+      async put() { writeCount += 1; },
+    },
+  };
+  const summary = await worker.scheduled(
+    { scheduledTime: Date.parse("2026-08-22T15:00:00Z"), cron: "*/5 * * * *" },
+    env,
+    { waitUntil() {} },
+  );
+  assert.equal(summary.status, "skipped");
+  assert.equal(writeCount, 0);
+});
+
+test("只读行情一次读取整包 KV，不按股票数量放大", async () => {
+  const now = Date.now();
+  let readCount = 0;
+  const bundle = {
+    cachedAt: now,
+    summary: { status: "ok", checkedAt: new Date(now).toISOString(), requested: 2, updated: 2 },
+    quotes: {
+      NVDA: { symbol: "NVDA", close: "225", timestamp: Math.floor(now / 1000), source: "twelve" },
+      VOO: { symbol: "VOO", close: "714", timestamp: Math.floor(now / 1000), source: "twelve" },
+    },
+  };
+  const env = {
+    TWELVE_PRIORITY_SYMBOLS: "NVDA,VOO",
+    MYH88_CACHE: {
+      async get(key) {
+        readCount += 1;
+        if (key === "config:portfolio-symbols:v3") return { cachedAt: now, body: JSON.stringify({ symbols: ["NVDA", "VOO"] }) };
+        if (key === "quotes:scheduled:current:v1") return bundle;
+        return null;
+      },
+      async put() {},
+    },
+  };
+  const response = await worker.fetch(
+    new Request("https://quote.myh88.com/quotes?symbols=NVDA,VOO&cache=only"),
+    env,
+    { waitUntil() {} },
+  );
+  assert.equal(response.status, 200);
+  assert.equal(readCount, 2);
+  assert.deepEqual(await response.json(), bundle.quotes);
 });

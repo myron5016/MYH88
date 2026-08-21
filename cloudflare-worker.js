@@ -1,5 +1,5 @@
-const WORKER_VERSION = "10.58";
-const WORKER_BUILT_AT = "2026-08-20T15:16:00.000Z";
+const WORKER_VERSION = "10.59";
+const WORKER_BUILT_AT = "2026-08-21T15:55:00.000Z";
 // Provider calls are still protected by the per-symbol KV cache, but a live
 // quote must not be allowed to sit behind a half-hour edge cache.
 // Eight Twelve symbols refreshed every five minutes use at most 624 credits
@@ -15,6 +15,8 @@ const PORTFOLIO_CACHE_SECONDS = 5 * 60;
 const PROVIDER_BACKOFF_SECONDS = 75;
 const FINNHUB_BACKOFF_SECONDS = 90;
 const TWELVE_BATCH_LIMIT = 8;
+const SCHEDULED_BUNDLE_KEY = "quotes:scheduled:current:v1";
+const SCHEDULED_BUNDLE_TTL_SECONDS = 24 * 60 * 60;
 const TWELVE_BASE = "https://api.twelvedata.com";
 const FINNHUB_BASE = "https://finnhub.io/api/v1";
 const TENCENT_QUOTE_BASE = "https://qt.gtimg.cn/q=";
@@ -101,6 +103,18 @@ function responseFromCached(record, cacheLabel) {
 }
 function jsonResponse(data, cacheLabel = "MISS", metadata = {}) {
   return json(data, 200, { "X-MYH88-Cache": safeHeaderValue(cacheLabel), "X-MYH88-Source": safeHeaderValue(metadata.source), "X-MYH88-As-Of": safeHeaderValue(metadata.asOf), ...(metadata.warnings ? { "X-MYH88-Warnings": safeHeaderValue(metadata.warnings) } : {}), ...(metadata.fallbackReason ? { "X-MYH88-Fallback-Reason": safeHeaderValue(metadata.fallbackReason, 120) } : {}) });
+}
+async function readScheduledBundle(env) {
+  return readSharedCache(env, SCHEDULED_BUNDLE_KEY);
+}
+async function writeScheduledBundle(env, quotes, summary) {
+  if (!env.MYH88_CACHE) return;
+  await env.MYH88_CACHE.put(SCHEDULED_BUNDLE_KEY, JSON.stringify({
+    cachedAt: Date.now(),
+    symbols: Object.keys(quotes),
+    summary,
+    quotes,
+  }), { expirationTtl: SCHEDULED_BUNDLE_TTL_SECONDS });
 }
 function quoteResponse(data, cacheLabel = "MISS", metadata = {}) {
   const response = jsonResponse(data, cacheLabel, metadata);
@@ -292,6 +306,21 @@ async function fetchQuotesWithCache(request, env, ctx, canonicalSymbols, request
   const isLastClose = mode === "last-close", asOf = isLastClose ? previousTradingDate() : "";
   const maxAge = isLastClose ? LAST_CLOSE_CACHE_SECONDS : CACHE_SECONDS;
   const ttl = isLastClose ? LAST_CLOSE_CACHE_SECONDS * 2 : CACHE_SECONDS + STALE_SECONDS;
+  if (cacheOnly && !isLastClose) {
+    const bundle = await readScheduledBundle(env);
+    if (bundle?.quotes && typeof bundle.quotes === "object") {
+      const body = Object.fromEntries(requestedSymbols.filter((symbol) => bundle.quotes[symbol]).map((symbol) => [symbol, bundle.quotes[symbol]]));
+      if (!Object.keys(body).length) return noStoreJson({ error: "Scheduled quote cache is warming up. Please retry shortly." }, 503);
+      const complete = Object.keys(body).length === requestedSymbols.length;
+      const hasStale = Object.values(body).some((quote) => !isFreshLiveQuote(quote));
+      const sources = new Set(Object.values(body).map((quote) => quote.source).filter(Boolean));
+      return quoteResponse(body, complete ? (hasStale ? "BUNDLE-STALE" : "BUNDLE-FRESH") : "BUNDLE-PARTIAL", {
+        source: sources.size > 1 ? "mixed" : [...sources][0] || "cache",
+        asOf: bundle.summary?.quoteAsOf || "",
+        warnings: complete ? "" : `Scheduled cache is still missing: ${requestedSymbols.filter((symbol) => !body[symbol]).join(",")}`,
+      });
+    }
+  }
   const records = await Promise.all(requestedSymbols.map(async (symbol) => {
     const key = quoteCacheKey(symbol, mode, asOf), record = await readSharedCache(env, key);
     let quote = null;
@@ -369,9 +398,7 @@ async function fetchQuotesWithCache(request, env, ctx, canonicalSymbols, request
 
 async function refreshScheduledQuotes(env, scheduledTime = Date.now()) {
   const clock = localMarketClock(new Date(Number(scheduledTime) || Date.now()));
-  const statusKey = "system:last-scheduled-refresh";
   if (!clock.isOpen) {
-    await env.MYH88_CACHE?.put(statusKey, JSON.stringify({ cachedAt: Date.now(), body: JSON.stringify({ status: "skipped", phase: clock.phase, checkedAt: clock.checkedAt }) }), { expirationTtl: 24 * 60 * 60 });
     log("scheduled_quote_refresh_skipped", { phase: clock.phase, date: clock.date });
     return { status: "skipped", phase: clock.phase };
   }
@@ -380,12 +407,6 @@ async function refreshScheduledQuotes(env, scheduledTime = Date.now()) {
   if (!symbols.length) throw new Error("No current automatic portfolio symbols");
   const routingPlan = buildProviderPlan(symbols, configuredTwelvePriority(env), TWELVE_BATCH_LIMIT);
   const result = await fetchQuotesWithFallback(symbols, env, routingPlan);
-  await Promise.all(Object.entries(result.quotes).map(([symbol, quote]) => writeSharedCache(
-    env,
-    quoteCacheKey(symbol, "live"),
-    jsonResponse(quote, "STORE-SCHEDULED", { source: quote.source }),
-    isFreshLiveQuote(quote) ? CACHE_SECONDS + STALE_SECONDS : LIVE_RETRY_COOLDOWN_SECONDS,
-  )));
   const summary = {
     status: "ok",
     checkedAt: new Date().toISOString(),
@@ -395,7 +416,7 @@ async function refreshScheduledQuotes(env, scheduledTime = Date.now()) {
     source: result.source,
     warnings: result.warnings,
   };
-  await env.MYH88_CACHE?.put(statusKey, JSON.stringify({ cachedAt: Date.now(), body: JSON.stringify(summary) }), { expirationTtl: 24 * 60 * 60 });
+  await writeScheduledBundle(env, result.quotes, summary);
   log("scheduled_quote_refresh", summary);
   return summary;
 }
@@ -442,13 +463,13 @@ export default {
       if (path === "/") {
         const portfolio = await livePortfolioSymbols(env);
         const routing = buildProviderPlan(portfolio, configuredTwelvePriority(env), TWELVE_BATCH_LIMIT);
-        const [twelveBackoff, finnhubBackoff, scheduledRefresh] = await Promise.all([providerBackedOff(env, "twelve"), providerBackedOff(env, "finnhub"), readSharedCache(env, "system:last-scheduled-refresh")]);
+        const [twelveBackoff, finnhubBackoff, scheduledBundle] = await Promise.all([providerBackedOff(env, "twelve"), providerBackedOff(env, "finnhub"), readScheduledBundle(env)]);
         return json({
           ok: true,
           service: "MYH88 price proxy",
           version: WORKER_VERSION,
           builtAt: WORKER_BUILT_AT,
-          cacheMode: "per-symbol",
+          cacheMode: "scheduled-bundle",
           cacheSeconds: CACHE_SECONDS,
           staleSeconds: STALE_SECONDS,
           liveQuoteMaxAgeSeconds: LIVE_QUOTE_MAX_AGE_SECONDS,
@@ -458,7 +479,7 @@ export default {
           sharedCache: Boolean(env.MYH88_CACHE),
           providers: { twelve: Boolean(String(env.TWELVE_DATA_KEY || "").trim()), finnhub: Boolean(String(env.FINNHUB_API_KEY || "").trim()), tencent: true },
           providerBackoff: { twelve: twelveBackoff || null, finnhub: finnhubBackoff || null },
-          scheduledRefresh: scheduledRefresh?.body ? JSON.parse(scheduledRefresh.body) : null,
+          scheduledRefresh: scheduledBundle?.summary || null,
           routing,
           rateLimitConfigured: Boolean(env.MYH88_QUOTE_LIMITER),
           portfolioSymbols: portfolio.length,

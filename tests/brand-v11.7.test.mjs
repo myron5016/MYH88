@@ -83,7 +83,7 @@ test("V11.7 map renderer exposes stable visual metadata", async () => {
   assert.match(source, /aria-label/);
 });
 
-test("V11.7 release fingerprint is consistent and keeps Worker 10.58", async () => {
+test("V11.7 release fingerprint is consistent and keeps Worker 10.59", async () => {
   const [index, runtime, worker, meta, pkg] = await Promise.all([
     read("../index.html"),
     read("../script.part1.js"),
@@ -109,7 +109,7 @@ test("V11.7 release fingerprint is consistent and keeps Worker 10.58", async () 
     assert.match(worker, new RegExp(`\\./${escaped}\\?v=${version.replaceAll(".", "\\.")}`));
   }
   assert.match(meta, /"release":\s*"11\.7\.2"/);
-  assert.match(meta, /"worker":\s*"10\.58"/);
+  assert.match(meta, /"worker":\s*"10\.59"/);
   assert.match(pkg, /"version":\s*"11\.7\.2"/);
 });
 
