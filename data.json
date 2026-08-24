@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-21T15:30:58.465Z",
+    "lastCloudSaveAt": "2026-08-24T05:52:43.878Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -314,6 +314,37 @@
           "remainingCostBasisNative": 1080.35,
           "currency": "USD",
           "price": 1080
+        }
+      ]
+    },
+    {
+      "id": "pos_mt6tk0d0_fenhti",
+      "symbol": "SSPC",
+      "name": "2倍做空SpaceX",
+      "currency": "USD",
+      "source": "twelve",
+      "shares": 800,
+      "avgCost": 11.402112500000001,
+      "sector": "太空",
+      "color": "#d03e61",
+      "sectorLocked": false,
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 9121.69,
+      "lots": [
+        {
+          "lotId": "tx_mt6tk0ck_g1238m",
+          "buyTransactionId": "tx_mt6tk0ck_g1238m",
+          "date": "2026-08-22",
+          "order": 82,
+          "shares": 800,
+          "remainingShares": 800,
+          "costBasisUSD": 9121.69,
+          "remainingCostBasisUSD": 9121.69,
+          "costBasisNative": 9121.69,
+          "remainingCostBasisNative": 9121.69,
+          "currency": "USD",
+          "price": 11.4
         }
       ]
     }
@@ -2543,6 +2574,28 @@
       "costBasisNative": 8961.68,
       "grossUSD": 9160,
       "realizedPnlUSD": 192.61999999999898
+    },
+    {
+      "id": "tx_mt6tk0ck_g1238m",
+      "date": "2026-08-22",
+      "type": "buy",
+      "symbol": "SSPC",
+      "name": "2倍做空SpaceX",
+      "shares": 800,
+      "price": 11.4,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 1.69,
+      "note": "",
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#d03e61",
+      "schemaVersion": "10.48",
+      "feeUSD": 1.69,
+      "costBasisUSD": 9121.69,
+      "costBasisNative": 9121.69,
+      "grossUSD": 9120,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -2846,6 +2899,22 @@
       "netAsset": 25043.47,
       "market": 11579.34,
       "cash": 13464.13
+    },
+    {
+      "scope": "active",
+      "date": "2026-08-22",
+      "capital": 22370,
+      "netAsset": 25101,
+      "market": 11636.87,
+      "cash": 13464.13
+    },
+    {
+      "scope": "active",
+      "date": "2026-08-24",
+      "capital": 22370,
+      "netAsset": 24963.43,
+      "market": 20620.99,
+      "cash": 4342.44
     }
   ],
   "dcaPlan": {
@@ -2858,12 +2927,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 704,
-        "priceAsOf": "2026-08-21T15:30:40.000Z",
-        "changePercent": 0.43,
-        "priceSource": "tencent",
-        "priceProvider": "tencent",
-        "priceUpdatedAt": "2026-08-21T15:30:40.000Z"
+        "price": 703.71,
+        "priceAsOf": "2026-08-21T20:00:00.000Z",
+        "changePercent": 0.38515855693927986,
+        "priceSource": "last-close",
+        "priceProvider": "finnhub",
+        "priceUpdatedAt": "2026-08-21T20:00:00.000Z"
       },
       {
         "symbol": "QQQM",
@@ -2871,12 +2940,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 293.54,
-        "priceAsOf": "2026-08-21T15:30:14.000Z",
-        "changePercent": 0.25615628949076125,
-        "priceSource": "finnhub",
+        "price": 293.76,
+        "priceAsOf": "2026-08-21T20:00:00.000Z",
+        "changePercent": 0.33129546774137447,
+        "priceSource": "last-close",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-08-21T15:30:14.000Z"
+        "priceUpdatedAt": "2026-08-21T20:00:00.000Z"
       }
     ],
     "entries": [
@@ -3078,6 +3147,13 @@
         "marketValueUSD": 1513.141972,
         "pnlUSD": 10.48743,
         "returnPct": 0.697927
+      },
+      {
+        "date": "2026-08-24",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1513.214748,
+        "pnlUSD": 10.560206,
+        "returnPct": 0.70277
       }
     ]
   }
