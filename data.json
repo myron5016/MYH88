@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-24T13:54:32.535Z",
+    "lastCloudSaveAt": "2026-08-26T17:09:53.824Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -318,33 +318,33 @@
       ]
     },
     {
-      "id": "pos_mt6tk0d0_fenhti",
-      "symbol": "SSPC",
-      "name": "2倍做空SpaceX",
+      "id": "pos_mtacl0cu_yry3iy",
+      "symbol": "SNXX",
+      "name": "2倍做多闪迪",
       "currency": "USD",
       "source": "twelve",
-      "shares": 800,
-      "avgCost": 11.402112500000001,
-      "sector": "太空",
-      "color": "#d03e61",
+      "shares": 600,
+      "avgCost": 13.5267,
+      "sector": "半导体",
+      "color": "#627288",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 9121.69,
+      "costBasisUSD": 8116.02,
       "lots": [
         {
-          "lotId": "tx_mt6tk0ck_g1238m",
-          "buyTransactionId": "tx_mt6tk0ck_g1238m",
-          "date": "2026-08-22",
-          "order": 82,
-          "shares": 800,
-          "remainingShares": 800,
-          "costBasisUSD": 9121.69,
-          "remainingCostBasisUSD": 9121.69,
-          "costBasisNative": 9121.69,
-          "remainingCostBasisNative": 9121.69,
+          "lotId": "tx_mtacl0ch_h6oz8n",
+          "buyTransactionId": "tx_mtacl0ch_h6oz8n",
+          "date": "2026-08-26",
+          "order": 86,
+          "shares": 600,
+          "remainingShares": 600,
+          "costBasisUSD": 8116.02,
+          "remainingCostBasisUSD": 8116.02,
+          "costBasisNative": 8116.02,
+          "remainingCostBasisNative": 8116.02,
           "currency": "USD",
-          "price": 11.4
+          "price": 13.52
         }
       ]
     }
@@ -2417,7 +2417,7 @@
       "fee": 1.05,
       "note": "",
       "source": "twelve",
-      "sector": "未分类",
+      "sector": "半导体",
       "color": "#627288",
       "schemaVersion": "10.48",
       "feeUSD": 1.05,
@@ -2439,7 +2439,7 @@
       "fee": 1.32,
       "note": "",
       "source": "twelve",
-      "sector": "未分类",
+      "sector": "半导体",
       "color": "#627288",
       "schemaVersion": "10.48",
       "lotMethod": "specific",
@@ -2653,6 +2653,63 @@
       "costBasisNative": 4911.85,
       "grossUSD": 5200,
       "realizedPnlUSD": 286.89999999999964
+    },
+    {
+      "id": "tx_mtacgu7s_mp6282",
+      "date": "2026-08-27",
+      "type": "sell",
+      "symbol": "SSPC",
+      "name": "2倍做空SpaceX",
+      "shares": 800,
+      "price": 11.4,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.75,
+      "note": "",
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#d03e61",
+      "schemaVersion": "10.48",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mt6tk0ck_g1238m",
+          "buyTransactionId": "tx_mt6tk0ck_g1238m",
+          "date": "2026-08-22",
+          "shares": 800,
+          "unitCostUSD": 11.402112500000001,
+          "unitCostNative": 11.402112500000001,
+          "costBasisUSD": 9121.69,
+          "costBasisNative": 9121.69
+        }
+      ],
+      "feeUSD": 0.75,
+      "costBasisUSD": 9121.69,
+      "costBasisNative": 9121.69,
+      "grossUSD": 9120,
+      "realizedPnlUSD": -2.4400000000005093
+    },
+    {
+      "id": "tx_mtacl0ch_h6oz8n",
+      "date": "2026-08-26",
+      "type": "buy",
+      "symbol": "SNXX",
+      "name": "2倍做多闪迪",
+      "shares": 600,
+      "price": 13.52,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 4.02,
+      "note": "",
+      "source": "twelve",
+      "sector": "半导体",
+      "color": "#627288",
+      "schemaVersion": "10.48",
+      "feeUSD": 4.02,
+      "costBasisUSD": 8116.02,
+      "costBasisNative": 8116.02,
+      "grossUSD": 8112,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -2972,6 +3029,22 @@
       "netAsset": 25190.32,
       "market": 20560.98,
       "cash": 4629.34
+    },
+    {
+      "scope": "active",
+      "date": "2026-08-25",
+      "capital": 22370,
+      "netAsset": 24748.73,
+      "market": 20119.39,
+      "cash": 4629.34
+    },
+    {
+      "scope": "active",
+      "date": "2026-08-27",
+      "capital": 22370,
+      "netAsset": 24979.77,
+      "market": 19347.2,
+      "cash": 5632.57
     }
   ],
   "dcaPlan": {
@@ -2984,12 +3057,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 701.3,
-        "priceAsOf": "2026-08-24T13:50:40.000Z",
-        "changePercent": -0.34,
-        "priceSource": "tencent",
-        "priceProvider": "tencent",
-        "priceUpdatedAt": "2026-08-24T13:50:40.000Z"
+        "price": 703.15,
+        "priceAsOf": "2026-08-26T17:05:16.000Z",
+        "changePercent": -0.12357603477174009,
+        "priceSource": "finnhub",
+        "priceProvider": "finnhub",
+        "priceUpdatedAt": "2026-08-26T17:05:16.000Z"
       },
       {
         "symbol": "QQQM",
@@ -2997,12 +3070,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 289.7,
-        "priceAsOf": "2026-08-24T13:50:40.000Z",
-        "changePercent": -1.38,
+        "price": 292.17,
+        "priceAsOf": "2026-08-26T17:05:41.000Z",
+        "changePercent": -0.17,
         "priceSource": "tencent",
         "priceProvider": "tencent",
-        "priceUpdatedAt": "2026-08-24T13:50:40.000Z"
+        "priceUpdatedAt": "2026-08-26T17:05:41.000Z"
       }
     ],
     "entries": [
@@ -3211,6 +3284,13 @@
         "marketValueUSD": 1501.79686,
         "pnlUSD": -0.857682,
         "returnPct": -0.057078
+      },
+      {
+        "date": "2026-08-27",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1509.241406,
+        "pnlUSD": 6.586864,
+        "returnPct": 0.438349
       }
     ]
   }
