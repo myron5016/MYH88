@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-08-26T17:09:53.824Z",
+    "lastCloudSaveAt": "2026-08-26T21:03:24.855Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -314,37 +314,6 @@
           "remainingCostBasisNative": 1080.35,
           "currency": "USD",
           "price": 1080
-        }
-      ]
-    },
-    {
-      "id": "pos_mtacl0cu_yry3iy",
-      "symbol": "SNXX",
-      "name": "2倍做多闪迪",
-      "currency": "USD",
-      "source": "twelve",
-      "shares": 600,
-      "avgCost": 13.5267,
-      "sector": "半导体",
-      "color": "#627288",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "",
-      "costBasisUSD": 8116.02,
-      "lots": [
-        {
-          "lotId": "tx_mtacl0ch_h6oz8n",
-          "buyTransactionId": "tx_mtacl0ch_h6oz8n",
-          "date": "2026-08-26",
-          "order": 86,
-          "shares": 600,
-          "remainingShares": 600,
-          "costBasisUSD": 8116.02,
-          "remainingCostBasisUSD": 8116.02,
-          "costBasisNative": 8116.02,
-          "remainingCostBasisNative": 8116.02,
-          "currency": "USD",
-          "price": 13.52
         }
       ]
     }
@@ -2417,7 +2386,7 @@
       "fee": 1.05,
       "note": "",
       "source": "twelve",
-      "sector": "半导体",
+      "sector": "未分类",
       "color": "#627288",
       "schemaVersion": "10.48",
       "feeUSD": 1.05,
@@ -2439,7 +2408,7 @@
       "fee": 1.32,
       "note": "",
       "source": "twelve",
-      "sector": "半导体",
+      "sector": "未分类",
       "color": "#627288",
       "schemaVersion": "10.48",
       "lotMethod": "specific",
@@ -2702,7 +2671,7 @@
       "fee": 4.02,
       "note": "",
       "source": "twelve",
-      "sector": "半导体",
+      "sector": "未分类",
       "color": "#627288",
       "schemaVersion": "10.48",
       "feeUSD": 4.02,
@@ -2710,6 +2679,41 @@
       "costBasisNative": 8116.02,
       "grossUSD": 8112,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mtakyeu5_hlojc4",
+      "date": "2026-08-27",
+      "type": "sell",
+      "symbol": "SNXX",
+      "name": "2倍做多闪迪",
+      "shares": 600,
+      "price": 13.55,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 1.55,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "10.48",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mtacl0ch_h6oz8n",
+          "buyTransactionId": "tx_mtacl0ch_h6oz8n",
+          "date": "2026-08-26",
+          "shares": 600,
+          "unitCostUSD": 13.5267,
+          "unitCostNative": 13.5267,
+          "costBasisUSD": 8116.02,
+          "costBasisNative": 8116.02
+        }
+      ],
+      "feeUSD": 1.55,
+      "costBasisUSD": 8116.02,
+      "costBasisNative": 8116.02,
+      "grossUSD": 8130,
+      "realizedPnlUSD": 12.429999999999382
     }
   ],
   "cashFlows": [
@@ -3042,9 +3046,9 @@
       "scope": "active",
       "date": "2026-08-27",
       "capital": 22370,
-      "netAsset": 24979.77,
-      "market": 19347.2,
-      "cash": 5632.57
+      "netAsset": 25033,
+      "market": 11271.98,
+      "cash": 13761.02
     }
   ],
   "dcaPlan": {
@@ -3057,12 +3061,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 703.15,
-        "priceAsOf": "2026-08-26T17:05:16.000Z",
-        "changePercent": -0.12357603477174009,
+        "price": 704.76,
+        "priceAsOf": "2026-08-26T19:45:30.000Z",
+        "changePercent": 0.10511065026561875,
         "priceSource": "finnhub",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-08-26T17:05:16.000Z"
+        "priceUpdatedAt": "2026-08-26T19:45:30.000Z"
       },
       {
         "symbol": "QQQM",
@@ -3070,12 +3074,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 292.17,
-        "priceAsOf": "2026-08-26T17:05:41.000Z",
-        "changePercent": -0.17,
+        "price": 292.97,
+        "priceAsOf": "2026-08-26T19:45:39.000Z",
+        "changePercent": 0.11,
         "priceSource": "tencent",
         "priceProvider": "tencent",
-        "priceUpdatedAt": "2026-08-26T17:05:41.000Z"
+        "priceUpdatedAt": "2026-08-26T19:45:39.000Z"
       }
     ],
     "entries": [
@@ -3288,9 +3292,9 @@
       {
         "date": "2026-08-27",
         "costBasisUSD": 1502.654542,
-        "marketValueUSD": 1509.241406,
-        "pnlUSD": 6.586864,
-        "returnPct": 0.438349
+        "marketValueUSD": 1512.964626,
+        "pnlUSD": 10.310084,
+        "returnPct": 0.686125
       }
     ]
   }
