@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-09-04T06:00:45.160Z",
+    "lastCloudSaveAt": "2026-09-05T07:31:47.929Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -30,7 +30,7 @@
       "shares": 4,
       "avgCost": 196.17201575,
       "sector": "AI基建",
-      "color": "#21cf87",
+      "color": "#41d99a",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
@@ -219,7 +219,7 @@
       "shares": 10,
       "avgCost": 150,
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
@@ -316,6 +316,99 @@
           "price": 1080
         }
       ]
+    },
+    {
+      "id": "pos_mto2ak93_kmgxx8",
+      "symbol": "SPCH",
+      "name": "2倍做多SpaceX",
+      "currency": "USD",
+      "source": "twelve",
+      "shares": 500,
+      "avgCost": 10.113700000000001,
+      "sector": "太空",
+      "color": "#f16183",
+      "sectorLocked": false,
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 5056.85,
+      "lots": [
+        {
+          "lotId": "tx_mto2ak8m_c3hrkk",
+          "buyTransactionId": "tx_mto2ak8m_c3hrkk",
+          "date": "2026-09-04",
+          "order": 95,
+          "shares": 500,
+          "remainingShares": 500,
+          "costBasisUSD": 5056.85,
+          "remainingCostBasisUSD": 5056.85,
+          "costBasisNative": 5056.85,
+          "remainingCostBasisNative": 5056.85,
+          "currency": "USD",
+          "price": 10.11
+        }
+      ]
+    },
+    {
+      "id": "pos_mto2b85y_zkwe24",
+      "symbol": "MSTU",
+      "name": "2倍做多MSTR",
+      "currency": "USD",
+      "source": "twelve",
+      "shares": 150,
+      "avgCost": 34.553666666666665,
+      "sector": "未分类",
+      "color": "#627288",
+      "sectorLocked": false,
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 5183.05,
+      "lots": [
+        {
+          "lotId": "tx_mto2b85k_tg9fbn",
+          "buyTransactionId": "tx_mto2b85k_tg9fbn",
+          "date": "2026-09-04",
+          "order": 96,
+          "shares": 150,
+          "remainingShares": 150,
+          "costBasisUSD": 5183.05,
+          "remainingCostBasisUSD": 5183.05,
+          "costBasisNative": 5183.05,
+          "remainingCostBasisNative": 5183.05,
+          "currency": "USD",
+          "price": 34.55
+        }
+      ]
+    },
+    {
+      "id": "pos_mto2df4f_th0mcl",
+      "symbol": "NVD",
+      "name": "2倍做空英伟达",
+      "currency": "USD",
+      "source": "twelve",
+      "shares": 2000,
+      "avgCost": 4.753705,
+      "sector": "AI基建",
+      "color": "#21cf87",
+      "sectorLocked": false,
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 9507.41,
+      "lots": [
+        {
+          "lotId": "tx_mto2df42_cyxvpp",
+          "buyTransactionId": "tx_mto2df42_cyxvpp",
+          "date": "2026-09-05",
+          "order": 97,
+          "shares": 2000,
+          "remainingShares": 2000,
+          "costBasisUSD": 9507.41,
+          "remainingCostBasisUSD": 9507.41,
+          "costBasisNative": 9507.41,
+          "remainingCostBasisNative": 9507.41,
+          "currency": "USD",
+          "price": 4.75
+        }
+      ]
     }
   ],
   "transactions": [
@@ -338,7 +431,7 @@
       "migration": true,
       "sector": "AI基建",
       "source": "twelve",
-      "color": "#21cf87",
+      "color": "#41d99a",
       "schemaVersion": "10.6",
       "costBasisNative": 2152
     },
@@ -660,7 +753,7 @@
       "migration": true,
       "source": "twelve",
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "schemaVersion": "10.6",
       "costBasisNative": 1500
     },
@@ -683,7 +776,7 @@
       "migration": true,
       "source": "twelve",
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "schemaVersion": "10.6",
       "closedHistory": true
     },
@@ -928,7 +1021,7 @@
       "schemaVersion": "10.6",
       "sector": "AI基建",
       "source": "twelve",
-      "color": "#21cf87",
+      "color": "#41d99a",
       "costBasisNative": 402.348063
     },
     {
@@ -1056,7 +1149,7 @@
       "schemaVersion": "10.6",
       "sector": "AI基建",
       "source": "twelve",
-      "color": "#21cf87",
+      "color": "#41d99a",
       "costBasisNative": 382.34
     },
     {
@@ -1154,7 +1247,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "schemaVersion": "10.6",
       "feeUSD": 0.35,
       "costBasisUSD": 298.35,
@@ -1286,7 +1379,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "schemaVersion": "10.6",
       "feeUSD": 0.34,
       "costBasisUSD": 695.34,
@@ -1330,7 +1423,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "schemaVersion": "10.6",
       "feeUSD": 0.34,
       "costBasisUSD": 675.34,
@@ -1396,7 +1489,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "schemaVersion": "10.6",
       "feeUSD": 0.34,
       "costBasisUSD": 615.34,
@@ -1541,7 +1634,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "schemaVersion": "10.6",
       "feeUSD": 0.34,
       "costBasisUSD": 585.34,
@@ -1695,7 +1788,7 @@
       "note": "",
       "source": "twelve",
       "sector": "AI基建",
-      "color": "#21cf87",
+      "color": "#41d99a",
       "schemaVersion": "10.48",
       "feeUSD": 0.39,
       "costBasisUSD": 2152,
@@ -1973,7 +2066,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "schemaVersion": "10.48",
       "lotMethod": "specific",
       "lotAllocations": [
@@ -2171,7 +2264,7 @@
       "note": "",
       "source": "twelve",
       "sector": "太空",
-      "color": "#f16183",
+      "color": "#d03e61",
       "schemaVersion": "10.48",
       "lotMethod": "specific",
       "lotAllocations": [
@@ -2917,6 +3010,72 @@
       "costBasisNative": 9922.1,
       "grossUSD": 9140,
       "realizedPnlUSD": -788.1900000000005
+    },
+    {
+      "id": "tx_mto2ak8m_c3hrkk",
+      "date": "2026-09-04",
+      "type": "buy",
+      "symbol": "SPCH",
+      "name": "2倍做多SpaceX",
+      "shares": 500,
+      "price": 10.11,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 1.85,
+      "note": "",
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#f16183",
+      "schemaVersion": "10.48",
+      "feeUSD": 1.85,
+      "costBasisUSD": 5056.85,
+      "costBasisNative": 5056.85,
+      "grossUSD": 5055,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mto2b85k_tg9fbn",
+      "date": "2026-09-04",
+      "type": "buy",
+      "symbol": "MSTU",
+      "name": "2倍做多MSTR",
+      "shares": 150,
+      "price": 34.55,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.55,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "10.48",
+      "feeUSD": 0.55,
+      "costBasisUSD": 5183.05,
+      "costBasisNative": 5183.05,
+      "grossUSD": 5182.5,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mto2df42_cyxvpp",
+      "date": "2026-09-05",
+      "type": "buy",
+      "symbol": "NVD",
+      "name": "2倍做空英伟达",
+      "shares": 2000,
+      "price": 4.75,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 7.41,
+      "note": "",
+      "source": "twelve",
+      "sector": "AI基建",
+      "color": "#21cf87",
+      "schemaVersion": "10.48",
+      "feeUSD": 7.41,
+      "costBasisUSD": 9507.41,
+      "costBasisNative": 9507.41,
+      "grossUSD": 9500,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -3271,6 +3430,14 @@
       "netAsset": 23943.5,
       "market": 11142.38,
       "cash": 12801.12
+    },
+    {
+      "scope": "active",
+      "date": "2026-09-05",
+      "capital": 22370,
+      "netAsset": 24053.86,
+      "market": 31000.05,
+      "cash": -6946.19
     }
   ],
   "dcaPlan": {
@@ -3283,12 +3450,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 710.72,
-        "priceAsOf": "2026-09-03T20:00:00.000Z",
-        "changePercent": 1.0392232126355978,
+        "price": 708.01,
+        "priceAsOf": "2026-09-04T20:00:00.000Z",
+        "changePercent": -0.38130346690680383,
         "priceSource": "last-close",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-09-03T20:00:00.000Z"
+        "priceUpdatedAt": "2026-09-04T20:00:00.000Z"
       },
       {
         "symbol": "QQQM",
@@ -3296,12 +3463,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 295.51,
-        "priceAsOf": "2026-09-03T20:00:00.000Z",
-        "changePercent": 1.1951236216697518,
+        "price": 296.07,
+        "priceAsOf": "2026-09-04T20:00:00.000Z",
+        "changePercent": 0.18950289330310388,
         "priceSource": "last-close",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-09-03T20:00:00.000Z"
+        "priceUpdatedAt": "2026-09-04T20:00:00.000Z"
       }
     ],
     "entries": [
@@ -3524,6 +3691,13 @@
         "marketValueUSD": 1525.886878,
         "pnlUSD": 23.232336,
         "returnPct": 1.546086
+      },
+      {
+        "date": "2026-09-05",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1523.512706,
+        "pnlUSD": 20.858164,
+        "returnPct": 1.388088
       }
     ]
   }
