@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-09-05T07:31:47.929Z",
+    "lastCloudSaveAt": "2026-09-05T07:33:34.881Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -30,7 +30,7 @@
       "shares": 4,
       "avgCost": 196.17201575,
       "sector": "AI基建",
-      "color": "#41d99a",
+      "color": "#21cf87",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
@@ -378,37 +378,6 @@
           "price": 34.55
         }
       ]
-    },
-    {
-      "id": "pos_mto2df4f_th0mcl",
-      "symbol": "NVD",
-      "name": "2倍做空英伟达",
-      "currency": "USD",
-      "source": "twelve",
-      "shares": 2000,
-      "avgCost": 4.753705,
-      "sector": "AI基建",
-      "color": "#21cf87",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "",
-      "costBasisUSD": 9507.41,
-      "lots": [
-        {
-          "lotId": "tx_mto2df42_cyxvpp",
-          "buyTransactionId": "tx_mto2df42_cyxvpp",
-          "date": "2026-09-05",
-          "order": 97,
-          "shares": 2000,
-          "remainingShares": 2000,
-          "costBasisUSD": 9507.41,
-          "remainingCostBasisUSD": 9507.41,
-          "costBasisNative": 9507.41,
-          "remainingCostBasisNative": 9507.41,
-          "currency": "USD",
-          "price": 4.75
-        }
-      ]
     }
   ],
   "transactions": [
@@ -431,7 +400,7 @@
       "migration": true,
       "sector": "AI基建",
       "source": "twelve",
-      "color": "#41d99a",
+      "color": "#21cf87",
       "schemaVersion": "10.6",
       "costBasisNative": 2152
     },
@@ -1021,7 +990,7 @@
       "schemaVersion": "10.6",
       "sector": "AI基建",
       "source": "twelve",
-      "color": "#41d99a",
+      "color": "#21cf87",
       "costBasisNative": 402.348063
     },
     {
@@ -1149,7 +1118,7 @@
       "schemaVersion": "10.6",
       "sector": "AI基建",
       "source": "twelve",
-      "color": "#41d99a",
+      "color": "#21cf87",
       "costBasisNative": 382.34
     },
     {
@@ -1788,7 +1757,7 @@
       "note": "",
       "source": "twelve",
       "sector": "AI基建",
-      "color": "#41d99a",
+      "color": "#21cf87",
       "schemaVersion": "10.48",
       "feeUSD": 0.39,
       "costBasisUSD": 2152,
@@ -3054,28 +3023,6 @@
       "costBasisNative": 5183.05,
       "grossUSD": 5182.5,
       "realizedPnlUSD": 0
-    },
-    {
-      "id": "tx_mto2df42_cyxvpp",
-      "date": "2026-09-05",
-      "type": "buy",
-      "symbol": "NVD",
-      "name": "2倍做空英伟达",
-      "shares": 2000,
-      "price": 4.75,
-      "currency": "USD",
-      "fxRate": 1,
-      "fee": 7.41,
-      "note": "",
-      "source": "twelve",
-      "sector": "AI基建",
-      "color": "#21cf87",
-      "schemaVersion": "10.48",
-      "feeUSD": 7.41,
-      "costBasisUSD": 9507.41,
-      "costBasisNative": 9507.41,
-      "grossUSD": 9500,
-      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -3435,9 +3382,9 @@
       "scope": "active",
       "date": "2026-09-05",
       "capital": 22370,
-      "netAsset": 24053.86,
-      "market": 31000.05,
-      "cash": -6946.19
+      "netAsset": 24061.27,
+      "market": 21500.05,
+      "cash": 2561.22
     }
   ],
   "dcaPlan": {
