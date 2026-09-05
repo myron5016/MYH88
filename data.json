@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-09-05T07:33:34.881Z",
+    "lastCloudSaveAt": "2026-09-05T07:44:40.132Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -3382,8 +3382,8 @@
       "scope": "active",
       "date": "2026-09-05",
       "capital": 22370,
-      "netAsset": 24061.27,
-      "market": 21500.05,
+      "netAsset": 24227.77,
+      "market": 21666.55,
       "cash": 2561.22
     }
   ],
