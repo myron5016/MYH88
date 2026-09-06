@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-09-05T07:44:40.132Z",
+    "lastCloudSaveAt": "2026-09-06T06:38:04.630Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -3385,6 +3385,14 @@
       "netAsset": 24227.77,
       "market": 21666.55,
       "cash": 2561.22
+    },
+    {
+      "scope": "active",
+      "date": "2026-09-06",
+      "capital": 22370,
+      "netAsset": 24227.77,
+      "market": 21666.55,
+      "cash": 2561.22
     }
   ],
   "dcaPlan": {
@@ -3641,6 +3649,13 @@
       },
       {
         "date": "2026-09-05",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1523.512706,
+        "pnlUSD": 20.858164,
+        "returnPct": 1.388088
+      },
+      {
+        "date": "2026-09-06",
         "costBasisUSD": 1502.654542,
         "marketValueUSD": 1523.512706,
         "pnlUSD": 20.858164,
