@@ -31,31 +31,6 @@ function autoRefreshPlan(){
   if(clock.isOpen||clock.phase==="open")return"盘中：自动实时刷新";
   return"休市：读取上个交易日收盘价";
 }
-function renderMarketAdminPanel(){
-  const box=$("marketAdminGrid");if(!box)return;
-  const live=[...new Set(state.positions.filter(p=>p.source==="twelve"&&p.symbol).map(p=>p.symbol))];
-  const manual=state.positions.filter(p=>p.source==="manual").map(p=>p.symbol).filter(Boolean);
-  const sourceCounts=quoteSourceSummary();
-  const health=workerHealth||{};
-  const twelveConfigured=health.providers?.twelve??health.secretConfigured;
-  const finnhubConfigured=health.providers?.finnhub??health.finnhubConfigured;
-  const clock=marketClockState||marketClock();
-  const checked=health.checkedAt?new Date(health.checkedAt).toLocaleTimeString("zh-CN",{hour:"2-digit",minute:"2-digit",second:"2-digit"}):"未检测";
-  const last=state.settings.lastPriceRefreshText||"暂无";
-  box.innerHTML=[
-    ["行情来源",marketRouteLabel(),lastQuoteCache?`缓存头：${lastQuoteCache}`:"等待下一次刷新"],
-    ["来源分布",`TWE ${sourceCounts.twe} / FIN ${sourceCounts.fin} / 收盘 ${sourceCounts.close}` ,`手填 ${sourceCounts.manual} / 静态 ${sourceCounts.static} / 待刷新 ${sourceCounts.pending}`],
-    ["美股时钟",marketClockDisplay(clock),clock.source==="finnhub"?"Finnhub 实时状态":"本地休市表兜底"],
-    ["自动刷新",autoRefreshPlan(),clock.isOpen?"盘中会主动消耗额度":"非盘中不自动消耗额度"],
-    ["实时标的",`${live.length} 只`,live.join(", ")||"无"],
-    ["手动资产",manual.length?manual.join(", "):"无","手动资产不消耗行情 API"],
-    ["EUR/USD",round(state.fxRates.EUR||defaultState.fxRates.EUR,6),"手动汇率，不请求 TWE 汇率接口"],
-    ["Worker",health.ok===undefined?"未检测":yesNo(health.ok),`V${health.version||"?"} / TWE ${twelveConfigured?"已配":"未配"} / FIN ${finnhubConfigured?"已配":"未配"} / KV ${health.sharedCache?"已启用":"未启用"} / ${checked}`],
-    ["行情分配",health.routing?`TWE ${health.routing.twelve?.length||0} / FIN ${health.routing.finnhub?.length||0}`:"等待检测",health.routing?`TWE：${health.routing.twelve?.join(", ")||"无"}；FIN：${health.routing.finnhub?.join(", ")||"无"}`:"固定优先级和逐股缓存"],
-    ["部署指纹",deploymentFingerprint().mismatch?"版本不一致":"版本一致",deploymentFingerprint().label],
-    ["最近刷新",last,lastQuoteWarnings?`警告：${lastQuoteWarnings}`:"暂无行情警告"]
-  ].map(([title,value,detail])=>`<div class="market-admin-item"><span>${escapeHtml(title)}</span><strong>${escapeHtml(value)}</strong><small>${escapeHtml(detail)}</small></div>`).join("");
-}
 function sectorPositions(label){return state.positions.filter(p=>normalizeSectorName(p.sector)===label)}
 function renderSectorAdminPanel(){
   const box=$("sectorRuleGrid");if(!box)return;
@@ -126,9 +101,10 @@ async function fetchJson(url,options={}){
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),options.timeout||FETCH_TIMEOUT_MS);
   try{
     const r=await fetch(url,{cache:"no-store",credentials:"omit",...options,signal:controller.signal});
-    if(!r.ok)throw new Error("网络错误 "+r.status);
+    if(!r.ok)throw await quoteHttpError(r);
     return r.json();
   }catch(error){
+    if(error?.status)throw error;
     throw new Error(friendlyFetchError(error));
   }finally{
     clearTimeout(timer);
@@ -138,9 +114,10 @@ async function fetchJsonWithHeaders(url,options={}){
   const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),options.timeout||FETCH_TIMEOUT_MS);
   try{
     const r=await fetch(url,{cache:"no-store",credentials:"omit",...options,signal:controller.signal});
-    if(!r.ok)throw new Error("网络错误 "+r.status);
+    if(!r.ok)throw await quoteHttpError(r);
     return{data:await r.json(),headers:r.headers};
   }catch(error){
+    if(error?.status)throw error;
     throw new Error(friendlyFetchError(error));
   }finally{
     clearTimeout(timer);
@@ -245,12 +222,16 @@ async function fetchQuoteBatchResilient(symbols,mode="live"){
   const proxies=priceProxyUrls();
   if(!proxies.length)throw new Error("Missing Cloudflare Worker price proxy URL");
   for(const proxy of proxies){
+    const started=Date.now();
     try{
       const modeParam=mode==="last-close"?"&mode=last-close":"&cache=only";
       const meta=await fetchJsonWithHeaders(`${proxy}/quotes?symbols=${encodeURIComponent(symbols.join(","))}${modeParam}`,{timeout:PROXY_TIMEOUT_MS});
       const res=meta.data;
       lastQuoteCache=meta.headers.get("X-MYH88-Cache")||"";
       lastQuoteWarnings=meta.headers.get("X-MYH88-Warnings")||"";
+      const rejected=(meta.headers.get("X-MYH88-Rejected-Symbols")||"").split(",").filter(Boolean);
+      rejected.forEach(symbol=>{quoteIssues[symbol]="持仓名单尚未同步，保留原价"});
+      recordQuoteRequest({symbols,mode,status:200,elapsed:Date.now()-started,cache:lastQuoteCache,error:rejected.length?`名单待同步：${rejected.join(", ")}`:lastQuoteWarnings});
       const sourceHeader=String(meta.headers.get("X-MYH88-Source")||"").toLowerCase();
       if(sourceHeader)lastMarketProvider=sourceHeader;
       if(res.code||res.status==="error")throw new Error(res.message||"Quote proxy error");
@@ -258,6 +239,8 @@ async function fetchQuoteBatchResilient(symbols,mode="live"){
       return res;
     }catch(error){
       lastError=error;
+      recordQuoteRequest({symbols,mode,status:error.status||"未收到响应",elapsed:Date.now()-started,error:friendlyFetchError(error)});
+      if(error.status===400||error.status===429)break;
     }
   }
   try{
@@ -280,19 +263,25 @@ async function refreshPricesSmart(){const clock=await refreshMarketClock();retur
 function refreshPricesForced(){return refreshPrices(false)}
 async function refreshAutomaticQuoteGroups(mode="live"){
   const providers=new Set(),routes=new Set(),errors=[];let updated=0;
+  lastMarketError="";lastQuoteWarnings="";
   for(const items of automaticQuoteGroups()){
     const symbols=[...new Set(items.map(item=>item.symbol))];
+    symbols.forEach(symbol=>{delete quoteIssues[symbol]});
     try{
       const res=await fetchQuoteBatchResilient(symbols,mode);routes.add(lastMarketRoute);
       items.forEach(item=>{
-        const quote=symbols.length===1?res:res[item.symbol],provider=String(quote?.source||(mode==="last-close"?"last-close":"twelve")).toLowerCase(),price=num(quote?.close||quote?.price);
-        if(!(price>0))return;
-        item.price=price;item.changePercent=num(quote?.percent_change);item.priceSource=mode==="last-close"?"last-close":(provider==="static"?"static":provider);item.priceProvider=provider;
-        item.priceUpdatedAt=quote?.as_of||quote?.datetime||quote?.last_quote_at||new Date().toISOString();item.priceAsOf=item.priceUpdatedAt;
+        const quote=res[item.symbol]||(symbols.length===1?res:null),provider=String(quote?.source||(mode==="last-close"?"last-close":"twelve")).toLowerCase(),price=num(quote?.close||quote?.price);
+        if(!(price>0)){quoteIssues[item.symbol]||="本次未返回有效价格，保留原价";return}
+        delete quoteIssues[item.symbol];
+        item.price=price;item.changePercent=num(quote?.percent_change);item.priceSource=lastMarketRoute==="static"?"static":mode==="last-close"?"last-close":provider;item.priceProvider=provider;
+        const stamp=quote?.last_quote_at||quote?.as_of||quote?.datetime||quote?.timestamp;
+        item.priceUpdatedAt=typeof stamp==="number"?new Date(stamp*1000).toISOString():(stamp||"");item.priceAsOf=item.priceUpdatedAt;
         if(provider)providers.add(provider);updated++;
       });
-    }catch(error){errors.push(error)}
+    }catch(error){errors.push(error);symbols.forEach(symbol=>{quoteIssues[symbol]=friendlyFetchError(error)})}
   }
+  const missing=Object.keys(quoteIssues).filter(symbol=>automaticQuoteGroups().flat().some(item=>item.symbol===symbol));
+  if(missing.length)lastQuoteWarnings=[lastQuoteWarnings,`未更新：${missing.join(", ")}，保留原价`].filter(Boolean).join("; ");
   if(!updated)throw errors[0]||new Error("No valid quotes returned");
   if(routes.has("proxy"))lastMarketRoute=routes.size>1?"mixed-cache":"proxy";
   else if(routes.has("fallback"))lastMarketRoute=routes.size>1?"mixed-cache":"fallback";
@@ -302,7 +291,12 @@ async function refreshAutomaticQuoteGroups(mode="live"){
   if(errors.length){const warning=errors.map(friendlyFetchError).join("; ");lastQuoteWarnings=[lastQuoteWarnings,warning].filter(Boolean).join("; ");lastMarketError=warning}
   return updated;
 }
-async function refreshLastClosePrices(clock=marketClockState||marketClock()){
+function refreshLastClosePrices(clock=marketClockState||marketClock()){
+  if(priceRefreshPromise)return priceRefreshPromise;
+  priceRefreshPromise=doRefreshLastClosePrices(clock).finally(()=>{priceRefreshPromise=null});
+  return priceRefreshPromise;
+}
+async function doRefreshLastClosePrices(clock=marketClockState||marketClock()){
   const status=$("status"),button=$("refreshButton");
   if(!navigator.onLine||!priceProxyUrl()){
     lastMarketRoute="cache";applyPriceCache();renderAll();
@@ -316,9 +310,9 @@ async function refreshLastClosePrices(clock=marketClockState||marketClock()){
       if(lastMarketRoute!=="static"&&lastMarketRoute!=="mixed-cache")lastMarketRoute="last-close";
     }else lastMarketRoute="last-close";
     state.settings.lastPriceRefresh=Date.now();state.settings.lastPriceRefreshText=new Date().toLocaleString("zh-CN");savePriceCache();
-    captureSnapshot(false);
+    if(lastMarketRoute!=="static"&&!lastQuoteWarnings)captureSnapshot(false);else saveLocal();
     renderAll();
-    if(status)status.textContent=`${marketClockDisplay(clock)}；已使用上个交易日收盘价`;
+    if(status)status.textContent=`${marketClockDisplay(clock)}；${lastQuoteWarnings?`部分行情需注意：${lastQuoteWarnings}`:lastMarketRoute==="static"?"正在使用静态历史价格":"已使用上个交易日收盘价"}`;
   }catch(error){
     lastMarketRoute="cache";applyPriceCache();renderAll();
     if(status)status.textContent=`${marketClockDisplay(clock)}；收盘价读取失败，显示本机历史价格：${friendlyFetchError(error)}`;
@@ -340,8 +334,9 @@ async function doRefreshPrices(useCache=true){
     try{await refreshFx(false)}catch(error){console.warn("FX refresh failed; keep cached rates",error);state.fxRates={...state.fxRates,...(getFxCache()?.fxRates||{}),USD:1}}
     if(automaticQuoteGroups().length)await refreshAutomaticQuoteGroups("live");
     state.settings.lastPriceRefresh=Date.now();state.settings.lastPriceRefreshText=new Date().toLocaleString("zh-CN");savePriceCache();
-    if(lastMarketRoute!=="static")captureSnapshot(false);else saveLocal();
+    if(lastMarketRoute!=="static"&&!lastQuoteWarnings)captureSnapshot(false);else saveLocal();
     renderAll();status.textContent=lastMarketRoute==="static"?`代理行情失败，已临时使用静态缓存：${lastMarketError}`:(isAdminMode?"已刷新："+state.settings.lastPriceRefreshText+"。保存到 GitHub 后家人可见":"已刷新："+state.settings.lastPriceRefreshText+"。本次价格已缓存在本设备");
+    if(lastQuoteWarnings)status.textContent=`部分行情需注意：${lastQuoteWarnings}`;
   }catch(error){lastMarketRoute="failed";applyPriceCache();renderAll();status.textContent="代理行情暂时不可用，已保留最近缓存行情："+friendlyFetchError(error);if(!useCache&&isAdminMode)alert(status.textContent)}finally{renderDiagnostics();if(button)button.disabled=false}
 }
 function saveAdminSettings(showAlert=true){admin={owner:$("ghOwner").value.trim(),repo:$("ghRepo").value.trim(),branch:$("ghBranch").value.trim()||"main",token:$("ghToken").value.trim()};sessionStorage.setItem("v9_admin",JSON.stringify(admin));if(showAlert){alert("管理员设置已保存到当前浏览器会话");if(admin.owner&&admin.repo&&admin.token)checkCloudStatus(false)}}

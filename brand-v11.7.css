@@ -138,6 +138,10 @@ body::before { display: none !important; }
 .map-holding-table thead, .position-table thead, .ledger-table thead { background: #edf7f1; color: var(--v117-green-deep); }
 .map-holding-table tbody tr:hover, .position-table tbody tr:hover, .ledger-table tbody tr:hover { background: #f4fbf7; }
 .position-table td, .position-table th, .map-holding-table td, .map-holding-table th { border-color: var(--v117-line) !important; }
+#quoteDiagnosticDetails h3 { font-size: 16px; margin: 20px 0 10px; }
+.quote-diagnostic-scroll { max-width: 100%; overflow-x: auto; }
+.quote-diagnostic-scroll table { width: 100%; min-width: 620px; border-collapse: collapse; }
+.quote-diagnostic-scroll th, .quote-diagnostic-scroll td { padding: 10px; border-bottom: 1px solid var(--v117-line); text-align: left; font-size: 12px; overflow-wrap: anywhere; }
 .position-table .asset-cell strong, .map-holding-table .position-code strong { color: var(--v117-ink); }
 .position-table .asset-cell small, .map-holding-table small, .muted { color: var(--v117-muted) !important; }
 

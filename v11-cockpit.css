@@ -135,7 +135,9 @@ button,.file-btn,input,select{border-radius:5px}
 .map-holding-table tbody tr:nth-child(even) td{background:#fbfdfc}
 .map-holding-table tbody tr:hover td{background:#f1f8f4}
 .map-holding-table tr:last-child td{border-bottom:0}
-.map-holding-table td.position-code{display:flex!important;grid-template-columns:none!important;align-items:center;gap:8px;min-width:0}
+.map-holding-table td.position-code{display:table-cell!important;vertical-align:middle;min-width:0}
+.map-holding-table td.position-code .position-logo{display:inline-flex;vertical-align:middle;margin-right:8px}
+.map-holding-table td.position-code>strong{display:inline!important;vertical-align:middle}
 .map-holding-table td.position-code strong{display:block;min-width:max-content;font-size:11px;color:#18372d}
 .map-holding-table .position-logo{display:inline-flex;width:28px;height:28px;flex:0 0 28px}
 .map-holding-table .position-logo .company-logo-card{width:28px;height:28px;min-width:28px;padding:4px;border:1px solid #dce9e2;border-radius:6px;box-shadow:0 2px 7px rgba(7,26,23,.08);background:#fff}

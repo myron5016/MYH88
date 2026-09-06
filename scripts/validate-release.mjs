@@ -12,6 +12,7 @@ const scriptParts = new Map([
   ["script.part4.js", "11.7.1"],
   ["script.part5.js", "11.6.0"],
   ["script.part6.js", "11.7.2"],
+  ["quote-diagnostics.js", "11.7.2.1"],
 ]);
 const files = Object.fromEntries(await Promise.all(
   ["index.html", "service-worker.js", "cloudflare-worker.js", "myh88-core.js", ...scriptParts.keys()]

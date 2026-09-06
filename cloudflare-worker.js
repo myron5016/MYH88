@@ -37,7 +37,7 @@ const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Expose-Headers": "X-MYH88-Cache, X-MYH88-Source, X-MYH88-Fallback-Reason, X-MYH88-Warnings, X-MYH88-As-Of",
+  "Access-Control-Expose-Headers": "X-MYH88-Cache, X-MYH88-Source, X-MYH88-Fallback-Reason, X-MYH88-Warnings, X-MYH88-As-Of, X-MYH88-Rejected-Symbols",
   "Cache-Control": `public, max-age=${CACHE_SECONDS}, stale-while-revalidate=${STALE_SECONDS}`,
 };
 const NO_STORE_CACHE_CONTROL = "no-store, no-cache, must-revalidate, max-age=0";
@@ -155,7 +155,14 @@ async function livePortfolioSymbols(env) {
     const symbols = portfolioSymbolsFromData(data);
     if (!symbols.length) throw new Error("No portfolio symbols in data.json");
     const response = json({ symbols }, 200); await writeSharedCache(env, key, response, PORTFOLIO_CACHE_SECONDS * 3); return symbols;
-  } catch (error) { log("portfolio_config_fallback", { message: error.message }); return FALLBACK_PORTFOLIO_SYMBOLS; }
+  } catch (error) {
+    log("portfolio_config_fallback", { message: error.message });
+    // A network failure must not replace a verified portfolio with a static old list.
+    if (cached?.body) {
+      try { const symbols = normalizeSymbols(JSON.parse(cached.body).symbols.join(",")); if (symbols.length) return symbols; } catch {}
+    }
+    throw new Error("Portfolio configuration unavailable; please retry later");
+  }
 }
 function normalizeFinnhubQuote(symbol, data) {
   const close = Number(data.c || 0), previous = Number(data.pc || close || 0), change = close && previous ? close - previous : 0;
@@ -491,14 +498,22 @@ export default {
       if (path !== "/quotes") return noStoreJson({ error: "Not found" }, 404);
       const requested = normalizeSymbols(url.searchParams.get("symbols")); if (!requested.length) return noStoreJson({ error: "Missing symbols" }, 400);
       const portfolio = await livePortfolioSymbols(env), blocked = requested.filter((symbol) => !portfolio.includes(symbol));
-      if (blocked.length) return noStoreJson({ error: "Only current portfolio symbols may be requested", symbols: blocked }, 400);
+      const accepted = requested.filter((symbol) => portfolio.includes(symbol));
+      if (!accepted.length) return noStoreJson({ error: "Only current portfolio symbols may be requested", code: "PORTFOLIO_SYMBOLS_PENDING", symbols: blocked }, 400);
       const mode = String(url.searchParams.get("mode") || "live").toLowerCase(); if (mode !== "live" && mode !== "last-close" && mode !== "historical-close") return noStoreJson({ error: "Unsupported quote mode" }, 400);
       if (mode === "historical-close") {
+        if (blocked.length) return noStoreJson({ error: "Only current portfolio symbols may be requested", code: "PORTFOLIO_SYMBOLS_PENDING", symbols: blocked }, 400);
         const date = String(url.searchParams.get("date") || "");
         if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !isTradingDate(date) || date > previousTradingDate()) return noStoreJson({ error: "Invalid historical trading date" }, 400);
         return fetchHistoricalCloseWithCache(env, ctx, portfolio, requested, date);
       }
-      return fetchQuotesWithCache(request, env, ctx, portfolio, requested, mode);
+      const response = await fetchQuotesWithCache(request, env, ctx, portfolio, accepted, mode);
+      if (blocked.length) {
+        response.headers.set("X-MYH88-Rejected-Symbols", blocked.join(","));
+        response.headers.set("X-MYH88-Warnings", safeHeaderValue([response.headers.get("X-MYH88-Warnings"), `Portfolio symbols pending: ${blocked.join(",")}`].filter(Boolean).join(" | ")));
+        response.headers.set("Cache-Control", NO_STORE_CACHE_CONTROL);
+      }
+      return response;
     } catch (error) { log("worker_error", { path, message: error.message || String(error) }); return noStoreJson({ error: error.message || "Proxy failed" }, 502); }
   },
 };
