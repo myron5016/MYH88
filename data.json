@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-09-18T07:40:13.484Z",
+    "lastCloudSaveAt": "2026-09-18T09:29:14.165Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -3027,6 +3027,63 @@
       "costBasisNative": 5056.85,
       "grossUSD": 5375,
       "realizedPnlUSD": 315.58999999999924
+    },
+    {
+      "id": "tx_mu6r907r_aahg3q",
+      "date": "2026-08-27",
+      "type": "buy",
+      "symbol": "NVD",
+      "name": "2倍做空英伟达",
+      "shares": 2000,
+      "price": 4.75,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 7.41,
+      "note": "",
+      "source": "twelve",
+      "sector": "AI基建",
+      "color": "#21cf87",
+      "schemaVersion": "10.48",
+      "feeUSD": 7.41,
+      "costBasisUSD": 9507.41,
+      "costBasisNative": 9507.41,
+      "grossUSD": 9500,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mu6ra5du_d95945",
+      "date": "2026-09-16",
+      "type": "sell",
+      "symbol": "NVD",
+      "name": "2倍做空英伟达",
+      "shares": 2000,
+      "price": 4.14,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 7.97,
+      "note": "",
+      "source": "twelve",
+      "sector": "AI基建",
+      "color": "#21cf87",
+      "schemaVersion": "10.48",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mu6r907r_aahg3q",
+          "buyTransactionId": "tx_mu6r907r_aahg3q",
+          "date": "2026-08-27",
+          "shares": 2000,
+          "unitCostUSD": 4.753705,
+          "unitCostNative": 4.753705,
+          "costBasisUSD": 9507.41,
+          "costBasisNative": 9507.41
+        }
+      ],
+      "feeUSD": 7.97,
+      "costBasisUSD": 9507.41,
+      "costBasisNative": 9507.41,
+      "grossUSD": 8280,
+      "realizedPnlUSD": -1235.3799999999992
     }
   ],
   "cashFlows": [
@@ -3434,9 +3491,9 @@
       "scope": "active",
       "date": "2026-09-18",
       "capital": 22370,
-      "netAsset": 24073.91,
+      "netAsset": 22838.53,
       "market": 16140.25,
-      "cash": 7933.66
+      "cash": 6698.28
     }
   ],
   "dcaPlan": {
