@@ -15,6 +15,9 @@ const PORTFOLIO_CACHE_SECONDS = 5 * 60;
 const PROVIDER_BACKOFF_SECONDS = 75;
 const FINNHUB_BACKOFF_SECONDS = 90;
 const TWELVE_BATCH_LIMIT = 8;
+const LOGO_PROFILE_TTL_SECONDS = 30 * 24 * 60 * 60;
+const LOGO_MISSING_TTL_SECONDS = 24 * 60 * 60;
+const LOGO_BATCH_LIMIT = 24;
 const SCHEDULED_BUNDLE_KEY = "quotes:scheduled:current:v1";
 const SCHEDULED_BUNDLE_TTL_SECONDS = 24 * 60 * 60;
 const TWELVE_BASE = "https://api.twelvedata.com";
@@ -27,6 +30,8 @@ const US_MARKET_CLOSE_MIN = 16 * 60;
 const US_EARLY_CLOSE_MIN = 13 * 60;
 const FALLBACK_PORTFOLIO_SYMBOLS = ["NVDA", "MRVL", "AAOI", "XFAB", "RKLB", "VRT", "SPCX", "GOOGL", "LITE", "MU", "VOO", "QQQM"];
 const DEFAULT_TWELVE_PRIORITY = ["NVDA", "RKLB", "SPCX", "GOOGL", "MU", "MRVL", "AAOI", "TSLA"];
+const VERIFIED_LOGO_OVERRIDES = Object.create(null);
+const LOGO_SUPPRESSIONS = new Set(["MSTU"]);
 const US_STATIC_HOLIDAYS = {
   "2026-01-01": "New Year's Day", "2026-01-19": "Martin Luther King Jr. Day", "2026-02-16": "Presidents' Day", "2026-04-03": "Good Friday", "2026-05-25": "Memorial Day", "2026-06-19": "Juneteenth", "2026-07-03": "Independence Day observed", "2026-09-07": "Labor Day", "2026-11-26": "Thanksgiving Day", "2026-12-25": "Christmas Day",
   "2027-01-01": "New Year's Day", "2027-01-18": "Martin Luther King Jr. Day", "2027-02-15": "Presidents' Day", "2027-03-26": "Good Friday", "2027-05-31": "Memorial Day", "2027-06-18": "Juneteenth observed", "2027-07-05": "Independence Day observed", "2027-09-06": "Labor Day", "2027-11-25": "Thanksgiving Day", "2027-12-24": "Christmas Day observed",
@@ -69,6 +74,39 @@ function quoteCacheKey(symbol, mode = "live", asOf = "") {
   const ticker = normalizeSymbols(symbol)[0] || "";
   if (mode === "historical-close") return `quote:historical:${asOf}:${ticker}`;
   return mode === "last-close" ? `quote:last-close:${asOf}:${ticker}` : `quote:live:${ticker}`;
+}
+function logoProfileCacheKey(symbol) {
+  return `logo:profile:v1:${normalizeSymbols(symbol)[0] || ""}`;
+}
+function missingLogoRecord(symbol) {
+  return { symbol, status: "missing", source: "finnhub" };
+}
+function normalizeLogoProfile(symbol, profile = {}) {
+  const ticker = normalizeSymbols(symbol)[0] || "";
+  const missing = missingLogoRecord(ticker);
+  if (!ticker || !profile || typeof profile !== "object") return missing;
+  let upstream;
+  try { upstream = new URL(String(profile.logo || "")); } catch { return missing; }
+  const hasOperatingCompanyEvidence = Number(profile.marketCapitalization || 0) > 0
+    || (String(profile.ipo || "").trim() && String(profile.finnhubIndustry || "").trim());
+  if (upstream.protocol !== "https:" || !hasOperatingCompanyEvidence) return missing;
+  return {
+    symbol: ticker,
+    status: "verified",
+    source: "finnhub",
+    name: String(profile.name || ticker).trim() || ticker,
+    upstreamUrl: upstream.toString(),
+  };
+}
+function publicLogoRecord(record) {
+  if (record?.status !== "verified") return { symbol: record.symbol, status: "missing", source: record.source || "finnhub" };
+  return {
+    symbol: record.symbol,
+    status: "verified",
+    source: record.source,
+    name: record.name,
+    path: `/logo/${encodeURIComponent(record.symbol)}`,
+  };
 }
 function nyParts(date = new Date()) {
   const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", { timeZone: US_MARKET_TZ, weekday: "short", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(date).filter((x) => x.type !== "literal").map((x) => [x.type, x.value]));
@@ -133,6 +171,46 @@ async function fetchJsonUpstream(url, timeoutMs = 8000) {
     if (!response.ok || data.code || data.status === "error") throw new Error(safeHeaderValue(data.message || data.error || text.slice(0, 160) || `Upstream error ${response.status}`, 320));
     return data;
   } finally { clearTimeout(timer); }
+}
+async function resolveLogoProfiles(env, symbols) {
+  const requested = normalizeSymbols(Array.isArray(symbols) ? symbols.join(",") : symbols);
+  const resolved = {};
+  await Promise.all(requested.map(async (symbol) => {
+    const key = logoProfileCacheKey(symbol);
+    const cached = await readSharedCache(env, key);
+    if (cached?.symbol === symbol && (cached.status === "verified" || cached.status === "missing")) {
+      resolved[symbol] = cached;
+      return;
+    }
+
+    let record;
+    if (LOGO_SUPPRESSIONS.has(symbol)) {
+      record = missingLogoRecord(symbol);
+    } else if (VERIFIED_LOGO_OVERRIDES[symbol]) {
+      const override = VERIFIED_LOGO_OVERRIDES[symbol];
+      record = {
+        symbol,
+        status: "verified",
+        source: "override",
+        name: String(override.name || symbol).trim() || symbol,
+        upstreamUrl: String(override.upstreamUrl || ""),
+      };
+    } else {
+      if (!String(env.FINNHUB_API_KEY || "").trim()) throw new Error("FINNHUB_API_KEY is not configured");
+      const url = new URL(`${FINNHUB_BASE}/stock/profile2`);
+      url.searchParams.set("symbol", symbol);
+      url.searchParams.set("token", env.FINNHUB_API_KEY);
+      record = normalizeLogoProfile(symbol, await fetchJsonUpstream(url));
+    }
+
+    const stored = { ...record, cachedAt: Date.now() };
+    resolved[symbol] = stored;
+    if (env.MYH88_CACHE) {
+      const ttl = stored.status === "verified" ? LOGO_PROFILE_TTL_SECONDS : LOGO_MISSING_TTL_SECONDS;
+      await env.MYH88_CACHE.put(key, JSON.stringify(stored), { expirationTtl: ttl });
+    }
+  }));
+  return resolved;
 }
 function portfolioSymbolsFromData(data = {}) {
   return normalizeSymbols([
@@ -495,6 +573,19 @@ export default {
       }
       if (path === "/market-clock") return fetchMarketClockWithCache(env, ctx);
       if (path === "/fx") return noStoreJson({ error: "FX proxy is disabled. Exchange rates are managed manually in the ledger." }, 404);
+      if (path === "/logos") {
+        const requested = normalizeSymbols(url.searchParams.get("symbols"));
+        if (!requested.length) return noStoreJson({ error: "Missing symbols" }, 400);
+        if (requested.length > LOGO_BATCH_LIMIT) return noStoreJson({ error: `A maximum of ${LOGO_BATCH_LIMIT} symbols may be requested` }, 400);
+        const portfolio = await livePortfolioSymbols(env);
+        const allowed = requested.filter((symbol) => portfolio.includes(symbol));
+        const records = await resolveLogoProfiles(env, allowed);
+        const logos = Object.fromEntries(requested.map((symbol) => [
+          symbol,
+          publicLogoRecord(records[symbol] || missingLogoRecord(symbol)),
+        ]));
+        return noStoreJson({ logos }, 200);
+      }
       if (path !== "/quotes") return noStoreJson({ error: "Not found" }, 404);
       const requested = normalizeSymbols(url.searchParams.get("symbols")); if (!requested.length) return noStoreJson({ error: "Missing symbols" }, 400);
       const portfolio = await livePortfolioSymbols(env), blocked = requested.filter((symbol) => !portfolio.includes(symbol));
@@ -518,4 +609,4 @@ export default {
   },
 };
 
-export { buildProviderPlan, currentPortfolioSymbolsFromData, localMarketClock, portfolioSymbolsFromData, previousTradingDate, quoteCacheKey, refreshScheduledQuotes };
+export { VERIFIED_LOGO_OVERRIDES, buildProviderPlan, currentPortfolioSymbolsFromData, localMarketClock, logoProfileCacheKey, normalizeLogoProfile, portfolioSymbolsFromData, previousTradingDate, quoteCacheKey, refreshScheduledQuotes, resolveLogoProfiles };
