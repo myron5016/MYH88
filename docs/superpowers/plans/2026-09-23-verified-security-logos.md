@@ -1,70 +1,73 @@
-# Verified Security Logos Implementation Plan
+# 真实证券 Logo 实施计划
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **供自动化开发代理使用：** 必须按任务逐项执行，并使用 `superpowers:subagent-driven-development`（推荐）或 `superpowers:executing-plans` 技能。所有步骤均使用复选框跟踪。
 
-**Goal:** Replace approximate and hard-coded holding logos with automatically resolved, verified logos while keeping a safe ticker fallback for every unsupported security.
+**目标：** 用自动解析且经过验证的真实 Logo 替代近似图和硬编码持仓 Logo，同时为所有不支持的证券保留安全、清晰的股票代码回退。
 
-**Architecture:** The existing Cloudflare Worker resolves Finnhub company profiles and caches verified metadata in `MYH88_CACHE`; a constrained image route proxies only URLs that came from that metadata. A small browser resolver batches current symbols, hydrates both map and table logo slots, and leaves ticker initials visible whenever resolution or loading fails.
+**架构：** 现有 Cloudflare Worker 负责解析 Finnhub 公司资料，并把经过验证的元数据缓存在 `MYH88_CACHE`；受限图片接口只代理这些元数据中已确认的地址。浏览器端新增一个小型解析器，批量获取当前持仓 Logo，同时更新持仓地图和表格；任何解析或加载失败都继续显示股票代码缩写。
 
-**Tech Stack:** Cloudflare Workers ES modules, Cloudflare KV and Cache API, vanilla browser JavaScript, Cloudflare Pages Functions, Node.js 20 built-in test runner.
+**技术栈：** Cloudflare Workers ES Modules、Cloudflare KV 与 Cache API、原生浏览器 JavaScript、Cloudflare Pages Functions、Node.js 20 内置测试框架。
 
-**Spec:** `docs/plans/2026-09-23-verified-security-logos-design.md`
+**设计文档：** `docs/plans/2026-09-23-verified-security-logos-design.md`
 
-## Global Constraints
+## 全局约束
 
-- Display a logo only from Finnhub company-profile data or an explicit reviewed override.
-- Do not substitute an ETF issuer logo when the product logo is unavailable.
-- Keep the `FINNHUB_API_KEY` exclusively in the Worker environment.
-- Require HTTPS, reject private/local hosts, accept only image content, and cap proxied images at 512 KiB.
-- Cache successful metadata for 30 days and missing metadata for 24 hours.
-- Keep `CASH` as the only local app-owned logo; unresolved listed securities show ticker initials.
-- A new saved holding must resolve without a code deployment.
+- 只展示来自 Finnhub 公司资料或人工核验例外配置的 Logo。
+- ETF 产品 Logo 不可用时，不得用发行商 Logo 替代。
+- `FINNHUB_API_KEY` 只能存在于 Worker 环境中。
+- 强制使用 HTTPS，拒绝本地或私有地址，只接受图片内容，并把代理图片限制在 512 KiB 以内。
+- 成功元数据缓存 30 天，缺失元数据缓存 24 小时。
+- `CASH` 是唯一保留的应用自有 Logo；无法解析的上市证券显示股票代码缩写。
+- 保存后的新持仓必须能自动解析，无需重新部署代码。
 
-## Review Focus
+## 重点审查项
 
-- Symbols containing dots or hyphens must remain valid but path traversal and encoded slashes must be rejected; Task 2 pins both cases.
-- A provider may return a company profile with an empty or malformed `logo`; Task 1 must cache this as `missing`, not `verified`.
-- The upstream image can claim an acceptable `Content-Length` and still exceed 512 KiB; Task 2 checks the actual byte length.
-- Map and table can request the same symbol during one render cycle; Task 3 verifies one metadata request and hydration of every matching slot.
-- A newly added unsaved position is not yet in the server portfolio allowlist; Task 3 verifies it remains a readable ticker fallback until the next successful data save/deploy.
+- 带点号或连字符的证券代码必须有效，但路径穿越和编码斜杠必须被拒绝；任务 2 覆盖这两类输入。
+- 提供商可能返回资料记录但 `logo` 为空或格式错误；任务 1 必须将其缓存为 `missing`，不能标记为 `verified`。
+- 上游可能声明合规的 `Content-Length`，实际响应却超过 512 KiB；任务 2 同时检查实际字节数。
+- 地图和表格可能在同一渲染周期请求同一代码；任务 3 验证只发送一次元数据请求，并更新所有匹配位置。
+- 刚新增但尚未保存的持仓还不在服务端持仓白名单中；任务 3 验证其在下次成功保存和部署前保持可读的代码回退。
 
 ---
 
-## File Structure
+## 文件职责
 
-- `cloudflare-worker.js`: add metadata normalization, KV resolution, trusted image proxying, and two routes.
-- `functions/api/[[path]].js`: forward `logos` and `logo/:symbol` through the same-origin Pages bridge without converting image responses to JSON.
-- `security-logo.js`: isolated browser-side batching, cache, DOM hydration, and image-failure fallback.
-- `script.part3.js`: render inert logo slots and invoke the shared resolver; remove approximate logo maps.
-- `index.html`: load `security-logo.js` before `script.part3.js` and bump affected asset fingerprints.
-- `service-worker.js`: cache the new runtime file and bump the shell cache identifier.
-- `tests/security-logo-worker.test.mjs`: Worker metadata and image security behavior.
-- `tests/security-logo.test.mjs`: browser resolver behavior with a minimal DOM fixture.
-- `tests/same-origin-proxy.test.mjs`: Pages bridge routing and binary response assertions.
-- `tests/brand-v11.7.test.mjs`: release fingerprint and removal of approximate-logo mappings.
+- `cloudflare-worker.js`：增加元数据规范化、KV 解析、可信图片代理和两条新路由。
+- `functions/api/[[path]].js`：通过同源 Pages 桥接转发 `logos` 与 `logo/:symbol`，且不把图片响应转换成 JSON。
+- `security-logo.js`：隔离浏览器端批量请求、缓存、DOM 更新和图片失败回退逻辑。
+- `script.part3.js`：渲染惰性 Logo 位置并调用共享解析器，删除近似 Logo 映射。
+- `index.html`：在 `script.part3.js` 之前加载 `security-logo.js`，并更新受影响资源指纹。
+- `service-worker.js`：缓存新运行时文件并更新应用壳缓存版本。
+- `tests/security-logo-worker.test.mjs`：验证 Worker 元数据和图片安全行为。
+- `tests/security-logo.test.mjs`：使用最小 DOM 测试浏览器解析器。
+- `tests/same-origin-proxy.test.mjs`：验证 Pages 桥接路由和二进制响应。
+- `tests/brand-v11.7.test.mjs`：验证发布指纹并确认近似 Logo 映射已移除。
 
-### Task 1: Verified metadata resolution and KV caching
+### 任务 1：真实 Logo 元数据解析与 KV 缓存
 
-**Files:**
-- Modify: `cloudflare-worker.js:1-150,465-510`
-- Create: `tests/security-logo-worker.test.mjs`
+**文件：**
 
-**Interfaces:**
-- Consumes: `normalizeSymbols(value)`, `readSharedCache(env, key)`, `FINNHUB_BASE`, and `env.FINNHUB_API_KEY`.
-- Produces: `logoProfileCacheKey(symbol) -> string`, `normalizeLogoProfile(symbol, profile) -> LogoRecord`, `resolveLogoProfiles(env, symbols) -> Promise<Record<string, LogoRecord>>`, and `GET /logos?symbols=...`.
-- `LogoRecord` is `{symbol, status:"verified", source:"finnhub"|"override", name, upstreamUrl, cachedAt}` or `{symbol, status:"missing", source:"finnhub", cachedAt}`. Public JSON omits `upstreamUrl` and returns `path:"/logo/<encoded symbol>"` for verified records.
-- `VERIFIED_LOGO_OVERRIDES` is a reviewed, initially empty map of `{name, upstreamUrl}` records; `LOGO_SUPPRESSIONS` contains known ETF/synthetic symbols such as `MSTU` until a product-specific asset is reviewed.
+- 修改：`cloudflare-worker.js:1-150,465-510`
+- 新建：`tests/security-logo-worker.test.mjs`
 
-- [ ] **Step 1: Write failing metadata tests**
+**接口：**
+
+- 使用：`normalizeSymbols(value)`、`readSharedCache(env, key)`、`FINNHUB_BASE` 和 `env.FINNHUB_API_KEY`。
+- 产出：`logoProfileCacheKey(symbol) -> string`、`normalizeLogoProfile(symbol, profile) -> LogoRecord`、`resolveLogoProfiles(env, symbols) -> Promise<Record<string, LogoRecord>>` 和 `GET /logos?symbols=...`。
+- `LogoRecord` 为 `{symbol, status:"verified", source:"finnhub"|"override", name, upstreamUrl, cachedAt}` 或 `{symbol, status:"missing", source:"finnhub", cachedAt}`。公开 JSON 不得包含 `upstreamUrl`；已验证记录返回 `path:"/logo/<编码后的代码>"`。
+- `VERIFIED_LOGO_OVERRIDES` 是初始为空、经过审核的 `{name, upstreamUrl}` 映射；`LOGO_SUPPRESSIONS` 收录 `MSTU` 等已知 ETF 或合成证券，直到产品自身 Logo 经过核验。
+
+- [ ] **步骤 1：先编写会失败的元数据测试**
 
 ```js
 import test from "node:test";
 import assert from "node:assert/strict";
 import worker, { logoProfileCacheKey, normalizeLogoProfile } from "../cloudflare-worker.js";
 
-test("normalizes only an HTTPS Finnhub logo as verified", () => {
+test("只把 HTTPS Finnhub Logo 规范化为已验证记录", () => {
   assert.deepEqual(normalizeLogoProfile("NVDA", {
     name: "NVIDIA Corp", logo: "https://static.example.test/nvda.png",
+    marketCapitalization: 100,
   }), {
     symbol: "NVDA", status: "verified", source: "finnhub",
     name: "NVIDIA Corp", upstreamUrl: "https://static.example.test/nvda.png",
@@ -79,7 +82,7 @@ test("normalizes only an HTTPS Finnhub logo as verified", () => {
   assert.equal(logoProfileCacheKey("nvda"), "logo:profile:v1:NVDA");
 });
 
-test("logos route caches verified and missing profiles with different TTLs", async () => {
+test("logos 路由分别缓存已验证和缺失资料", async () => {
   const records = new Map();
   const puts = [];
   const env = {
@@ -92,7 +95,7 @@ test("logos route caches verified and missing profiles with different TTLs", asy
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (url) => new Response(JSON.stringify(
     String(url).includes("NVDA")
-      ? { name: "NVIDIA Corp", logo: "https://static.example.test/nvda.png" }
+      ? { name: "NVIDIA Corp", logo: "https://static.example.test/nvda.png", marketCapitalization: 100 }
       : { name: "MSTU", logo: "" },
   ));
   try {
@@ -109,15 +112,17 @@ test("logos route caches verified and missing profiles with different TTLs", asy
 });
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [ ] **步骤 2：运行测试，确认测试按预期失败**
 
-Run: `node --test tests/security-logo-worker.test.mjs`
+运行：`node --test tests/security-logo-worker.test.mjs`
 
-Expected: FAIL because `logoProfileCacheKey`, `normalizeLogoProfile`, and `/logos` do not exist.
+预期：失败，因为 `logoProfileCacheKey`、`normalizeLogoProfile` 和 `/logos` 尚不存在。
 
-- [ ] **Step 3: Implement the minimal metadata resolver**
+- [ ] **步骤 3：实现最小可用的元数据解析器**
 
-Add constants `LOGO_PROFILE_TTL_SECONDS = 30 * 24 * 60 * 60`, `LOGO_MISSING_TTL_SECONDS = 24 * 60 * 60`, and `LOGO_BATCH_LIMIT = 24`. Implement normalization that accepts only parseable `https:` URLs and requires operating-company evidence (`marketCapitalization > 0` or both a non-empty `ipo` and `finnhubIndustry`); this prevents a generic ETF issuer mark from being labelled as the product logo. Check `LOGO_SUPPRESSIONS`, then `VERIFIED_LOGO_OVERRIDES`, then Finnhub, and never emit `upstreamUrl` in public JSON. Query `${FINNHUB_BASE}/stock/profile2?symbol=<symbol>&token=<secret>` only on a cache miss, store each normalized record directly in KV, and route `/logos` before the existing `/quotes` guard.
+新增常量 `LOGO_PROFILE_TTL_SECONDS = 30 * 24 * 60 * 60`、`LOGO_MISSING_TTL_SECONDS = 24 * 60 * 60` 和 `LOGO_BATCH_LIMIT = 24`。规范化函数只接受可解析的 `https:` 地址，并要求存在运营公司证据：`marketCapitalization > 0`，或 `ipo` 与 `finnhubIndustry` 同时非空。这样可防止把普通 ETF 发行商图标标成基金产品 Logo。
+
+解析顺序为 `LOGO_SUPPRESSIONS`、`VERIFIED_LOGO_OVERRIDES`、Finnhub。仅在缓存未命中时请求 `${FINNHUB_BASE}/stock/profile2?symbol=<symbol>&token=<secret>`，把每条结果直接写入 KV，并在现有 `/quotes` 路由拦截之前处理 `/logos`。
 
 ```js
 function publicLogoRecord(record) {
@@ -126,39 +131,41 @@ function publicLogoRecord(record) {
 }
 ```
 
-- [ ] **Step 4: Add invalid batch and cache-hit tests**
+- [ ] **步骤 4：补充非法批量请求与缓存命中测试**
 
-Add assertions that an empty request returns 400, more than 24 normalized symbols returns 400, duplicate symbols call Finnhub once, an override skips Finnhub, a suppressed ETF stays missing even if Finnhub returns an issuer logo, and a cached record triggers zero provider calls. Also assert neither the API key nor `upstreamUrl` appears in the JSON body.
+断言空请求返回 400、超过 24 个规范化代码返回 400、重复代码只请求一次 Finnhub、例外配置不会请求 Finnhub、受抑制 ETF 即使返回发行商 Logo 也保持 `missing`、缓存命中时上游请求数为零。另需断言 JSON 正文不包含 API Key 或 `upstreamUrl`。
 
-- [ ] **Step 5: Run the focused tests**
+- [ ] **步骤 5：运行本任务测试**
 
-Run: `node --test tests/security-logo-worker.test.mjs tests/worker-routing.test.mjs`
+运行：`node --test tests/security-logo-worker.test.mjs tests/worker-routing.test.mjs`
 
-Expected: PASS.
+预期：全部通过。
 
-- [ ] **Step 6: Commit metadata resolution**
+- [ ] **步骤 6：提交元数据解析功能**
 
 ```bash
 git add cloudflare-worker.js tests/security-logo-worker.test.mjs
 git commit -m "feat: resolve verified security logo metadata"
 ```
 
-### Task 2: Constrained image proxy and same-origin bridge
+### 任务 2：受限图片代理与同源桥接
 
-**Files:**
-- Modify: `cloudflare-worker.js`
-- Modify: `functions/api/[[path]].js`
-- Modify: `tests/security-logo-worker.test.mjs`
-- Modify: `tests/same-origin-proxy.test.mjs`
+**文件：**
 
-**Interfaces:**
-- Consumes: cached `LogoRecord` from Task 1.
-- Produces: `validateLogoUrl(value) -> URL|null`, `proxySecurityLogo(env, symbol) -> Promise<Response>`, `GET /logo/:symbol`, and Pages routes `/api/logos` plus `/api/logo/:symbol`.
+- 修改：`cloudflare-worker.js`
+- 修改：`functions/api/[[path]].js`
+- 修改：`tests/security-logo-worker.test.mjs`
+- 修改：`tests/same-origin-proxy.test.mjs`
 
-- [ ] **Step 1: Write failing image-proxy tests**
+**接口：**
+
+- 使用：任务 1 缓存的 `LogoRecord`。
+- 产出：`validateLogoUrl(value) -> URL|null`、`proxySecurityLogo(env, symbol) -> Promise<Response>`、`GET /logo/:symbol`，以及 Pages 路由 `/api/logos` 和 `/api/logo/:symbol`。
+
+- [ ] **步骤 1：先编写会失败的图片代理测试**
 
 ```js
-test("logo route serves only the cached verified upstream image", async () => {
+test("logo 路由只返回缓存记录指定的已验证图片", async () => {
   const record = { symbol: "BRK.B", status: "verified", source: "finnhub", name: "Berkshire Hathaway", upstreamUrl: "https://static.example.test/brkb.png" };
   const env = { MYH88_CACHE: { async get(key) { return key.endsWith("BRK.B") ? record : null; } } };
   const originalFetch = globalThis.fetch;
@@ -174,23 +181,23 @@ test("logo route serves only the cached verified upstream image", async () => {
 });
 ```
 
-Add rejection cases for `localhost`, `127.0.0.1`, `[::1]`, private IPv4 ranges, URL credentials, non-HTTPS schemes, missing metadata, non-image content type, declared size above 512 KiB, actual body above 512 KiB, `../`, and `%2F`. Add a valid hyphenated ticker assertion.
+增加拒绝用例：`localhost`、`127.0.0.1`、`[::1]`、私有 IPv4、带用户名或密码的 URL、非 HTTPS、缺失元数据、非图片内容、声明大小超过 512 KiB、实际正文超过 512 KiB、`../` 和 `%2F`。同时加入合法连字符代码测试。
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [ ] **步骤 2：运行测试，确认测试按预期失败**
 
-Run: `node --test tests/security-logo-worker.test.mjs tests/same-origin-proxy.test.mjs`
+运行：`node --test tests/security-logo-worker.test.mjs tests/same-origin-proxy.test.mjs`
 
-Expected: FAIL because `/logo/:symbol` and multi-segment Pages forwarding are absent.
+预期：失败，因为 `/logo/:symbol` 和多段 Pages 转发尚未实现。
 
-- [ ] **Step 3: Implement URL and image validation**
+- [ ] **步骤 3：实现 URL 与图片校验**
 
-Implement `validateLogoUrl` with `https:`, no credentials, port `""` or `"443"`, and explicit local/private host rejection. `proxySecurityLogo` must read only `logo:profile:v1:<symbol>`, request with `Accept: image/avif,image/webp,image/png,image/jpeg,image/svg+xml,image/*`, verify `image/(png|jpeg|webp|avif|svg\+xml|x-icon|vnd\.microsoft\.icon)`, enforce both declared and actual byte limits, and return `X-Content-Type-Options: nosniff`.
+`validateLogoUrl` 必须要求 `https:`、不得包含用户名或密码、端口只能为空或 `443`，并显式拒绝本地和私有主机。`proxySecurityLogo` 只能读取 `logo:profile:v1:<symbol>`，请求头使用 `Accept: image/avif,image/webp,image/png,image/jpeg,image/svg+xml,image/*`，内容类型只允许 `image/(png|jpeg|webp|avif|svg\+xml|x-icon|vnd\.microsoft\.icon)`，同时检查声明长度和实际字节长度，并返回 `X-Content-Type-Options: nosniff`。
 
-Use `caches.default` when available with a cache key based only on the normalized symbol; otherwise rely on `Cache-Control: public, max-age=2592000, stale-while-revalidate=604800`.
+可用时使用 `caches.default`，缓存键只基于规范化证券代码；否则依靠 `Cache-Control: public, max-age=2592000, stale-while-revalidate=604800`。
 
-- [ ] **Step 4: Extend the Pages API bridge**
+- [ ] **步骤 4：扩展 Pages API 桥接**
 
-Replace the one-segment restriction with exact route parsing:
+将单段路径限制替换成精确路由解析：
 
 ```js
 const singleRoutes = new Set(["", "quotes", "market-clock", "fx", "logos"]);
@@ -198,45 +205,47 @@ const isLogoImage = segments.length === 2 && segments[0] === "logo" && /^[A-Z0-9
 if (!(segments.length <= 1 && singleRoutes.has(path)) && !isLogoImage) return notFound();
 ```
 
-Forward the incoming `Accept` header, preserve upstream `Content-Type`, `Content-Length`, `ETag`, and `Cache-Control`, and apply `no-store` only to JSON quote/metadata bridge responses—not to `/api/logo/:symbol` image responses.
+转发客户端 `Accept`，保留上游的 `Content-Type`、`Content-Length`、`ETag` 和 `Cache-Control`。仅 JSON 行情及元数据桥接响应使用 `no-store`；`/api/logo/:symbol` 图片响应不得强制 `no-store`。
 
-- [ ] **Step 5: Run focused and full tests**
+- [ ] **步骤 5：运行局部和完整测试**
 
-Run: `node --test tests/security-logo-worker.test.mjs tests/same-origin-proxy.test.mjs`
+运行：`node --test tests/security-logo-worker.test.mjs tests/same-origin-proxy.test.mjs`
 
-Expected: PASS.
+预期：全部通过。
 
-Run: `npm test`
+运行：`npm test`
 
-Expected: PASS with no existing quote-routing regression.
+预期：全部通过，现有行情路由无回归。
 
-- [ ] **Step 6: Commit the safe image path**
+- [ ] **步骤 6：提交安全图片代理**
 
 ```bash
 git add cloudflare-worker.js functions/api/[[path]].js tests/security-logo-worker.test.mjs tests/same-origin-proxy.test.mjs
 git commit -m "feat: proxy verified security logo images"
 ```
 
-### Task 3: Browser batching, hydration, and ticker fallback
+### 任务 3：浏览器批量加载、DOM 更新与代码回退
 
-**Files:**
-- Create: `security-logo.js`
-- Create: `tests/security-logo.test.mjs`
-- Modify: `script.part3.js:31-58,58-82`
-- Modify: `script.part4.js:118-132`
-- Modify: `index.html:468-478`
+**文件：**
 
-**Interfaces:**
-- Consumes: `priceProxyUrls() -> string[]`, Task 1 response `{logos: Record<string, PublicLogoRecord>}`, and Task 2 image paths.
-- Produces: global `MYH88SecurityLogos` with `normalizeSymbols(values)`, `load(symbols, proxyUrls, fetchImpl)`, `hydrate(root, proxyUrls, fetchImpl)`, and `resetForTests()`.
-- DOM contract: every non-cash slot is `<span class="company-logo-card logo-fallback-active" data-logo-symbol="NVDA"><span class="logo-fallback">NV</span></span>`.
+- 新建：`security-logo.js`
+- 新建：`tests/security-logo.test.mjs`
+- 修改：`script.part3.js:31-58,58-82`
+- 修改：`script.part4.js:118-132`
+- 修改：`index.html:468-478`
 
-- [ ] **Step 1: Write failing browser resolver tests**
+**接口：**
 
-Use `node:vm` to evaluate `security-logo.js` with a fake `document`, fake logo slots, and a fetch spy. Pin these behaviors:
+- 使用：`priceProxyUrls() -> string[]`、任务 1 的 `{logos: Record<string, PublicLogoRecord>}` 响应，以及任务 2 的图片路径。
+- 产出：全局对象 `MYH88SecurityLogos`，包含 `normalizeSymbols(values)`、`load(symbols, proxyUrls, fetchImpl)`、`hydrate(root, proxyUrls, fetchImpl)` 和 `resetForTests()`。
+- DOM 约定：所有非现金位置均为 `<span class="company-logo-card logo-fallback-active" data-logo-symbol="NVDA"><span class="logo-fallback">NV</span></span>`。
+
+- [ ] **步骤 1：先编写会失败的浏览器解析器测试**
+
+使用 `node:vm` 执行 `security-logo.js`，并提供伪造的 `document`、Logo 元素和 fetch 监视器。固定以下行为：
 
 ```js
-test("hydrates duplicate map and table slots with one batched request", async () => {
+test("地图和表格的重复位置只触发一次批量请求", async () => {
   const slots = [fakeSlot("NVDA"), fakeSlot("NVDA"), fakeSlot("MSTU")];
   const fetches = [];
   const api = loadLogoRuntime(slots);
@@ -254,17 +263,17 @@ test("hydrates duplicate map and table slots with one batched request", async ()
 });
 ```
 
-Also test request de-duplication across concurrent `hydrate` calls, retry through the second proxy after a network/HTTP failure, permanent fallback after image `error`, `CASH` exclusion, invalid symbol exclusion, and an unknown newly added symbol remaining as initials.
+另需测试：并发 `hydrate` 去重、第一个代理网络或 HTTP 失败后尝试第二个代理、图片 `error` 后永久回退、排除 `CASH`、排除非法证券代码，以及新增未知代码继续显示缩写。
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [ ] **步骤 2：运行测试，确认测试按预期失败**
 
-Run: `node --test tests/security-logo.test.mjs`
+运行：`node --test tests/security-logo.test.mjs`
 
-Expected: FAIL because `security-logo.js` does not exist.
+预期：失败，因为 `security-logo.js` 尚不存在。
 
-- [ ] **Step 3: Implement the isolated browser resolver**
+- [ ] **步骤 3：实现隔离的浏览器解析器**
 
-Use a closure with `metadataCache` and `pendingSymbols`. Batch unique normalized symbols, try proxy URLs in order, and create image elements through `ownerDocument.createElement("img")`. Build the image source by joining the proxy base with `record.path`; do not trust a full URL from JSON. Add a one-shot `error` listener that removes the image and restores `logo-fallback-active`.
+使用闭包保存 `metadataCache` 和 `pendingSymbols`。批量处理去重且规范化的代码，依次尝试代理地址，并通过 `ownerDocument.createElement("img")` 创建图片元素。图片地址只能由代理基础地址与 `record.path` 拼接，不信任 JSON 中返回的完整 URL。注册一次性 `error` 监听器，失败时移除图片并恢复 `logo-fallback-active`。
 
 ```js
 function logoImageUrl(proxy, path) {
@@ -273,9 +282,9 @@ function logoImageUrl(proxy, path) {
 }
 ```
 
-- [ ] **Step 4: Replace hard-coded and approximate logo rendering**
+- [ ] **步骤 4：替换硬编码及近似 Logo 渲染**
 
-Delete `COMPANY_LOGO_ASSETS`, `COMPANY_LOGO_DOMAINS`, and `COMPANY_LOGO_GLYPHS`. Keep only a tiny pure ticker fallback helper and the local `CASH` branch:
+删除 `COMPANY_LOGO_ASSETS`、`COMPANY_LOGO_DOMAINS` 和 `COMPANY_LOGO_GLYPHS`。只保留纯代码回退函数和本地 `CASH` 分支：
 
 ```js
 function companyLogoMarkup(label) {
@@ -286,91 +295,93 @@ function companyLogoMarkup(label) {
 }
 ```
 
-After map and table HTML is inserted, schedule `MYH88SecurityLogos.hydrate(document, priceProxyUrls())`. The resolver cache and pending map must ensure the two renderers do not duplicate provider requests.
+地图和表格 HTML 插入后，安排执行 `MYH88SecurityLogos.hydrate(document, priceProxyUrls())`。解析器缓存和进行中任务映射必须保证两个渲染器不会重复请求提供商。
 
-- [ ] **Step 5: Load the resolver before the map renderer**
+- [ ] **步骤 5：在地图渲染器之前加载解析器**
 
-Add `<script src="security-logo.js?v=11.7.3"></script>` immediately before `script.part3.js`, and bump the `script.part3.js` and `script.part4.js` query versions to `11.7.3`.
+在 `script.part3.js` 之前加入 `<script src="security-logo.js?v=11.7.3"></script>`，并将 `script.part3.js` 和 `script.part4.js` 的查询版本更新为 `11.7.3`。
 
-- [ ] **Step 6: Run browser-focused tests**
+- [ ] **步骤 6：运行前端相关测试**
 
-Run: `node --test tests/security-logo.test.mjs tests/ledger-carousel.test.mjs tests/brand-v11.7.test.mjs`
+运行：`node --test tests/security-logo.test.mjs tests/ledger-carousel.test.mjs tests/brand-v11.7.test.mjs`
 
-Expected: PASS, with no layout or ledger regression.
+预期：全部通过，布局和账本功能无回归。
 
-- [ ] **Step 7: Commit frontend hydration**
+- [ ] **步骤 7：提交前端更新功能**
 
 ```bash
 git add security-logo.js script.part3.js script.part4.js index.html tests/security-logo.test.mjs
 git commit -m "feat: hydrate holdings with verified logos"
 ```
 
-### Task 4: Remove fake assets, bump release, and verify the complete flow
+### 任务 4：移除假 Logo、更新版本并验证完整流程
 
-**Files:**
-- Delete: `logos/aaoi.svg`
-- Delete: `logos/dram.svg`
-- Delete: `logos/googl.svg`
-- Delete: `logos/mrvl.svg`
-- Delete: `logos/mu.svg`
-- Delete: `logos/nvda.svg`
-- Delete: `logos/rklb.svg`
-- Delete: `logos/spcx.svg`
-- Delete: `logos/vrt.svg`
-- Delete: `logos/xfab.svg`
-- Modify: `service-worker.js`
-- Modify: `build-meta.json`
-- Modify: `package.json`
-- Modify: `tests/brand-v11.7.test.mjs`
+**文件：**
 
-**Interfaces:**
-- Consumes: all Worker and browser behavior from Tasks 1-3.
-- Produces: release `11.7.3` with only `logos/cash.svg` retained as an app-owned logo asset.
+- 删除：`logos/aaoi.svg`
+- 删除：`logos/dram.svg`
+- 删除：`logos/googl.svg`
+- 删除：`logos/mrvl.svg`
+- 删除：`logos/mu.svg`
+- 删除：`logos/nvda.svg`
+- 删除：`logos/rklb.svg`
+- 删除：`logos/spcx.svg`
+- 删除：`logos/vrt.svg`
+- 删除：`logos/xfab.svg`
+- 修改：`service-worker.js`
+- 修改：`build-meta.json`
+- 修改：`package.json`
+- 修改：`tests/brand-v11.7.test.mjs`
 
-- [ ] **Step 1: Add failing release-integrity assertions**
+**接口：**
 
-Extend `tests/brand-v11.7.test.mjs` to assert that `security-logo.js?v=11.7.3`, `script.part3.js?v=11.7.3`, and `script.part4.js?v=11.7.3` appear in both `index.html` and the service-worker shell list. Assert `package.json` and `build-meta.json` use `11.7.3`; assert `script.part3.js` does not contain `COMPANY_LOGO_ASSETS`, Google favicon, or DuckDuckGo icon URLs.
+- 使用：任务 1 至任务 3 的全部 Worker 与浏览器功能。
+- 产出：版本 `11.7.3`，并只保留 `logos/cash.svg` 作为应用自有 Logo。
 
-- [ ] **Step 2: Run the release test to verify it fails**
+- [ ] **步骤 1：增加会失败的发布完整性断言**
 
-Run: `node --test tests/brand-v11.7.test.mjs`
+扩展 `tests/brand-v11.7.test.mjs`，断言 `security-logo.js?v=11.7.3`、`script.part3.js?v=11.7.3` 和 `script.part4.js?v=11.7.3` 同时存在于 `index.html` 与 Service Worker 应用壳清单。断言 `package.json` 和 `build-meta.json` 使用 `11.7.3`；断言 `script.part3.js` 不再包含 `COMPANY_LOGO_ASSETS`、Google favicon 或 DuckDuckGo 图标地址。
 
-Expected: FAIL on stale release fingerprints and cache manifest.
+- [ ] **步骤 2：运行发布测试，确认测试按预期失败**
 
-- [ ] **Step 3: Apply the release update and remove approximate assets**
+运行：`node --test tests/brand-v11.7.test.mjs`
 
-Set the app/package/build release to `11.7.3`, increment the service-worker cache name, add `security-logo.js?v=11.7.3` to the shell, update the affected query strings, and delete every obsolete logo file listed above. Keep `logos/cash.svg`.
+预期：因发布指纹和缓存清单仍为旧版本而失败。
 
-- [ ] **Step 4: Run automated verification**
+- [ ] **步骤 3：更新版本并移除近似图片**
 
-Run: `npm test`
+把应用、软件包及构建版本更新为 `11.7.3`，递增 Service Worker 缓存名称，将 `security-logo.js?v=11.7.3` 加入应用壳，更新受影响的查询字符串，并删除上方列出的所有过时 Logo 文件。保留 `logos/cash.svg`。
 
-Expected: `node scripts/validate-release.mjs` and all `tests/*.test.mjs` PASS.
+- [ ] **步骤 4：运行自动化验证**
 
-Run: `git diff --check`
+运行：`npm test`
 
-Expected: no output.
+预期：`node scripts/validate-release.mjs` 及所有 `tests/*.test.mjs` 全部通过。
 
-- [ ] **Step 5: Perform local UI verification**
+运行：`git diff --check`
 
-Serve the site and Worker locally with the repository's existing Wrangler configuration. Verify at desktop width and at 390 px mobile width:
+预期：无输出。
 
-1. NVDA/GOOGL/RKLB render verified images when the provider returns them.
-2. MSTU and any unsupported ETF remain legible initials rather than showing an issuer or invented mark.
-3. A deliberately unknown ticker remains initials and does not break map layout.
-4. Map and position table show the same result for a ticker.
-5. Offline mode, a 502 metadata response, and a broken image response preserve the rest of the dashboard.
-6. Browser network requests contain no Finnhub token and use `/api/logos` plus `/api/logo/<symbol>`.
+- [ ] **步骤 5：执行本地界面验证**
 
-- [ ] **Step 6: Commit cleanup and release**
+使用仓库现有 Wrangler 配置在本地启动网站和 Worker，并分别在桌面宽度与 390 px 移动端宽度验证：
+
+1. 提供商有资料时，NVDA、GOOGL、RKLB 显示经过验证的图片。
+2. MSTU 及任何不支持的 ETF 显示清晰缩写，不显示发行商或虚构图形。
+3. 一个故意添加的未知代码保持缩写，且不破坏地图布局。
+4. 同一代码在地图和持仓表中显示一致。
+5. 离线状态、元数据接口返回 502、图片损坏时，看板其他部分继续工作。
+6. 浏览器网络请求不包含 Finnhub Token，只访问 `/api/logos` 与 `/api/logo/<symbol>`。
+
+- [ ] **步骤 6：提交清理和版本更新**
 
 ```bash
 git add -A logos service-worker.js build-meta.json package.json tests/brand-v11.7.test.mjs
 git commit -m "chore: release verified holding logos"
 ```
 
-- [ ] **Step 7: Review final history and working tree**
+- [ ] **步骤 7：检查最终历史和工作区**
 
-Run: `git status --short --branch && git log --oneline -6`
+运行：`git status --short --branch && git log --oneline -6`
 
-Expected: only the pre-existing untracked `.wrangler/` directory remains; the four feature commits follow the design and plan documentation commits.
+预期：只剩原有未跟踪的 `.wrangler/` 目录；四个功能提交位于架构设计与实施计划提交之后。
