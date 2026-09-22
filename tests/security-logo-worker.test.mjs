@@ -5,6 +5,7 @@ import worker, {
   VERIFIED_LOGO_OVERRIDES,
   logoProfileCacheKey,
   normalizeLogoProfile,
+  validateLogoUrl,
 } from "../cloudflare-worker.js";
 
 function portfolioRecord(symbols) {
@@ -172,6 +173,132 @@ test("未保存代码保持缺失回退且不消耗 Finnhub", async () => {
     });
     assert.equal(fetchCount, 0);
     assert.equal(puts.length, 0);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("Logo URL 只允许无凭据的公网 HTTPS 443 地址", () => {
+  assert.equal(validateLogoUrl("https://static.example.test/logo.png").hostname, "static.example.test");
+  assert.equal(validateLogoUrl("https://static.example.test:443/logo.png").port, "");
+  for (const value of [
+    "http://static.example.test/logo.png",
+    "https://user:pass@static.example.test/logo.png",
+    "https://static.example.test:444/logo.png",
+    "https://localhost/logo.png",
+    "https://assets.localhost/logo.png",
+    "https://127.0.0.1/logo.png",
+    "https://10.0.0.1/logo.png",
+    "https://172.16.0.1/logo.png",
+    "https://192.168.1.1/logo.png",
+    "https://169.254.1.1/logo.png",
+    "https://[::1]/logo.png",
+    "not a url",
+  ]) assert.equal(validateLogoUrl(value), null, value);
+});
+
+function imageProxyEnv(symbol, record) {
+  return {
+    MYH88_CACHE: {
+      async get(key) { return key === logoProfileCacheKey(symbol) ? record : null; },
+    },
+  };
+}
+
+test("logo 路由只返回缓存记录指定的已验证图片", async () => {
+  const record = {
+    symbol: "BRK.B",
+    status: "verified",
+    source: "finnhub",
+    name: "Berkshire Hathaway",
+    upstreamUrl: "https://static.example.test/brkb.png",
+  };
+  const env = imageProxyEnv("BRK.B", record);
+  const originalFetch = globalThis.fetch;
+  let accept = "";
+  globalThis.fetch = async (_url, init) => {
+    accept = init.headers.Accept;
+    return new Response(new Uint8Array([137, 80, 78, 71]), {
+      headers: { "Content-Type": "image/png", "Content-Length": "4", ETag: '"logo-v1"' },
+    });
+  };
+  try {
+    const response = await worker.fetch(new Request("https://quote.myh88.com/logo/BRK.B"), env, { waitUntil() {} });
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("Content-Type"), "image/png");
+    assert.equal(response.headers.get("Content-Length"), "4");
+    assert.equal(response.headers.get("ETag"), '"logo-v1"');
+    assert.equal(response.headers.get("X-Content-Type-Options"), "nosniff");
+    assert.match(response.headers.get("Cache-Control"), /max-age=2592000/);
+    assert.match(accept, /image\/avif/);
+    assert.deepEqual([...new Uint8Array(await response.arrayBuffer())], [137, 80, 78, 71]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("logo 路由允许连字符代码，拒绝缺失资料、路径穿越和编码斜杠", async () => {
+  const env = imageProxyEnv("ABC-D", {
+    symbol: "ABC-D",
+    status: "verified",
+    source: "finnhub",
+    name: "ABC",
+    upstreamUrl: "https://static.example.test/logo.webp",
+  });
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(new Uint8Array([1]), { headers: { "Content-Type": "image/webp" } });
+  try {
+    assert.equal((await worker.fetch(new Request("https://quote.myh88.com/logo/ABC-D"), env, { waitUntil() {} })).status, 200);
+    assert.equal((await worker.fetch(new Request("https://quote.myh88.com/logo/MISSING"), env, { waitUntil() {} })).status, 404);
+    assert.equal((await worker.fetch(new Request("https://quote.myh88.com/logo/..%2FSECRET"), env, { waitUntil() {} })).status, 404);
+    assert.equal((await worker.fetch(new Request("https://quote.myh88.com/logo/%2FSECRET"), env, { waitUntil() {} })).status, 404);
+    assert.equal((await worker.fetch(new Request("https://quote.myh88.com/logo/../SECRET"), env, { waitUntil() {} })).status, 404);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("logo 代理拒绝非图片、超大声明和超大实际正文", async () => {
+  const env = imageProxyEnv("NVDA", {
+    symbol: "NVDA",
+    status: "verified",
+    source: "finnhub",
+    name: "NVIDIA",
+    upstreamUrl: "https://static.example.test/nvda.png",
+  });
+  const originalFetch = globalThis.fetch;
+  try {
+    for (const response of [
+      new Response("not an image", { headers: { "Content-Type": "text/html" } }),
+      new Response(new Uint8Array([1]), { headers: { "Content-Type": "image/png", "Content-Length": String(512 * 1024 + 1) } }),
+      new Response(new Uint8Array(512 * 1024 + 1), { headers: { "Content-Type": "image/png", "Content-Length": "1" } }),
+    ]) {
+      globalThis.fetch = async () => response.clone();
+      const result = await worker.fetch(new Request("https://quote.myh88.com/logo/NVDA"), env, { waitUntil() {} });
+      assert.equal(result.status, 502);
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("logo 代理拒绝缓存中的非法上游地址和 missing 记录", async () => {
+  const originalFetch = globalThis.fetch;
+  let fetchCount = 0;
+  globalThis.fetch = async () => { fetchCount += 1; throw new Error("invalid records must not fetch"); };
+  try {
+    for (const record of [
+      { symbol: "NVDA", status: "missing", source: "finnhub" },
+      { symbol: "NVDA", status: "verified", source: "finnhub", upstreamUrl: "https://127.0.0.1/logo.png" },
+    ]) {
+      const response = await worker.fetch(
+        new Request("https://quote.myh88.com/logo/NVDA"),
+        imageProxyEnv("NVDA", record),
+        { waitUntil() {} },
+      );
+      assert.equal(response.status, 404);
+    }
+    assert.equal(fetchCount, 0);
   } finally {
     globalThis.fetch = originalFetch;
   }
