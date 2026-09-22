@@ -3,6 +3,8 @@
 
   const metadataCache=new Map();
   const pendingSymbols=new Map();
+  const LOGO_BATCH_LIMIT=24;
+  const MISSING_CACHE_MS=5*60*1000;
 
   function normalizeSymbols(values){
     const input=Array.isArray(values)?values:String(values||"").split(",");
@@ -15,6 +17,17 @@
   }
 
   function missingRecord(symbol){return {symbol,status:"missing"}}
+
+  function getCachedRecord(symbol){
+    const entry=metadataCache.get(symbol);
+    if(!entry)return null;
+    if(entry.expiresAt<=Date.now()){metadataCache.delete(symbol);return null}
+    return entry.record;
+  }
+
+  function cacheRecord(record){
+    metadataCache.set(record.symbol,{record,expiresAt:record.status==="missing"?Date.now()+MISSING_CACHE_MS:Number.POSITIVE_INFINITY});
+  }
 
   function normalizeRecord(symbol,record,proxyUrl){
     if(!record||record.status!=="verified"||String(record.symbol||"").toUpperCase()!==symbol)return missingRecord(symbol);
@@ -42,20 +55,23 @@
     const symbols=normalizeSymbols(values);
     if(!symbols.length)return {};
     if(typeof fetchImpl!=="function")throw new Error("当前环境不支持徽标请求");
-    const fresh=symbols.filter(symbol=>!metadataCache.has(symbol)&&!pendingSymbols.has(symbol));
+    const fresh=symbols.filter(symbol=>!getCachedRecord(symbol)&&!pendingSymbols.has(symbol));
     if(fresh.length){
-      const batchPromise=(async()=>{
-        try{
-          const {logos,proxyUrl}=await fetchBatch(fresh,proxyUrls,fetchImpl);
-          fresh.forEach(symbol=>metadataCache.set(symbol,normalizeRecord(symbol,logos[symbol],proxyUrl)));
-        }finally{
-          fresh.forEach(symbol=>pendingSymbols.delete(symbol));
-        }
-      })();
-      fresh.forEach(symbol=>pendingSymbols.set(symbol,batchPromise));
+      for(let offset=0;offset<fresh.length;offset+=LOGO_BATCH_LIMIT){
+        const batch=fresh.slice(offset,offset+LOGO_BATCH_LIMIT);
+        const batchPromise=(async()=>{
+          try{
+            const {logos,proxyUrl}=await fetchBatch(batch,proxyUrls,fetchImpl);
+            batch.forEach(symbol=>cacheRecord(normalizeRecord(symbol,logos[symbol],proxyUrl)));
+          }finally{
+            batch.forEach(symbol=>pendingSymbols.delete(symbol));
+          }
+        })();
+        batch.forEach(symbol=>pendingSymbols.set(symbol,batchPromise));
+      }
     }
     await Promise.all([...new Set(symbols.map(symbol=>pendingSymbols.get(symbol)).filter(Boolean))]);
-    return Object.fromEntries(symbols.map(symbol=>[symbol,metadataCache.get(symbol)||missingRecord(symbol)]));
+    return Object.fromEntries(symbols.map(symbol=>[symbol,getCachedRecord(symbol)||missingRecord(symbol)]));
   }
 
   async function hydrate(root=global.document,proxyUrls=[],fetchImpl=global.fetch?.bind(global)){
@@ -77,7 +93,14 @@
     });
   }
 
+  function invalidateMissing(values){
+    const selected=values==null?null:new Set(normalizeSymbols(values));
+    for(const [symbol,entry] of metadataCache){
+      if(entry.record.status==="missing"&&(!selected||selected.has(symbol)))metadataCache.delete(symbol);
+    }
+  }
+
   function resetForTests(){metadataCache.clear();pendingSymbols.clear()}
 
-  global.MYH88SecurityLogos=Object.freeze({normalizeSymbols,load,hydrate,resetForTests});
+  global.MYH88SecurityLogos=Object.freeze({normalizeSymbols,load,hydrate,invalidateMissing,resetForTests});
 })(globalThis);

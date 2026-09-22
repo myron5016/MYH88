@@ -158,3 +158,32 @@ test("CASH、非法代码和未知代码都保留可读回退", async () => {
   assert.equal(slots.every((slot) => slot.image === null), true);
   assert.equal(slots.every((slot) => slot.classList.contains("logo-fallback-active")), true);
 });
+
+test("超过服务端上限的代码会自动拆成不超过 24 个的批次", async () => {
+  const api = loadLogoRuntime();
+  const symbols = Array.from({ length: 25 }, (_, index) => `T${index}`);
+  const calls = [];
+  const records = await api.load(symbols, ["/api"], async (url) => {
+    calls.push(url);
+    const requested = new URL(url, "https://app.example").searchParams.get("symbols").split(",");
+    return metadataResponse(Object.fromEntries(requested.map((symbol) => [symbol, { symbol, status: "missing" }])));
+  });
+  assert.equal(calls.length, 2);
+  assert.ok(calls.every((url) => new URL(url, "https://app.example").searchParams.get("symbols").split(",").length <= 24));
+  assert.equal(Object.keys(records).length, 25);
+});
+
+test("保存后可清除 missing 缓存并重新解析", async () => {
+  const api = loadLogoRuntime();
+  let requestCount = 0;
+  const fetchImpl = async () => {
+    requestCount += 1;
+    return requestCount === 1
+      ? metadataResponse({ NEW: { symbol: "NEW", status: "missing" } })
+      : metadataResponse({ NEW: { symbol: "NEW", status: "verified", source: "finnhub", path: "/logo/NEW" } });
+  };
+  assert.equal((await api.load(["NEW"], ["/api"], fetchImpl)).NEW.status, "missing");
+  api.invalidateMissing(["NEW"]);
+  assert.equal((await api.load(["NEW"], ["/api"], fetchImpl)).NEW.status, "verified");
+  assert.equal(requestCount, 2);
+});

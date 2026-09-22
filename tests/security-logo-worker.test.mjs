@@ -56,6 +56,12 @@ test("只把具有运营公司证据的 HTTPS Finnhub Logo 规范化为已验证
     logo: "http://example.test/a.png",
     marketCapitalization: 100,
   }).status, "missing");
+  for (const logo of [
+    "https://localhost/a.png",
+    "https://user:pass@static.example.test/a.png",
+    "https://static.example.test:444/a.png",
+    "https://[::ffff:127.0.0.1]/a.png",
+  ]) assert.equal(normalizeLogoProfile("BAD", { logo, marketCapitalization: 100 }).status, "missing", logo);
   assert.equal(normalizeLogoProfile("IPO", {
     name: "IPO Co",
     logo: "https://static.example.test/ipo.svg",
@@ -158,6 +164,26 @@ test("经审核例外不请求 Finnhub", async () => {
   }
 });
 
+test("非法人工例外按 missing 缓存且不请求上游", async () => {
+  VERIFIED_LOGO_OVERRIDES.TEST = {
+    name: "Unsafe Test Company",
+    upstreamUrl: "https://localhost/logo.png",
+  };
+  const { env, puts } = logoEnv(["TEST"]);
+  const originalFetch = globalThis.fetch;
+  let fetchCount = 0;
+  globalThis.fetch = async () => { fetchCount += 1; throw new Error("invalid override must not fetch"); };
+  try {
+    const response = await worker.fetch(new Request("https://quote.myh88.com/logos?symbols=TEST"), env, { waitUntil() {} });
+    assert.deepEqual((await response.json()).logos.TEST, { symbol: "TEST", status: "missing", source: "finnhub" });
+    assert.equal(puts[0].options.expirationTtl, 86400);
+    assert.equal(fetchCount, 0);
+  } finally {
+    delete VERIFIED_LOGO_OVERRIDES.TEST;
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("未保存代码保持缺失回退且不消耗 Finnhub", async () => {
   const { env, puts } = logoEnv(["NVDA"]);
   const originalFetch = globalThis.fetch;
@@ -193,6 +219,8 @@ test("Logo URL 只允许无凭据的公网 HTTPS 443 地址", () => {
     "https://192.168.1.1/logo.png",
     "https://169.254.1.1/logo.png",
     "https://[::1]/logo.png",
+    "https://[::ffff:127.0.0.1]/logo.png",
+    "https://[::ffff:192.168.1.1]/logo.png",
     "not a url",
   ]) assert.equal(validateLogoUrl(value), null, value);
 });
@@ -277,6 +305,29 @@ test("logo 代理拒绝非图片、超大声明和超大实际正文", async () 
       const result = await worker.fetch(new Request("https://quote.myh88.com/logo/NVDA"), env, { waitUntil() {} });
       assert.equal(result.status, 502);
     }
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("logo 代理为 SVG 响应设置同源文档隔离策略", async () => {
+  const env = imageProxyEnv("SVG", {
+    symbol: "SVG",
+    status: "verified",
+    source: "finnhub",
+    name: "SVG Company",
+    upstreamUrl: "https://static.example.test/logo.svg",
+  });
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response('<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>', {
+    headers: { "Content-Type": "image/svg+xml" },
+  });
+  try {
+    const response = await worker.fetch(new Request("https://quote.myh88.com/logo/SVG"), env, { waitUntil() {} });
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get("Content-Security-Policy") || "", /sandbox/);
+    assert.match(response.headers.get("Content-Security-Policy") || "", /default-src 'none'/);
+    assert.match(response.headers.get("Content-Security-Policy") || "", /script-src 'none'/);
   } finally {
     globalThis.fetch = originalFetch;
   }

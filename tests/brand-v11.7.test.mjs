@@ -84,13 +84,14 @@ test("V11.7 map renderer exposes stable visual metadata", async () => {
 });
 
 test("V11.7.3 release ships only the verified-logo runtime and cash artwork", async () => {
-  const [index, runtime, worker, meta, pkg, logoRuntime, logos] = await Promise.all([
+  const [index, runtime, worker, meta, pkg, logoRuntime, syncRuntime, logos] = await Promise.all([
     read("../index.html"),
     read("../script.part1.js"),
     read("../service-worker.js"),
     read("../build-meta.json"),
     read("../package.json"),
     read("../security-logo.js"),
+    read("../script.part2.js"),
     fs.readdir(new URL("../logos/", import.meta.url)),
   ]);
   assert.match(runtime, /const VERSION=["']V11\.7\.3 果园生长版["']/);
@@ -99,6 +100,8 @@ test("V11.7.3 release ships only the verified-logo runtime and cash artwork", as
   assert.match(worker, /brand-v11\.7\.css/);
   assert.match(worker, /brand-v11\.7\.js/);
   assert.match(logoRuntime, /MYH88SecurityLogos/);
+  assert.match(syncRuntime, /MYH88SecurityLogos\.invalidateMissing\(\)/);
+  assert.match(syncRuntime, /setTimeout\([^]*315000/);
   assert.deepEqual(logos.sort(), ["cash.svg"]);
   for (const [name, version] of Object.entries({
     "script.part1.js": "11.7.3",

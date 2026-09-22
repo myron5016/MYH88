@@ -86,11 +86,10 @@ function normalizeLogoProfile(symbol, profile = {}) {
   const ticker = normalizeSymbols(symbol)[0] || "";
   const missing = missingLogoRecord(ticker);
   if (!ticker || !profile || typeof profile !== "object") return missing;
-  let upstream;
-  try { upstream = new URL(String(profile.logo || "")); } catch { return missing; }
+  const upstream = validateLogoUrl(profile.logo);
   const hasOperatingCompanyEvidence = Number(profile.marketCapitalization || 0) > 0
     || (String(profile.ipo || "").trim() && String(profile.finnhubIndustry || "").trim());
-  if (upstream.protocol !== "https:" || !hasOperatingCompanyEvidence) return missing;
+  if (!upstream || !hasOperatingCompanyEvidence) return missing;
   return {
     symbol: ticker,
     status: "verified",
@@ -125,7 +124,7 @@ function validateLogoUrl(value) {
   }
   if (hostname.includes(":")) {
     const compact = hostname.replace(/^0+/, "");
-    if (hostname === "::" || hostname === "::1" || /^f[cd]/i.test(compact)
+    if (hostname === "::" || hostname === "::1" || /^::ffff:/i.test(hostname) || /^f[cd]/i.test(compact)
       || /^fe[89ab]/i.test(compact) || /^::ffff:(?:0:)?(?:10\.|127\.|169\.254\.|172\.(?:1[6-9]|2\d|3[01])\.|192\.168\.)/i.test(hostname)) return null;
   }
   return url;
@@ -166,6 +165,9 @@ async function proxySecurityLogo(env, symbol) {
     "Cache-Control": `public, max-age=${LOGO_PROFILE_TTL_SECONDS}, stale-while-revalidate=604800`,
     "X-Content-Type-Options": "nosniff",
   });
+  if (contentType === "image/svg+xml") {
+    headers.set("Content-Security-Policy", "sandbox; default-src 'none'; script-src 'none'; style-src 'unsafe-inline'");
+  }
   const etag = response.headers.get("ETag");
   if (etag) headers.set("ETag", safeHeaderValue(etag));
   const result = new Response(bytes, { status: 200, headers });
@@ -252,13 +254,14 @@ async function resolveLogoProfiles(env, symbols) {
       record = missingLogoRecord(symbol);
     } else if (VERIFIED_LOGO_OVERRIDES[symbol]) {
       const override = VERIFIED_LOGO_OVERRIDES[symbol];
-      record = {
+      const upstream = validateLogoUrl(override.upstreamUrl);
+      record = upstream ? {
         symbol,
         status: "verified",
         source: "override",
         name: String(override.name || symbol).trim() || symbol,
-        upstreamUrl: String(override.upstreamUrl || ""),
-      };
+        upstreamUrl: upstream.toString(),
+      } : missingLogoRecord(symbol);
     } else {
       if (!String(env.FINNHUB_API_KEY || "").trim()) throw new Error("FINNHUB_API_KEY is not configured");
       const url = new URL(`${FINNHUB_BASE}/stock/profile2`);
