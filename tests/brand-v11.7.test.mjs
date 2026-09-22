@@ -99,13 +99,23 @@ test("V11.7 release fingerprint is consistent and keeps Worker 10.59", async () 
   for (const [name, version] of Object.entries({
     "script.part1.js": "11.7.2",
     "script.part2.js": "11.7.2",
+    "script.part3.js": "11.7.3",
+    "script.part4.js": "11.7.3",
+    "script.part5.js": "11.6.0",
+    "script.part6.js": "11.7.2",
+  })) {
+    const escaped = name.replaceAll(".", "\\.");
+    assert.match(index, new RegExp(`${escaped}\\?v=${version.replaceAll(".", "\\.")}`));
+  }
+  for (const [name, version] of Object.entries({
+    "script.part1.js": "11.7.2",
+    "script.part2.js": "11.7.2",
     "script.part3.js": "11.7.1",
     "script.part4.js": "11.7.1",
     "script.part5.js": "11.6.0",
     "script.part6.js": "11.7.2",
   })) {
     const escaped = name.replaceAll(".", "\\.");
-    assert.match(index, new RegExp(`${escaped}\\?v=${version.replaceAll(".", "\\.")}`));
     assert.match(worker, new RegExp(`\\./${escaped}\\?v=${version.replaceAll(".", "\\.")}`));
   }
   assert.match(meta, /"release":\s*"11\.7\.2"/);

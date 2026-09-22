@@ -28,33 +28,13 @@ function treemapTileSize(tile){
   if(shortSide>=55&&area>=6000)return "small";
   return "micro";
 }
-const COMPANY_LOGO_ASSETS=Object.freeze({
-  AAOI:"aaoi.svg",CASH:"cash.svg",DRAM:"dram.svg",GOOGL:"googl.svg",MRVL:"mrvl.svg",MU:"mu.svg",
-  NVDA:"nvda.svg",RKLB:"rklb.svg",SPCX:"spcx.svg",VRT:"vrt.svg",XFAB:"xfab.svg",SKHY:"dram.svg"
-});
-const COMPANY_LOGO_DOMAINS=Object.freeze({
-  AAOI:"appliedoptoelectronics.com",DRAM:"skhynix.com",GOOGL:"google.com",MRVL:"marvell.com",
-  MU:"micron.com",TSM:"tsmc.com",TSLA:"tesla.com",SKHY:"skhynix.com",SOXL:"direxion.com",
-  VOO:"vanguard.com",QQQM:"invesco.com",IBKR:"interactivebrokers.com",VRT:"vertiv.com",XFAB:"xfab.com"
-});
-const COMPANY_LOGO_GLYPHS=Object.freeze({
-  NVDA:"NV",MRVL:"MR",AAOI:"AO",XFAB:"XF",RKLB:"RK",VRT:"VR",SPCX:"SX",GOOGL:"G",MU:"MU",
-  DRAM:"DR",TSM:"TSM",TSLA:"TS",SKHY:"SK",SOXL:"SO",VOO:"VO",QQQM:"QQ",IBKR:"IB",CASH:"$"
-});
 function companyLogoMarkup(label){
   const key=String(label||"").toUpperCase().trim();
-  const glyph=COMPANY_LOGO_GLYPHS[key]||key.slice(0,2)||".";
-  const asset=COMPANY_LOGO_ASSETS[key];
-  const domain=COMPANY_LOGO_DOMAINS[key];
-  const localSrc=asset?`logos/${asset}?v=11.7.0`:"";
-  const officialSrc=domain?`https://www.google.com/s2/favicons?domain=${domain}&sz=128`:"";
-  const alternateSrc=domain?`https://icons.duckduckgo.com/ip3/${domain}.ico`:"";
-  const safeKey=key.toLowerCase().replace(/[^a-z0-9-]/g,"")||"asset";
-  if(!localSrc&&!officialSrc)return `<span class="company-logo-card logo-${safeKey} logo-fallback-active" aria-hidden="true"><span class="logo-fallback">${escapeHtml(glyph)}</span></span>`;
-  const alternateAttr=alternateSrc?` data-alternate-src="${escapeHtml(alternateSrc)}"`:"";
-  const onerror="if(this.dataset.fallbackIndex!==\"1\"&&this.dataset.alternateSrc){this.dataset.fallbackIndex=\"1\";this.src=this.dataset.alternateSrc}else{this.parentElement.classList.add(\"logo-fallback-active\")}";
-  return `<span class="company-logo-card logo-${safeKey}" aria-hidden="true"><img src="${escapeHtml(localSrc||officialSrc)}"${alternateAttr} alt="" onerror="${onerror}"><span class="logo-fallback">${escapeHtml(glyph)}</span></span>`;
+  if(key==="CASH")return '<span class="company-logo-card logo-cash" aria-hidden="true"><img src="logos/cash.svg" alt=""><span class="logo-fallback">$</span></span>';
+  const safeKey=escapeHtml(key),glyph=escapeHtml(key.slice(0,3)||".");
+  return `<span class="company-logo-card logo-fallback-active" data-logo-symbol="${safeKey}" aria-hidden="true"><span class="logo-fallback">${glyph}</span></span>`;
 }
+function hydrateSecurityLogos(root=document){if(window.MYH88SecurityLogos)window.MYH88SecurityLogos.hydrate(root,priceProxyUrls()).catch(()=>{})}
 function renderTreemap(){
   const box=$("treemap");box.innerHTML="";
   const items=treemapItems(),denom=Math.max(contributedCapital()+realizedPnl(),1);
@@ -78,7 +58,8 @@ function renderTreemap(){
     const meta=size==="large"||wideCompact?`${money(t.value)} | ${share}%`:`${share}%`;
     d.innerHTML=`<div class="tile-copy">${showLogo?companyLogoMarkup(t.label):""}<div class="tile-text"><span class="tile-symbol">${escapeHtml(t.label)}</span><span class="tile-meta">${escapeHtml(meta)}</span></div></div>`;
     box.appendChild(d)
-  })
+  });
+  hydrateSecurityLogos(box)
 }
 function sectorItems(){const map={};state.positions.forEach(p=>{const key=inferSector(p.symbol,p.name,p.sector);if(!map[key])map[key]={label:key,total:0,pnl:0,color:sectorBaseColor(key)};map[key].total+=num(p.costBasisUSD);map[key].pnl+=floatingPnlUSD(p)});const cash=cashBalance();if(cash>0)map["现金"]={label:"现金",total:cash,pnl:0,color:sectorBaseColor("现金")};return Object.values(map).sort((a,b)=>b.total-a.total)}
 function renderSectors(){const bar=$("sectorBar"),legend=$("sectorLegend"),total=Math.max(contributedCapital()+realizedPnl(),1);bar.innerHTML="";legend.innerHTML="";sectorItems().forEach(s=>{const pct=s.total/total*100,seg=document.createElement("div");seg.className="segment"+(pct>=10?" major":"");seg.style.width=Math.max(3,pct)+"%";seg.style.background=`linear-gradient(135deg,${mixColor(s.color,"#ffffff",.12)},${mixColor(s.color,"#000000",.08)})`;seg.textContent=`${s.label} ${round(pct)}%`;bar.appendChild(seg);legend.insertAdjacentHTML("beforeend",`<span><i class="dot" style="background:${validColor(s.color)}"></i>${escapeHtml(s.label)} ${money(s.total)} <b class="${cls(s.pnl)}">${money(s.pnl)}</b></span>`)})}
