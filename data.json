@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-09-18T09:29:14.165Z",
+    "lastCloudSaveAt": "2026-09-22T17:13:03.839Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -136,9 +136,9 @@
       "source": "manual",
       "shares": 44,
       "avgCost": 11.685,
-      "price": 6.92,
+      "price": 6.845,
       "sector": "半导体",
-      "color": "#ff9a58",
+      "color": "#fa873c",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "手动价，EUR",
@@ -287,37 +287,6 @@
       ]
     },
     {
-      "id": "pos_mqz9i9o7_8b8hhc",
-      "symbol": "MU",
-      "name": "美光",
-      "currency": "USD",
-      "source": "twelve",
-      "shares": 1,
-      "avgCost": 1080.35,
-      "sector": "半导体",
-      "color": "#fa873c",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "",
-      "costBasisUSD": 1080.35,
-      "lots": [
-        {
-          "lotId": "tx_mr3ji5kj_m8ogzy",
-          "buyTransactionId": "tx_mr3ji5kj_m8ogzy",
-          "date": "2026-07-01",
-          "order": 29,
-          "shares": 1,
-          "remainingShares": 1,
-          "costBasisUSD": 1080.35,
-          "remainingCostBasisUSD": 1080.35,
-          "costBasisNative": 1080.35,
-          "remainingCostBasisNative": 1080.35,
-          "currency": "USD",
-          "price": 1080
-        }
-      ]
-    },
-    {
       "id": "pos_mto2b85y_zkwe24",
       "symbol": "MSTU",
       "name": "2倍做多MSTR",
@@ -461,7 +430,7 @@
       "migration": true,
       "source": "manual",
       "sector": "半导体",
-      "color": "#ff9a58",
+      "color": "#fa873c",
       "schemaVersion": "10.6",
       "costBasisNative": 514.14
     },
@@ -3084,6 +3053,41 @@
       "costBasisNative": 9507.41,
       "grossUSD": 8280,
       "realizedPnlUSD": -1235.3799999999992
+    },
+    {
+      "id": "tx_mucv1022_lk7ezi",
+      "date": "2026-09-22",
+      "type": "sell",
+      "symbol": "MU",
+      "name": "美光",
+      "shares": 1,
+      "price": 1060,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.37,
+      "note": "",
+      "source": "twelve",
+      "sector": "半导体",
+      "color": "#fa873c",
+      "schemaVersion": "10.48",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mr3ji5kj_m8ogzy",
+          "buyTransactionId": "tx_mr3ji5kj_m8ogzy",
+          "date": "2026-07-01",
+          "shares": 1,
+          "unitCostUSD": 1080.35,
+          "unitCostNative": 1080.35,
+          "costBasisUSD": 1080.35,
+          "costBasisNative": 1080.35
+        }
+      ],
+      "feeUSD": 0.37,
+      "costBasisUSD": 1080.35,
+      "costBasisNative": 1080.35,
+      "grossUSD": 1060,
+      "realizedPnlUSD": -20.7199999999998
     }
   ],
   "cashFlows": [
@@ -3494,6 +3498,30 @@
       "netAsset": 22838.53,
       "market": 16140.25,
       "cash": 6698.28
+    },
+    {
+      "scope": "active",
+      "date": "2026-09-19",
+      "capital": 22370,
+      "netAsset": 24298.04,
+      "market": 17599.76,
+      "cash": 6698.28
+    },
+    {
+      "scope": "active",
+      "date": "2026-09-22",
+      "capital": 22370,
+      "netAsset": 26081.99,
+      "market": 18324.08,
+      "cash": 7757.91
+    },
+    {
+      "scope": "active",
+      "date": "2026-09-23",
+      "capital": 22370,
+      "netAsset": 25986.57,
+      "market": 18228.66,
+      "cash": 7757.91
     }
   ],
   "dcaPlan": {
@@ -3506,12 +3534,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 701.03,
-        "priceAsOf": "2026-09-17T20:00:00.000Z",
-        "changePercent": 1.1237089608216437,
-        "priceSource": "last-close",
+        "price": 712.71,
+        "priceAsOf": "2026-09-22T17:10:06.000Z",
+        "changePercent": -0.009820702039891178,
+        "priceSource": "finnhub",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-09-17T20:00:00.000Z"
+        "priceUpdatedAt": "2026-09-22T17:10:06.000Z"
       },
       {
         "symbol": "QQQM",
@@ -3519,12 +3547,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 295.2,
-        "priceAsOf": "2026-09-17T20:00:00.000Z",
-        "changePercent": 1.722949689869056,
-        "priceSource": "last-close",
+        "price": 306.92,
+        "priceAsOf": "2026-09-22T17:10:03.000Z",
+        "changePercent": 0.5405051266092423,
+        "priceSource": "finnhub",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-09-17T20:00:00.000Z"
+        "priceUpdatedAt": "2026-09-22T17:10:03.000Z"
       }
     ],
     "entries": [
@@ -3768,6 +3796,20 @@
         "marketValueUSD": 1512.6763,
         "pnlUSD": 10.021758,
         "returnPct": 0.666937
+      },
+      {
+        "date": "2026-09-22",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1550.15819,
+        "pnlUSD": 47.503648,
+        "returnPct": 3.161315
+      },
+      {
+        "date": "2026-09-23",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1551.766836,
+        "pnlUSD": 49.112294,
+        "returnPct": 3.268369
       }
     ]
   }
