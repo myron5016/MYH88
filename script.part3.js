@@ -159,21 +159,10 @@ function transactionMetaMap(transactions=state.transactions){
 }
 function transactionDateValue(t){return String(t?.date||"0000-00-00")}
 function openingBaselineDates(transactions){
-  const map={};
-  (transactions||[]).forEach(t=>{
-    if(t?.voided||t?.type!=="opening")return;
-    const symbol=String(t.symbol||"").trim().toUpperCase();
-    if(!symbol)return;
-    const date=transactionDateValue(t);
-    if(!map[symbol]||date<map[symbol])map[symbol]=date;
-  });
-  return map;
+  return MYH88Core.openingBaselineDates(transactions);
 }
 function transactionAffectsCurrentPosition(t,baselineDates){
-  if(t?.type==="opening")return true;
-  const symbol=String(t?.symbol||"").trim().toUpperCase();
-  const baseline=baselineDates[symbol];
-  return !baseline||transactionDateValue(t)>=baseline;
+  return MYH88Core.transactionAffectsCurrentPosition(t,baselineDates);
 }
 function orderedTransactionsForRebuild(transactions){
   return (transactions||[]).map((t,index)=>({...t,_order:index})).sort((a,b)=>{

@@ -196,14 +196,34 @@
     });
   }
 
+  function openingBaselineDates(transactions = []) {
+    const dates = {};
+    transactions.forEach((transaction) => {
+      if (transaction?.voided || transaction?.type !== "opening") return;
+      const symbol = String(transaction.symbol || "").trim().toUpperCase();
+      const date = String(transaction.date || "0000-00-00");
+      if (symbol && (!dates[symbol] || date < dates[symbol])) dates[symbol] = date;
+    });
+    return dates;
+  }
+
+  function transactionAffectsCurrentPosition(transaction, baselineDates = {}) {
+    if (transaction?.type === "opening") return true;
+    const symbol = String(transaction?.symbol || "").trim().toUpperCase();
+    const baseline = baselineDates[symbol];
+    return !baseline || String(transaction?.date || "0000-00-00") >= baseline;
+  }
+
   function lotsBeforeTransaction(transactions = [], stopBeforeId = "", symbolFilter = "") {
     const bySymbol = new Map();
     const wanted = String(symbolFilter || "").toUpperCase();
+    const baselineDates = openingBaselineDates(transactions);
     for (const transaction of orderedLotTransactions(transactions)) {
       if (stopBeforeId && transaction.id === stopBeforeId) break;
       if (transaction.voided) continue;
       const symbol = String(transaction.symbol || "").toUpperCase();
       if (!symbol || (wanted && symbol !== wanted)) continue;
+      if (!transactionAffectsCurrentPosition(transaction, baselineDates)) continue;
       const lots = bySymbol.get(symbol) || [];
       if (transaction.type === "buy" || transaction.type === "opening") {
         lots.push(createLot(transaction, transaction._lotOrder));
@@ -673,6 +693,7 @@
     createLot,
     lotsBeforeTransaction,
     marketUSD,
+    openingBaselineDates,
     parseStaticQuoteCache,
     quoteTradingDay,
     quoteCacheCoversSymbols,
@@ -681,6 +702,7 @@
     scheduleBackgroundTasks,
     summarizeLots,
     squarifiedTreemap,
+    transactionAffectsCurrentPosition,
     treemapVisualItems,
   });
 })(globalThis);

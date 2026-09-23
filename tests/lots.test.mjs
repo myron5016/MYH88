@@ -64,6 +64,45 @@ test("历史回放会在目标卖出前返回当时可用批次", () => {
   assert.equal(lots[0].buyTransactionId, "first");
 });
 
+test("迁移期初日前的历史卖出不会再次扣减当前批次", () => {
+  const transactions = [
+    {
+      id: "opening", date: "2026-06-21", type: "opening", symbol: "MRVL",
+      shares: 5, price: 325.04, fee: 0, fxRate: 1, costBasisUSD: 1625.2,
+      migration: true,
+    },
+    {
+      id: "historical-sale", date: "2026-06-19", type: "sell", symbol: "MRVL",
+      shares: 4, price: 315, fee: 0, fxRate: 1, costBasisUSD: 1300.16,
+      migration: true, closedHistory: true,
+    },
+  ];
+
+  const lots = lotsBeforeTransaction(transactions, "", "MRVL");
+  const summary = summarizeLots(lots);
+
+  assert.equal(summary.shares, 5);
+  assert.equal(lots.length, 1);
+  assert.equal(lots[0].buyTransactionId, "opening");
+});
+
+test("迁移期初日后的新卖出仍会正常扣减批次", () => {
+  const transactions = [
+    {
+      id: "opening", date: "2026-06-21", type: "opening", symbol: "MRVL",
+      shares: 5, price: 325.04, fee: 0, fxRate: 1, costBasisUSD: 1625.2,
+      migration: true,
+    },
+    {
+      id: "new-sale", date: "2026-09-23", type: "sell", symbol: "MRVL",
+      shares: 5, price: 265, fee: 0.37, fxRate: 1,
+    },
+  ];
+
+  const lots = lotsBeforeTransaction(transactions, "", "MRVL");
+  assert.equal(summarizeLots(lots).shares, 0);
+});
+
 test("指定批次数量不完整会拒绝记账", () => {
   const lots = [createLot(buy("only", "2026-01-01", 2, 100, 0), 0)];
   assert.throws(() => allocateLotSale(lots, 2, "specific", [{ buyTransactionId: "only", shares: 1 }]), /must equal/);
