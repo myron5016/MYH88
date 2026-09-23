@@ -265,6 +265,63 @@ test("logo 路由只返回缓存记录指定的已验证图片", async () => {
   }
 });
 
+test("logo 代理逐跳校验并跟随有限次 HTTPS 重定向", async () => {
+  const env = imageProxyEnv("NVDA", {
+    symbol: "NVDA",
+    status: "verified",
+    source: "finnhub",
+    name: "NVIDIA",
+    upstreamUrl: "https://static2.finnhub.io/logo.png",
+  });
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url, init) => {
+    calls.push({ url: String(url), redirect: init.redirect });
+    if (calls.length === 1) {
+      return new Response(null, {
+        status: 302,
+        headers: { Location: "https://static9.finnhub.io/final.png" },
+      });
+    }
+    return new Response(new Uint8Array([137, 80, 78, 71]), {
+      headers: { "Content-Type": "image/png" },
+    });
+  };
+  try {
+    const response = await worker.fetch(new Request("https://quote.myh88.com/logo/NVDA"), env, { waitUntil() {} });
+    assert.equal(response.status, 200);
+    assert.deepEqual(calls, [
+      { url: "https://static2.finnhub.io/logo.png", redirect: "manual" },
+      { url: "https://static9.finnhub.io/final.png", redirect: "manual" },
+    ]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("logo 代理拒绝重定向到内网地址", async () => {
+  const env = imageProxyEnv("NVDA", {
+    symbol: "NVDA",
+    status: "verified",
+    source: "finnhub",
+    name: "NVIDIA",
+    upstreamUrl: "https://static2.finnhub.io/logo.png",
+  });
+  const originalFetch = globalThis.fetch;
+  let fetchCount = 0;
+  globalThis.fetch = async () => {
+    fetchCount += 1;
+    return new Response(null, { status: 302, headers: { Location: "https://127.0.0.1/secret" } });
+  };
+  try {
+    const response = await worker.fetch(new Request("https://quote.myh88.com/logo/NVDA"), env, { waitUntil() {} });
+    assert.equal(response.status, 502);
+    assert.equal(fetchCount, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("logo 路由允许连字符代码，拒绝缺失资料、路径穿越和编码斜杠", async () => {
   const env = imageProxyEnv("ABC-D", {
     symbol: "ABC-D",

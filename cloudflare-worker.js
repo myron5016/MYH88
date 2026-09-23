@@ -19,6 +19,7 @@ const LOGO_PROFILE_TTL_SECONDS = 30 * 24 * 60 * 60;
 const LOGO_MISSING_TTL_SECONDS = 24 * 60 * 60;
 const LOGO_BATCH_LIMIT = 24;
 const LOGO_MAX_BYTES = 512 * 1024;
+const LOGO_MAX_REDIRECTS = 3;
 const SCHEDULED_BUNDLE_KEY = "quotes:scheduled:current:v1";
 const SCHEDULED_BUNDLE_TTL_SECONDS = 24 * 60 * 60;
 const TWELVE_BASE = "https://api.twelvedata.com";
@@ -146,10 +147,21 @@ async function proxySecurityLogo(env, symbol) {
     if (cached) return cached;
   }
 
-  const response = await fetch(upstream.toString(), {
-    headers: { Accept: "image/avif,image/webp,image/png,image/jpeg,image/svg+xml,image/*" },
-    redirect: "manual",
-  });
+  let response;
+  let currentUpstream = upstream;
+  for (let redirectCount = 0; redirectCount <= LOGO_MAX_REDIRECTS; redirectCount += 1) {
+    response = await fetch(currentUpstream.toString(), {
+      headers: { Accept: "image/avif,image/webp,image/png,image/jpeg,image/svg+xml,image/*" },
+      redirect: "manual",
+    });
+    if (![301, 302, 303, 307, 308].includes(response.status)) break;
+    if (redirectCount >= LOGO_MAX_REDIRECTS) return logoProxyError("Logo upstream unavailable");
+    const location = response.headers.get("Location");
+    let redirected;
+    try { redirected = location ? validateLogoUrl(new URL(location, currentUpstream).toString()) : null; } catch { redirected = null; }
+    if (!redirected) return logoProxyError("Logo upstream unavailable");
+    currentUpstream = redirected;
+  }
   if (!response.ok || response.status >= 300) return logoProxyError("Logo upstream unavailable");
   const contentType = String(response.headers.get("Content-Type") || "").split(";", 1)[0].trim().toLowerCase();
   if (!/^image\/(?:png|jpeg|webp|avif|svg\+xml|x-icon|vnd\.microsoft\.icon)$/.test(contentType)) return logoProxyError("Logo upstream returned an unsupported content type");
