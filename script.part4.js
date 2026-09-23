@@ -126,6 +126,7 @@ function renderMapHoldingTable(){
     return `<tr><td class="position-code"><span class="position-logo">${companyLogoMarkup(p.symbol)}</span><strong>${escapeHtml(p.symbol)}</strong></td><td class="position-name">${escapeHtml(p.name||p.symbol)}</td><td>${round(p.shares,4)}</td><td>${money(marketValue)}</td><td>${weight}%</td><td>${usdPrice(costPrice)}</td><td>${usdPrice(currentPrice)}</td><td class="${cls(pnl)}"><strong>${money(pnl)}</strong></td><td class="${cls(ret)}"><strong>${ret>0?"+":""}${ret}%</strong></td>${actions}</tr>`;
   }).join("");
   body.innerHTML=rows||`<tr><td colspan="${isAdminMode?10:9}" class="muted empty-table-cell">暂无当前持仓</td></tr>`;
+  hydrateSecurityLogos(body);
 }
 
 function renderAll(){renderKpis();renderTreemap();renderSectorsV2();renderMapHoldingTable();renderReturnDashboard();renderHoldingCardsV2();renderPositionTable();renderTransactionTable();renderCashFlowTable();renderSectorAdminPanel();if($("positionCount"))$("positionCount").textContent=state.positions.length;$("transactionCount").textContent=state.transactions.length;$("cashFlowCount").textContent=state.cashFlows.length;renderLedgerSummary();switchLedgerTab(activeLedgerTab);$("pageTitle").textContent=state.settings.title;document.title=state.settings.title;$("titleInput").value=state.settings.title;$("cacheInput").value=state.settings.priceCacheMinutes;if($("eurFxInput"))$("eurFxInput").value=state.fxRates.EUR||defaultState.fxRates.EUR;if($("proxyInput"))$("proxyInput").value=priceProxyUrl();renderSyncStatus();renderDiagnostics()}
