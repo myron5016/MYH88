@@ -31,7 +31,7 @@ const US_MARKET_CLOSE_MIN = 16 * 60;
 const US_EARLY_CLOSE_MIN = 13 * 60;
 const FALLBACK_PORTFOLIO_SYMBOLS = ["NVDA", "MRVL", "AAOI", "XFAB", "RKLB", "VRT", "SPCX", "GOOGL", "LITE", "MU", "VOO", "QQQM"];
 const DEFAULT_TWELVE_PRIORITY = ["NVDA", "RKLB", "SPCX", "GOOGL", "MU", "MRVL", "AAOI", "TSLA"];
-const VERIFIED_LOGO_OVERRIDES = Object.create(null);
+const VERIFIED_LOGO_OVERRIDES = {};
 const LOGO_SUPPRESSIONS = new Set(["MSTU"]);
 const US_STATIC_HOLIDAYS = {
   "2026-01-01": "New Year's Day", "2026-01-19": "Martin Luther King Jr. Day", "2026-02-16": "Presidents' Day", "2026-04-03": "Good Friday", "2026-05-25": "Memorial Day", "2026-06-19": "Juneteenth", "2026-07-03": "Independence Day observed", "2026-09-07": "Labor Day", "2026-11-26": "Thanksgiving Day", "2026-12-25": "Christmas Day",
