@@ -322,6 +322,37 @@ test("logo 代理拒绝重定向到内网地址", async () => {
   }
 });
 
+test("logo 代理把重定向网络异常和正文读取异常收敛为 502", async () => {
+  const env = imageProxyEnv("NVDA", {
+    symbol: "NVDA",
+    status: "verified",
+    source: "finnhub",
+    name: "NVIDIA",
+    upstreamUrl: "https://static2.finnhub.io/logo.png",
+  });
+  const originalFetch = globalThis.fetch;
+  try {
+    let fetchCount = 0;
+    globalThis.fetch = async () => {
+      fetchCount += 1;
+      if (fetchCount === 1) return new Response(null, { status: 302, headers: { Location: "/final.png" } });
+      throw new Error("TLS failed at private upstream URL");
+    };
+    let response = await worker.fetch(new Request("https://quote.myh88.com/logo/NVDA"), env, { waitUntil() {} });
+    assert.equal(response.status, 502);
+    assert.deepEqual(await response.json(), { error: "Logo upstream unavailable" });
+
+    globalThis.fetch = async () => new Response(new ReadableStream({
+      pull(controller) { controller.error(new Error("body read failed")); },
+    }), { headers: { "Content-Type": "image/png" } });
+    response = await worker.fetch(new Request("https://quote.myh88.com/logo/NVDA"), env, { waitUntil() {} });
+    assert.equal(response.status, 502);
+    assert.deepEqual(await response.json(), { error: "Logo upstream unavailable" });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 test("logo 路由允许连字符代码，拒绝缺失资料、路径穿越和编码斜杠", async () => {
   const env = imageProxyEnv("ABC-D", {
     symbol: "ABC-D",

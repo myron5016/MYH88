@@ -150,10 +150,14 @@ async function proxySecurityLogo(env, symbol) {
   let response;
   let currentUpstream = upstream;
   for (let redirectCount = 0; redirectCount <= LOGO_MAX_REDIRECTS; redirectCount += 1) {
-    response = await fetch(currentUpstream.toString(), {
-      headers: { Accept: "image/avif,image/webp,image/png,image/jpeg,image/svg+xml,image/*" },
-      redirect: "manual",
-    });
+    try {
+      response = await fetch(currentUpstream.toString(), {
+        headers: { Accept: "image/avif,image/webp,image/png,image/jpeg,image/svg+xml,image/*" },
+        redirect: "manual",
+      });
+    } catch {
+      return logoProxyError("Logo upstream unavailable");
+    }
     if (![301, 302, 303, 307, 308].includes(response.status)) break;
     if (redirectCount >= LOGO_MAX_REDIRECTS) return logoProxyError("Logo upstream unavailable");
     const location = response.headers.get("Location");
@@ -167,7 +171,8 @@ async function proxySecurityLogo(env, symbol) {
   if (!/^image\/(?:png|jpeg|webp|avif|svg\+xml|x-icon|vnd\.microsoft\.icon)$/.test(contentType)) return logoProxyError("Logo upstream returned an unsupported content type");
   const declaredLength = Number(response.headers.get("Content-Length") || 0);
   if (declaredLength > LOGO_MAX_BYTES) return logoProxyError("Logo image is too large");
-  const bytes = await response.arrayBuffer();
+  let bytes;
+  try { bytes = await response.arrayBuffer(); } catch { return logoProxyError("Logo upstream unavailable"); }
   if (bytes.byteLength > LOGO_MAX_BYTES) return logoProxyError("Logo image is too large");
 
   const headers = new Headers({
