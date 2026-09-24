@@ -9,9 +9,9 @@ function commitTransactionChange(nextTransactions,reason){
   createBackup(reason+"前");
   try{
     rebuildCurrentPositionsFromTransactions(nextTransactions);
-    captureSnapshot(false);markDirty(reason);renderAll();switchLedgerTab("transactions");
+    captureSnapshot(false);markDirty(reason);renderAll();switchLedgerTab("transactions");return true;
   }catch(error){
-    state=before;saveLocal();renderAll();alert("操作失败："+error.message);
+    state=before;saveLocal();renderAll();alert("操作失败："+error.message);return false;
   }
 }
 function openTrade(type,positionId=""){
@@ -31,12 +31,12 @@ function submitTrade(event){
   const editId=$("tradeEditId").value;
   if(editId){
     const existing=state.transactions.find(t=>t.id===editId);if(!existing)return;
-    try{const draft=tradeFormDraft(existing),next=state.transactions.map(t=>t.id===editId?draft:t);commitTransactionChange(next,`${draft.symbol} 交易已编辑`);$("tradeDialog").close()}catch(error){alert(error.message)}
+    try{const draft=tradeFormDraft(existing),next=state.transactions.map(t=>t.id===editId?draft:t);if(commitTransactionChange(next,`${draft.symbol} 交易已编辑`))$("tradeDialog").close()}catch(error){alert(error.message)}
     return;
   }
   try{
     const draft=tradeFormDraft({});
-    commitTransactionChange([...state.transactions,draft],`${draft.symbol} ${draft.type==="sell"?"卖出":"买入"}交易已记录`);
+    if(!commitTransactionChange([...state.transactions,draft],`${draft.symbol} ${transactionLabel(draft)}交易已记录`))return;
     $("tradeDialog").close();switchLedgerTab(draft.type==="sell"?"transactions":"positions");
   }catch(error){alert(error.message)}
 }
@@ -59,7 +59,7 @@ function submitPositionEdit(event){
   state.transactions.forEach(t=>{if(t.symbol===p.symbol){t.name=p.name;t.sector=p.sector;t.source=p.source;t.color=p.color}});
   markDirty(`${p.symbol} 资产资料与颜色已编辑`);$("positionDialog").close();renderAll()
 }
-function renderSectorsV2(){const bar=$("sectorBar"),legend=$("sectorLegend"),total=Math.max(contributedCapital()+realizedPnl(),1);bar.innerHTML="";legend.innerHTML="";sectorItems().forEach(s=>{const pct=round(s.total/total*100),seg=document.createElement("div");seg.className="segment"+(pct>=14?" major":"");seg.style.width=Math.max(4,pct)+"%";seg.style.background=`linear-gradient(90deg, ${mixColor(s.color,"#ffffff",.14)}, ${mixColor(s.color,"#000000",.12)})`;seg.title=`${s.label} ${pct}%`;seg.textContent=pct>=14?`${s.label} ${pct}%`:"";bar.appendChild(seg);legend.insertAdjacentHTML("beforeend",`<span><i class="dot" style="background:${validColor(s.color)}"></i>${escapeHtml(s.label)} ${money(s.total)} <b class="${cls(s.pnl)}">${money(s.pnl)}</b></span>`)})}
+function renderSectorsV2(){const bar=$("sectorBar"),legend=$("sectorLegend"),total=Math.max(sectorItems().reduce((sum,item)=>sum+item.total,0),1);bar.innerHTML="";legend.innerHTML="";sectorItems().forEach(s=>{const pct=round(s.total/total*100),seg=document.createElement("div");seg.className="segment"+(pct>=14?" major":"");seg.style.width=Math.max(4,pct)+"%";seg.style.background=`linear-gradient(90deg, ${mixColor(s.color,"#ffffff",.14)}, ${mixColor(s.color,"#000000",.12)})`;seg.title=`${s.label} ${pct}%`;seg.textContent=pct>=14?`${s.label} ${pct}%`:"";bar.appendChild(seg);legend.insertAdjacentHTML("beforeend",`<span><i class="dot" style="background:${validColor(s.color)}"></i>${escapeHtml(s.label)} ${money(s.total)} <b class="${cls(s.pnl)}">${money(s.pnl)}</b></span>`)})}
 const RETURN_VIEWS=["all","month","year"];
 let activeReturnView="all",returnScrollTimer=null;
 function returnDateLabel(date){const parts=String(date||"").split("-");return parts.length===3?`${num(parts[1])}/${num(parts[2])}`:String(date||"")}
@@ -108,22 +108,22 @@ function initReturnCarousel(){const carousel=$("returnCarousel");if(!carousel)re
 function renderHoldingCardsV2(){
   const box=$("holdingCards");
   if(!state.positions.length){box.innerHTML='<div class="empty">暂无当前持仓</div>';return}
-  const total=Math.max(contributedCapital()+realizedPnl(),1);
+  const total=Math.max(treemapItems().reduce((sum,item)=>sum+item.value,0),1);
   box.innerHTML=state.positions.slice().sort((a,b)=>num(b.costBasisUSD)-num(a.costBasisUSD)).map(p=>{
-    const pnl=floatingPnlUSD(p),ret=round(p.costBasisUSD?pnl/p.costBasisUSD*100:0),weight=round(p.costBasisUSD/total*100),change=round(p.changePercent||0),changeText=change?change+"%":"--",source=priceSourceLabel(p);
+    const pnl=floatingPnlUSD(p),ret=round(p.costBasisUSD?pnl/Math.abs(p.costBasisUSD)*100:0),weight=round(Math.abs(p.costBasisUSD)/total*100),change=round(p.changePercent||0),changeText=change?change+"%":"--",source=priceSourceLabel(p);
     return '<div class="holding-card"><div class="holding-main"><div><div class="symbol">'+escapeHtml(p.symbol)+'</div><div class="name">'+(escapeHtml(p.name)||escapeHtml(p.sector))+'</div></div><div class="holding-value"><strong>'+money(marketUSD(p))+'</strong><span class="'+cls(pnl)+'">'+money(pnl)+' / '+ret+'%</span></div></div><div class="holding-meta"><span>'+escapeHtml(p.sector)+'</span><span class="'+cls(change)+'">'+changeText+'</span></div><div class="quote-line"><span class="quote-source '+priceSourceClass(p)+'">'+escapeHtml(source)+'</span><small>'+round(p.price,4)+' '+escapeHtml(p.currency)+'</small></div><div class="holding-progress"><i style="width:'+Math.min(100,Math.max(2,weight))+'%;background:'+validColor(p.color)+'"></i></div><div class="grid compact"><div><div class="label">成本仓位</div><div class="value">'+weight+'%</div></div><div><div class="label">数量</div><div class="value">'+round(p.shares,4)+'</div></div><div><div class="label">平均成本</div><div class="value">'+round(p.avgCost,4)+' '+escapeHtml(p.currency)+'</div></div><div><div class="label">投入成本</div><div class="value">'+money(p.costBasisUSD)+'</div></div></div></div>'
   }).join("")
 }
 
 function renderMapHoldingTable(){
   const body=$("mapHoldingBody");if(!body)return;
-  const holdingsTotal=Math.max(state.positions.reduce((sum,p)=>sum+marketUSD(p),0),1);
+  const holdingsTotal=Math.max(state.positions.reduce((sum,p)=>sum+Math.abs(marketUSD(p)),0),1);
   const usdPrice=value=>Number.isFinite(value)?`$${Number(value).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4})}`:"—";
   const rows=state.positions.slice().sort((a,b)=>marketUSD(b)-marketUSD(a)).map(p=>{
-    const pnl=floatingPnlUSD(p),marketValue=marketUSD(p),weight=round(marketValue/holdingsTotal*100),ret=round(p.costBasisUSD?pnl/p.costBasisUSD*100:0);
+    const pnl=floatingPnlUSD(p),marketValue=marketUSD(p),weight=round(Math.abs(marketValue)/holdingsTotal*100),ret=round(p.costBasisUSD?pnl/Math.abs(p.costBasisUSD)*100:0);
     const costPrice=num(p.avgCost)*fx(p.currency),currentPrice=num(p.price)*fx(p.currency);
-    const actions=isAdminMode?`<td class="admin-column"><div class="cockpit-row-actions"><button title="记录买入" aria-label="记录买入 ${escapeHtml(p.symbol)}" onclick="openTrade('buy','${p.id}')">买</button><button title="记录卖出" aria-label="记录卖出 ${escapeHtml(p.symbol)}" onclick="openTrade('sell','${p.id}')">卖</button><button title="编辑资产" aria-label="编辑 ${escapeHtml(p.symbol)}" onclick="editPosition('${p.id}')">编</button></div></td>`:"";
-    return `<tr><td class="position-code"><span class="position-logo">${companyLogoMarkup(p.symbol)}</span><strong>${escapeHtml(p.symbol)}</strong></td><td class="position-name">${escapeHtml(p.name||p.symbol)}</td><td>${round(p.shares,4)}</td><td>${money(marketValue)}</td><td>${weight}%</td><td>${usdPrice(costPrice)}</td><td>${usdPrice(currentPrice)}</td><td class="${cls(pnl)}"><strong>${money(pnl)}</strong></td><td class="${cls(ret)}"><strong>${ret>0?"+":""}${ret}%</strong></td>${actions}</tr>`;
+    const actions=isAdminMode?`<td class="admin-column"><div class="cockpit-row-actions"><button title="${p.shares<0?"增加空头":"记录买入"}" onclick="openTrade('${p.shares<0?"short":"buy"}','${p.id}')">${p.shares<0?"加空":"买"}</button><button title="${p.shares<0?"买入平空":"记录卖出"}" onclick="openTrade('${p.shares<0?"cover":"sell"}','${p.id}')">${p.shares<0?"平空":"卖"}</button><button title="编辑资产" aria-label="编辑 ${escapeHtml(p.symbol)}" onclick="editPosition('${p.id}')">编</button></div></td>`:"";
+    return `<tr><td class="position-code"><span class="position-logo">${companyLogoMarkup(p.symbol)}</span><strong>${escapeHtml(p.symbol)}</strong></td><td class="position-name">${escapeHtml(p.name||p.symbol)}${p.shares<0?" · 空头":""}</td><td>${round(p.shares,4)}</td><td>${money(marketValue)}</td><td>${weight}%</td><td>${usdPrice(costPrice)}</td><td>${usdPrice(currentPrice)}</td><td class="${cls(pnl)}"><strong>${money(pnl)}</strong></td><td class="${cls(ret)}"><strong>${ret>0?"+":""}${ret}%</strong></td>${actions}</tr>`;
   }).join("");
   body.innerHTML=rows||`<tr><td colspan="${isAdminMode?10:9}" class="muted empty-table-cell">暂无当前持仓</td></tr>`;
   hydrateSecurityLogos(body);

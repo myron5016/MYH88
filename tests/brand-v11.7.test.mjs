@@ -127,10 +127,10 @@ test("V11.7.3 release ships only the verified-logo runtime and cash artwork", as
   }
   for (const source of [index, worker]) assert.match(source, /security-logo\.js\?v=11\.7\.3/);
   for (const source of [index, worker]) {
-    assert.match(source, /myh88-core\.js\?v=11\.6\.0&fix=20260923/);
-    assert.match(source, /script\.part3\.js\?v=11\.7\.3&fix=20260923/);
+    assert.match(source, /myh88-core\.js\?v=11\.6\.0&fix=20260925-short/);
+    assert.match(source, /script\.part3\.js\?v=11\.7\.3&fix=20260925-short/);
   }
-  assert.match(worker, /const CACHE_VERSION=["']dream-fund-v11-7-3-lot-baseline["']/);
+  assert.match(worker, /const CACHE_VERSION=["']dream-fund-v11-7-3-short-20260925["']/);
   assert.match(meta, /"release":\s*"11\.7\.3"/);
   assert.match(meta, /"worker":\s*"10\.59"/);
   assert.match(pkg, /"version":\s*"11\.7\.3"/);

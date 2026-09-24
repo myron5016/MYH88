@@ -18,7 +18,7 @@
       .filter((item) => !item.voided)
       .reduce((sum, item) => sum + (item.type === "withdraw" ? -num(item.amountUSD) : num(item.amountUSD)), 0);
     const realizedPnl = transactions
-      .filter((item) => item.type === "sell" && !item.voided)
+      .filter((item) => ["sell", "cover"].includes(item.type) && !item.voided)
       .reduce((sum, item) => sum + num(item.realizedPnlUSD), 0);
     const currentCost = positions.reduce((sum, position) => sum + num(position.costBasisUSD), 0);
     const marketTotal = positions.reduce((sum, position) => sum + marketUSD(position, fxRates), 0);
@@ -36,7 +36,7 @@
       netAsset,
       totalPnl,
       totalReturn: contributedCapital ? totalPnl / contributedCapital * 100 : 0,
-      floatingReturn: currentCost ? floatingPnl / currentCost * 100 : 0,
+      floatingReturn: positions.reduce((sum, p) => sum + Math.abs(num(p.costBasisUSD)), 0) ? floatingPnl / positions.reduce((sum, p) => sum + Math.abs(num(p.costBasisUSD)), 0) * 100 : 0,
     };
   }
 
@@ -52,7 +52,7 @@
     const fxRate = num(transaction.fxRate) || 1;
     const nativeBasis = Number.isFinite(Number(transaction.costBasisNative))
       ? num(transaction.costBasisNative)
-      : shares * num(transaction.price) + num(transaction.fee);
+      : shares * num(transaction.price) + (transaction.type === "short" ? -1 : 1) * num(transaction.fee);
     const usdBasis = Number.isFinite(Number(transaction.costBasisUSD))
       ? num(transaction.costBasisUSD)
       : nativeBasis * fxRate;
@@ -61,6 +61,7 @@
       buyTransactionId: String(transaction.id || transaction.lotId || `lot-${order}`),
       date: String(transaction.date || ""),
       order,
+      side: transaction.type === "short" ? "short" : "long",
       shares: roundLot(shares),
       remainingShares: roundLot(shares),
       costBasisUSD: usdBasis,
@@ -160,8 +161,8 @@
         ? num(lot.remainingCostBasisNative)
         : num(lot.remainingCostBasisNative) / beforeShares * shares;
       lot.remainingShares = roundLot(beforeShares - shares);
-      lot.remainingCostBasisUSD = roundLot(Math.max(0, num(lot.remainingCostBasisUSD) - basisUSD), 8);
-      lot.remainingCostBasisNative = roundLot(Math.max(0, num(lot.remainingCostBasisNative) - basisNative), 8);
+      lot.remainingCostBasisUSD = roundLot(num(lot.remainingCostBasisUSD) - basisUSD, 8);
+      lot.remainingCostBasisNative = roundLot(num(lot.remainingCostBasisNative) - basisNative, 8);
       costBasisUSD += basisUSD;
       costBasisNative += basisNative;
       return {
@@ -196,6 +197,32 @@
     });
   }
 
+  // Lots retain positive quantities; only the aggregate short position is signed.
+  function positionFromLots(lots = []) {
+    const summary = summarizeLots(lots);
+    const sign = summary.lots[0]?.side === "short" ? -1 : 1;
+    return { ...summary, shares: sign * summary.shares, costBasisUSD: sign * summary.costBasisUSD };
+  }
+
+  function applyLotTrade(lots = [], transaction = {}, order = 0) {
+    const type = transaction.type, quantity = num(transaction.shares);
+    if (!["buy", "opening", "sell", "short", "cover"].includes(type)) throw new Error("不支持的交易类型");
+    if (!Number.isFinite(Number(transaction.shares)) || quantity <= 0) throw new Error("交易数量必须为正数");
+    const current = positionFromLots(lots), short = type === "short" || type === "cover";
+    if ((short && current.shares > LOT_EPSILON) || (!short && current.shares < -LOT_EPSILON)) {
+      throw new Error("请先平掉现有反向持仓，再单独开仓；不支持自动拆分多空交易");
+    }
+    if (type === "buy" || type === "opening" || type === "short") {
+      const next = [...lots, createLot(transaction, order)];
+      return { lots: next, remaining: positionFromLots(next), realizedPnlUSD: 0 };
+    }
+    if (quantity > Math.abs(current.shares) + LOT_EPSILON) throw new Error(type === "cover" ? "平空数量超过可用空头持仓" : "卖出数量超过可用多头持仓");
+    const frozen = transaction.lotAllocations?.length > 0;
+    const result = allocateLotSale(lots, quantity, frozen ? "specific" : (transaction.lotMethod || "average"), transaction.lotAllocations || []);
+    const rate = num(transaction.fxRate) || 1, gross = quantity * num(transaction.price) * rate, fee = num(transaction.fee) * rate;
+    return { ...result, remaining: positionFromLots(result.lots), realizedPnlUSD: short ? result.costBasisUSD - gross - fee : gross - fee - result.costBasisUSD };
+  }
+
   function openingBaselineDates(transactions = []) {
     const dates = {};
     transactions.forEach((transaction) => {
@@ -225,17 +252,10 @@
       if (!symbol || (wanted && symbol !== wanted)) continue;
       if (!transactionAffectsCurrentPosition(transaction, baselineDates)) continue;
       const lots = bySymbol.get(symbol) || [];
-      if (transaction.type === "buy" || transaction.type === "opening") {
-        lots.push(createLot(transaction, transaction._lotOrder));
-        bySymbol.set(symbol, lots);
-      } else if (transaction.type === "sell") {
-        const available = summarizeLots(lots).shares;
-        if (available + LOT_EPSILON < num(transaction.shares)) continue;
-        const frozen = Array.isArray(transaction.lotAllocations) && transaction.lotAllocations.length > 0;
-        const method = frozen ? "specific" : (transaction.lotMethod || "average");
-        const result = allocateLotSale(lots, transaction.shares, method, transaction.lotAllocations || []);
-        bySymbol.set(symbol, result.lots);
-      }
+      // Preserve imported closed sales that predate the available purchase history.
+      if (transaction.type === "sell" && !lots.length && transaction.schemaVersion !== "11.7.4") continue;
+      const result = applyLotTrade(lots, transaction, transaction._lotOrder);
+      bySymbol.set(symbol, result.lots);
     }
     if (wanted) return (bySymbol.get(wanted) || []).map((lot) => ({ ...lot }));
     return Object.fromEntries([...bySymbol.entries()].map(([symbol, lots]) => [symbol, lots.map((lot) => ({ ...lot }))]));
@@ -354,8 +374,8 @@
     const missingSymbols = [];
 
     Object.entries(lotsBySymbol).forEach(([symbol, lots]) => {
-      const remaining = summarizeLots(lots);
-      if (!(remaining.shares > LOT_EPSILON)) return;
+      const remaining = positionFromLots(lots);
+      if (!(Math.abs(remaining.shares) > LOT_EPSILON)) return;
       const metadata = currentMetadata.get(symbol) || transactionMetadata.get(symbol) || {};
       const currency = String(metadata.currency || "USD").toUpperCase();
       const source = String(metadata.source || "twelve").toLowerCase();
@@ -375,7 +395,7 @@
     });
 
     const capital = cashFlows.reduce((sum, item) => sum + (item.type === "withdraw" ? -1 : 1) * num(item.amountUSD), 0);
-    const realizedPnl = transactions.filter((item) => item.type === "sell").reduce((sum, item) => sum + num(item.realizedPnlUSD), 0);
+    const realizedPnl = transactions.filter((item) => ["sell", "cover"].includes(item.type)).reduce((sum, item) => sum + num(item.realizedPnlUSD), 0);
     const currentCost = positions.reduce((sum, item) => sum + num(item.costBasisUSD), 0);
     const cash = capital + realizedPnl - currentCost;
     const market = positions.reduce((sum, item) => sum + num(item.shares) * num(item.price) * (item.currency === "USD" ? 1 : num(fxRates[item.currency])), 0);
@@ -684,6 +704,8 @@
   }
 
   root.MYH88Core = Object.freeze({
+    applyLotTrade,
+    positionFromLots,
     allocateLotSale,
     buildHistoricalSnapshot,
     buildDcaReturnSeries,

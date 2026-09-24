@@ -84,7 +84,7 @@ test("ledger summary renders recent trades without including a second transactio
   harness.context.state.cashFlows = [];
   harness.context.renderLedgerSummary();
   assert.match(harness.getElement("ledgerSummaryMonth").textContent, /2026年8月/);
-  assert.match(harness.getElement("ledgerSummaryGrid").innerHTML, /买入金额/);
+  assert.match(harness.getElement("ledgerSummaryGrid").innerHTML, /买入 \/ 平空金额/);
   assert.match(harness.getElement("ledgerSummaryRecent").innerHTML, /NVDA/);
   assert.doesNotMatch(harness.getElement("ledgerSummaryRecent").innerHTML, /transactionBody/);
 });

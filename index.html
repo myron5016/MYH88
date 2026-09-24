@@ -155,7 +155,7 @@
   <section id="allocationMap" class="terminal-grid v117-map-layout">
     <div class="card map-card cockpit-panel v117-map-shell">
       <div class="section-head">
-        <div><span class="section-kicker">ALLOCATION MAP</span><h2>本金配置地图</h2><p class="section-note">按持仓成本展示；小仓位保留最小可读面积，数字均为真实占比</p></div>
+        <div><span class="section-kicker">ALLOCATION MAP</span><h2>本金配置地图</h2><p class="section-note">按持仓成本展示；小仓位保留最小可读面积，多空按绝对成本展示，空头单独标注</p></div>
         <span id="status" class="panel-status">正在读取共享数据...</span>
       </div>
       <div id="treemap"></div>
@@ -215,6 +215,8 @@
       <div class="buttons admin-only hidden">
         <button class="buy-btn" onclick="openTrade('buy')">＋ 买入</button>
         <button class="sell-btn" onclick="openTrade('sell')">－ 卖出</button>
+        <button class="sell-btn" onclick="openTrade('short')">做空</button>
+        <button class="buy-btn" onclick="openTrade('cover')">买入平空</button>
         <button onclick="openCashFlow()">本金变动</button>
       </div>
     </div>
@@ -253,7 +255,7 @@
         <section data-ledger-pane="transactions" id="transactionsPane" class="ledger-page">
           <div class="table-tools">
             <input id="transactionSearch" placeholder="搜索代码" oninput="transactionPage=1;renderTransactionTable()">
-            <select id="transactionTypeFilter" onchange="transactionPage=1;renderTransactionTable()"><option value="all">全部类型</option><option value="buy">仅买入</option><option value="sell">仅卖出</option><option value="opening">V8 迁移记录</option></select>
+            <select id="transactionTypeFilter" onchange="transactionPage=1;renderTransactionTable()"><option value="all">全部类型</option><option value="buy">仅买入</option><option value="sell">仅卖出</option><option value="short">做空</option><option value="cover">买入平空</option><option value="opening">V8 迁移记录</option></select>
           </div>
           <div class="table-wrap"><table class="compact-table"><thead><tr><th>日期</th><th>类型</th><th>代码</th><th>数量</th><th>成交价</th><th>手续费</th><th>成交汇率</th><th>已实现盈亏 USD</th><th>备注</th><th>操作</th></tr></thead><tbody id="transactionBody"></tbody></table></div>
           <div id="transactionPager" class="pager"></div>
@@ -467,15 +469,15 @@
   </form>
 </dialog>
 
-<script src="myh88-core.js?v=11.6.0&fix=20260923"></script>
-<script src="script.part1.js?v=11.7.3"></script>
+<script src="myh88-core.js?v=11.6.0&fix=20260925-short"></script>
+<script src="script.part1.js?v=11.7.3&fix=20260925-short"></script>
 <script src="quote-diagnostics.js?v=11.7.2.1"></script>
-<script src="script.part2.js?v=11.7.2&fix=20260905"></script>
+<script src="script.part2.js?v=11.7.2&fix=20260925-short"></script>
 <script src="security-logo.js?v=11.7.3"></script>
-<script src="script.part3.js?v=11.7.3&fix=20260923"></script>
-<script src="ledger-summary-v11.7.js?v=11.7.1"></script>
-<script src="script.part4.js?v=11.7.3"></script>
-<script src="script.part5.js?v=11.6.0"></script>
+<script src="script.part3.js?v=11.7.3&fix=20260925-short"></script>
+<script src="ledger-summary-v11.7.js?v=11.7.1&fix=20260925-short"></script>
+<script src="script.part4.js?v=11.7.3&fix=20260925-short"></script>
+<script src="script.part5.js?v=11.6.0&fix=20260925-short"></script>
 <script src="script.part6.js?v=11.7.2"></script>
 <script src="brand-v11.6.js?v=11.6.0"></script>
 <script src="brand-v11.7.js?v=11.7.1"></script>

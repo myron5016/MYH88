@@ -254,7 +254,7 @@ function normalizeState(raw){
   state.settings={...defaultState.settings,...(state.settings||{})};
   if(state.settings.apiKey&&!state.settings.publicMarketKey)state.settings.publicMarketKey=String(state.settings.apiKey);
   state.fxRates={...defaultState.fxRates,...(state.fxRates||{}),USD:1};
-  state.positions=(Array.isArray(state.positions)?state.positions:[]).map(normalizePosition).filter(p=>p.symbol&&p.shares>0);
+  state.positions=(Array.isArray(state.positions)?state.positions:[]).map(normalizePosition).filter(p=>p.symbol&&Math.abs(p.shares)>1e-8);
   applyAutoTaxonomy(incomingTaxonomy!==TAXONOMY_VERSION);
   state.settings.taxonomyVersion=TAXONOMY_VERSION;
   state.transactions=Array.isArray(state.transactions)?state.transactions:[];
