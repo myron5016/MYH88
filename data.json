@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-09-24T07:06:22.446Z",
+    "lastCloudSaveAt": "2026-09-24T18:27:30.384Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -41,6 +41,7 @@
           "buyTransactionId": "tx_mqszfh6h_n9zn35",
           "date": "2026-06-24",
           "order": 23,
+          "side": "long",
           "shares": 2,
           "remainingShares": 2,
           "costBasisUSD": 402.348063,
@@ -55,6 +56,7 @@
           "buyTransactionId": "tx_mqzowpji_t0yuji",
           "date": "2026-06-29",
           "order": 27,
+          "side": "long",
           "shares": 2,
           "remainingShares": 2,
           "costBasisUSD": 382.34,
@@ -86,6 +88,7 @@
           "buyTransactionId": "tx_mqnjborg_9zvalh",
           "date": "2026-06-21",
           "order": 2,
+          "side": "long",
           "shares": 4,
           "remainingShares": 4,
           "costBasisUSD": 820.34,
@@ -119,6 +122,7 @@
           "buyTransactionId": "tx_mqnjborg_dndtbg",
           "date": "2026-06-21",
           "order": 4,
+          "side": "long",
           "shares": 44,
           "remainingShares": 44,
           "costBasisUSD": 588.613179,
@@ -154,6 +158,7 @@
           "buyTransactionId": "tx_mqnjborg_b6vxv2",
           "date": "2026-06-21",
           "order": 6,
+          "side": "long",
           "shares": 30,
           "remainingShares": 30,
           "costBasisUSD": 3342,
@@ -168,6 +173,7 @@
           "buyTransactionId": "tx_mso5dkdj_6f4l4c",
           "date": "2026-08-11",
           "order": 67,
+          "side": "long",
           "shares": 10,
           "remainingShares": 10,
           "costBasisUSD": 840.33,
@@ -199,6 +205,7 @@
           "buyTransactionId": "tx_mqnjborg_1jspyf",
           "date": "2026-06-21",
           "order": 14,
+          "side": "long",
           "shares": 10,
           "remainingShares": 10,
           "costBasisUSD": 1500,
@@ -230,6 +237,7 @@
           "buyTransactionId": "tx_mrwsacgk_xi32ic",
           "date": "2026-07-23",
           "order": 51,
+          "side": "long",
           "shares": 5,
           "remainingShares": 5,
           "costBasisUSD": 1700.34,
@@ -244,6 +252,7 @@
           "buyTransactionId": "tx_mrxcf5b8_ut9erb",
           "date": "2026-07-23",
           "order": 54,
+          "side": "long",
           "shares": 5,
           "remainingShares": 5,
           "costBasisUSD": 1650.34,
@@ -252,6 +261,38 @@
           "remainingCostBasisNative": 1650.34,
           "currency": "USD",
           "price": 330
+        }
+      ]
+    },
+    {
+      "id": "pos_mufv5zcw_vmc5tc",
+      "symbol": "TQQQ",
+      "name": "3倍做多纳指",
+      "currency": "USD",
+      "source": "twelve",
+      "shares": -100,
+      "avgCost": 77.2145,
+      "sector": "未分类",
+      "color": "#627288",
+      "sectorLocked": false,
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": -7721.45,
+      "lots": [
+        {
+          "lotId": "tx_mufv5zcd_84dm5v",
+          "buyTransactionId": "tx_mufv5zcd_84dm5v",
+          "date": "2026-09-24",
+          "order": 107,
+          "side": "short",
+          "shares": 100,
+          "remainingShares": 100,
+          "costBasisUSD": 7721.45,
+          "remainingCostBasisUSD": 7721.45,
+          "costBasisNative": 7721.45,
+          "remainingCostBasisNative": 7721.45,
+          "currency": "USD",
+          "price": 77.22
         }
       ]
     }
@@ -3210,6 +3251,28 @@
       "costBasisNative": 5183.05,
       "grossUSD": 6498,
       "realizedPnlUSD": 1314
+    },
+    {
+      "id": "tx_mufv5zcd_84dm5v",
+      "date": "2026-09-24",
+      "type": "short",
+      "symbol": "TQQQ",
+      "name": "3倍做多纳指",
+      "shares": 100,
+      "price": 77.22,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.55,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "11.7.4",
+      "feeUSD": 0.55,
+      "costBasisUSD": 7721.45,
+      "costBasisNative": 7721.45,
+      "grossUSD": 7722,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -3652,6 +3715,14 @@
       "netAsset": 24441.17,
       "market": 9326.94,
       "cash": 15114.23
+    },
+    {
+      "scope": "active",
+      "date": "2026-09-25",
+      "capital": 22370,
+      "netAsset": 24626.12,
+      "market": 1790.44,
+      "cash": 22835.68
     }
   ],
   "dcaPlan": {
@@ -3664,12 +3735,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 707.6,
-        "priceAsOf": "2026-09-23T20:00:00.000Z",
-        "changePercent": -0.7267319509526011,
-        "priceSource": "last-close",
-        "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-09-23T20:00:00.000Z"
+        "price": 706.93,
+        "priceAsOf": "2026-09-24T18:25:00.000Z",
+        "changePercent": -0.094682816,
+        "priceSource": "twelve",
+        "priceProvider": "twelve",
+        "priceUpdatedAt": "2026-09-24T18:25:00.000Z"
       },
       {
         "symbol": "QQQM",
@@ -3677,12 +3748,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 305.14,
-        "priceAsOf": "2026-09-23T20:00:00.000Z",
-        "changePercent": -0.8577555396711893,
-        "priceSource": "last-close",
-        "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-09-23T20:00:00.000Z"
+        "price": 304.6,
+        "priceAsOf": "2026-09-24T18:25:00.000Z",
+        "changePercent": -0.17697274,
+        "priceSource": "twelve",
+        "priceProvider": "twelve",
+        "priceUpdatedAt": "2026-09-24T18:25:00.000Z"
       }
     ],
     "entries": [
@@ -3947,6 +4018,13 @@
         "marketValueUSD": 1541.499652,
         "pnlUSD": 38.84511,
         "returnPct": 2.585099
+      },
+      {
+        "date": "2026-09-25",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1539.52742,
+        "pnlUSD": 36.872878,
+        "returnPct": 2.453849
       }
     ]
   }
