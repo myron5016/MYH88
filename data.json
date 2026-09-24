@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-09-23T09:21:59.790Z",
+    "lastCloudSaveAt": "2026-09-24T07:06:22.446Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -107,7 +107,7 @@
       "avgCost": 11.685,
       "price": 6.845,
       "sector": "半导体",
-      "color": "#ff9a58",
+      "color": "#fa873c",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "手动价，EUR",
@@ -254,68 +254,6 @@
           "price": 330
         }
       ]
-    },
-    {
-      "id": "pos_mto2b85y_zkwe24",
-      "symbol": "MSTU",
-      "name": "2倍做多MSTR",
-      "currency": "USD",
-      "source": "twelve",
-      "shares": 150,
-      "avgCost": 34.553666666666665,
-      "sector": "未分类",
-      "color": "#627288",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "",
-      "costBasisUSD": 5183.05,
-      "lots": [
-        {
-          "lotId": "tx_mto2b85k_tg9fbn",
-          "buyTransactionId": "tx_mto2b85k_tg9fbn",
-          "date": "2026-09-04",
-          "order": 96,
-          "shares": 150,
-          "remainingShares": 150,
-          "costBasisUSD": 5183.05,
-          "remainingCostBasisUSD": 5183.05,
-          "costBasisNative": 5183.05,
-          "remainingCostBasisNative": 5183.05,
-          "currency": "USD",
-          "price": 34.55
-        }
-      ]
-    },
-    {
-      "id": "pos_mudw902z_dydra9",
-      "symbol": "SOXL",
-      "name": "3倍做多半导体",
-      "currency": "USD",
-      "source": "twelve",
-      "shares": 40,
-      "avgCost": 150.00825,
-      "sector": "半导体",
-      "color": "#fa873c",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "",
-      "costBasisUSD": 6000.33,
-      "lots": [
-        {
-          "lotId": "tx_mudw902l_8mxnsz",
-          "buyTransactionId": "tx_mudw902l_8mxnsz",
-          "date": "2026-09-23",
-          "order": 104,
-          "shares": 40,
-          "remainingShares": 40,
-          "costBasisUSD": 6000.33,
-          "remainingCostBasisUSD": 6000.33,
-          "costBasisNative": 6000.33,
-          "remainingCostBasisNative": 6000.33,
-          "currency": "USD",
-          "price": 150
-        }
-      ]
     }
   ],
   "transactions": [
@@ -430,7 +368,7 @@
       "migration": true,
       "source": "manual",
       "sector": "半导体",
-      "color": "#ff9a58",
+      "color": "#fa873c",
       "schemaVersion": "10.6",
       "costBasisNative": 514.14
     },
@@ -3202,6 +3140,76 @@
       "costBasisNative": 6000.33,
       "grossUSD": 6000,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_muf6s066_fgix9u",
+      "date": "2026-09-24",
+      "type": "sell",
+      "symbol": "SOXL",
+      "name": "3倍做多半导体",
+      "shares": 40,
+      "price": 141,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.46,
+      "note": "",
+      "source": "twelve",
+      "sector": "半导体",
+      "color": "#fa873c",
+      "schemaVersion": "10.48",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mudw902l_8mxnsz",
+          "buyTransactionId": "tx_mudw902l_8mxnsz",
+          "date": "2026-09-23",
+          "shares": 40,
+          "unitCostUSD": 150.00825,
+          "unitCostNative": 150.00825,
+          "costBasisUSD": 6000.33,
+          "costBasisNative": 6000.33
+        }
+      ],
+      "feeUSD": 0.46,
+      "costBasisUSD": 6000.33,
+      "costBasisNative": 6000.33,
+      "grossUSD": 5640,
+      "realizedPnlUSD": -360.78999999999996
+    },
+    {
+      "id": "tx_muf6t1q0_n8c5k3",
+      "date": "2026-09-24",
+      "type": "sell",
+      "symbol": "MSTU",
+      "name": "2倍做多MSTR",
+      "shares": 150,
+      "price": 43.32,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.95,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "10.48",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mto2b85k_tg9fbn",
+          "buyTransactionId": "tx_mto2b85k_tg9fbn",
+          "date": "2026-09-04",
+          "shares": 150,
+          "unitCostUSD": 34.553666666666665,
+          "unitCostNative": 34.553666666666665,
+          "costBasisUSD": 5183.05,
+          "costBasisNative": 5183.05
+        }
+      ],
+      "feeUSD": 0.95,
+      "costBasisUSD": 5183.05,
+      "costBasisNative": 5183.05,
+      "grossUSD": 6498,
+      "realizedPnlUSD": 1314
     }
   ],
   "cashFlows": [
@@ -3636,6 +3644,14 @@
       "netAsset": 25778.04,
       "market": 22800.4,
       "cash": 2977.64
+    },
+    {
+      "scope": "active",
+      "date": "2026-09-24",
+      "capital": 22370,
+      "netAsset": 24441.17,
+      "market": 9326.94,
+      "cash": 15114.23
     }
   ],
   "dcaPlan": {
@@ -3648,12 +3664,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 712.78,
-        "priceAsOf": "2026-09-22T20:00:00.000Z",
-        "changePercent": 0,
+        "price": 707.6,
+        "priceAsOf": "2026-09-23T20:00:00.000Z",
+        "changePercent": -0.7267319509526011,
         "priceSource": "last-close",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-09-22T20:00:00.000Z"
+        "priceUpdatedAt": "2026-09-23T20:00:00.000Z"
       },
       {
         "symbol": "QQQM",
@@ -3661,12 +3677,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 307.78,
-        "priceAsOf": "2026-09-22T20:00:00.000Z",
-        "changePercent": 0.8222229501752517,
+        "price": 305.14,
+        "priceAsOf": "2026-09-23T20:00:00.000Z",
+        "changePercent": -0.8577555396711893,
         "priceSource": "last-close",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-09-22T20:00:00.000Z"
+        "priceUpdatedAt": "2026-09-23T20:00:00.000Z"
       }
     ],
     "entries": [
@@ -3924,6 +3940,13 @@
         "marketValueUSD": 1553.613644,
         "pnlUSD": 50.959102,
         "returnPct": 3.391272
+      },
+      {
+        "date": "2026-09-24",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1541.499652,
+        "pnlUSD": 38.84511,
+        "returnPct": 2.585099
       }
     ]
   }
