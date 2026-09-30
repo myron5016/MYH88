@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-09-24T18:27:30.384Z",
+    "lastCloudSaveAt": "2026-09-30T19:12:30.793Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -110,7 +110,7 @@
       "avgCost": 11.685,
       "price": 6.845,
       "sector": "半导体",
-      "color": "#fa873c",
+      "color": "#ff9a58",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "手动价，EUR",
@@ -295,6 +295,38 @@
           "price": 77.22
         }
       ]
+    },
+    {
+      "id": "pos_muohe3ew_m6flmj",
+      "symbol": "SOXL",
+      "name": "3倍做多半导体",
+      "currency": "USD",
+      "source": "twelve",
+      "shares": -50,
+      "avgCost": 150.21120000000002,
+      "sector": "半导体",
+      "color": "#fa873c",
+      "sectorLocked": false,
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": -7510.56,
+      "lots": [
+        {
+          "lotId": "tx_muohe3ef_f210kx",
+          "buyTransactionId": "tx_muohe3ef_f210kx",
+          "date": "2026-09-30",
+          "order": 110,
+          "side": "short",
+          "shares": 50,
+          "remainingShares": 50,
+          "costBasisUSD": 7510.56,
+          "remainingCostBasisUSD": 7510.56,
+          "costBasisNative": 7510.56,
+          "remainingCostBasisNative": 7510.56,
+          "currency": "USD",
+          "price": 150.22
+        }
+      ]
     }
   ],
   "transactions": [
@@ -409,7 +441,7 @@
       "migration": true,
       "source": "manual",
       "sector": "半导体",
-      "color": "#fa873c",
+      "color": "#ff9a58",
       "schemaVersion": "10.6",
       "costBasisNative": 514.14
     },
@@ -3273,6 +3305,85 @@
       "costBasisNative": 7721.45,
       "grossUSD": 7722,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_muohbu5p_z8rgjn",
+      "date": "2026-10-01",
+      "type": "buy",
+      "symbol": "MSTZ",
+      "name": "2倍做空MSTR",
+      "shares": 2000,
+      "price": 2.45,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 4.21,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "11.7.4",
+      "feeUSD": 4.21,
+      "costBasisUSD": 4904.21,
+      "costBasisNative": 4904.21,
+      "grossUSD": 4900,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_muohccor_vh2pxx",
+      "date": "2026-10-01",
+      "type": "sell",
+      "symbol": "MSTZ",
+      "name": "2倍做空MSTR",
+      "shares": 2000,
+      "price": 2.64,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 1.11,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "11.7.4",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_muohbu5p_z8rgjn",
+          "buyTransactionId": "tx_muohbu5p_z8rgjn",
+          "date": "2026-10-01",
+          "shares": 2000,
+          "unitCostUSD": 2.452105,
+          "unitCostNative": 2.452105,
+          "costBasisUSD": 4904.21,
+          "costBasisNative": 4904.21
+        }
+      ],
+      "feeUSD": 1.11,
+      "costBasisUSD": 4904.21,
+      "costBasisNative": 4904.21,
+      "grossUSD": 5280,
+      "realizedPnlUSD": 374.6800000000003
+    },
+    {
+      "id": "tx_muohe3ef_f210kx",
+      "date": "2026-09-30",
+      "type": "short",
+      "symbol": "SOXL",
+      "name": "3倍做多半导体",
+      "shares": 50,
+      "price": 150.22,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.44,
+      "note": "",
+      "source": "twelve",
+      "sector": "半导体",
+      "color": "#fa873c",
+      "schemaVersion": "11.7.4",
+      "feeUSD": 0.44,
+      "costBasisUSD": 7510.56,
+      "costBasisNative": 7510.56,
+      "grossUSD": 7511,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -3723,6 +3834,14 @@
       "netAsset": 24626.12,
       "market": 1790.44,
       "cash": 22835.68
+    },
+    {
+      "scope": "active",
+      "date": "2026-10-01",
+      "capital": 22370,
+      "netAsset": 24788.07,
+      "market": -5932.85,
+      "cash": 30720.92
     }
   ],
   "dcaPlan": {
@@ -3735,12 +3854,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 706.93,
-        "priceAsOf": "2026-09-24T18:25:00.000Z",
-        "changePercent": -0.094682816,
+        "price": 704.74,
+        "priceAsOf": "2026-09-30T19:11:00.000Z",
+        "changePercent": 0.3245705,
         "priceSource": "twelve",
         "priceProvider": "twelve",
-        "priceUpdatedAt": "2026-09-24T18:25:00.000Z"
+        "priceUpdatedAt": "2026-09-30T19:11:00.000Z"
       },
       {
         "symbol": "QQQM",
@@ -3748,12 +3867,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 304.6,
-        "priceAsOf": "2026-09-24T18:25:00.000Z",
-        "changePercent": -0.17697274,
+        "price": 306.17,
+        "priceAsOf": "2026-09-30T19:11:00.000Z",
+        "changePercent": 0.77017198,
         "priceSource": "twelve",
         "priceProvider": "twelve",
-        "priceUpdatedAt": "2026-09-24T18:25:00.000Z"
+        "priceUpdatedAt": "2026-09-30T19:11:00.000Z"
       }
     ],
     "entries": [
@@ -4025,6 +4144,13 @@
         "marketValueUSD": 1539.52742,
         "pnlUSD": 36.872878,
         "returnPct": 2.453849
+      },
+      {
+        "date": "2026-10-01",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1539.92098,
+        "pnlUSD": 37.266438,
+        "returnPct": 2.48004
       }
     ]
   }
