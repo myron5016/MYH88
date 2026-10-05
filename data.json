@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-09-30T19:12:30.793Z",
+    "lastCloudSaveAt": "2026-10-05T17:45:30.307Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -99,44 +99,6 @@
           "price": 205.085
         }
       ]
-    },
-    {
-      "id": "pos_mqnjborg_q3swfw",
-      "symbol": "XFAB",
-      "name": "芯片代工",
-      "currency": "EUR",
-      "source": "manual",
-      "shares": 44,
-      "avgCost": 11.685,
-      "price": 6.845,
-      "sector": "半导体",
-      "color": "#ff9a58",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "手动价，EUR",
-      "costBasisUSD": 588.613179,
-      "changePercent": 0,
-      "lots": [
-        {
-          "lotId": "tx_mqnjborg_dndtbg",
-          "buyTransactionId": "tx_mqnjborg_dndtbg",
-          "date": "2026-06-21",
-          "order": 4,
-          "side": "long",
-          "shares": 44,
-          "remainingShares": 44,
-          "costBasisUSD": 588.613179,
-          "remainingCostBasisUSD": 588.613179,
-          "costBasisNative": 514.14,
-          "remainingCostBasisNative": 514.14,
-          "currency": "EUR",
-          "price": 11.685
-        }
-      ],
-      "priceSource": "manual",
-      "priceProvider": "",
-      "priceUpdatedAt": "",
-      "priceAsOf": ""
     },
     {
       "id": "pos_mqnjborg_0c6vpc",
@@ -3384,6 +3346,41 @@
       "costBasisNative": 7510.56,
       "grossUSD": 7511,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_muvjhxst_2o0z2c",
+      "date": "2026-10-03",
+      "type": "sell",
+      "symbol": "XFAB",
+      "name": "芯片代工",
+      "shares": 44,
+      "price": 6.89,
+      "currency": "EUR",
+      "fxRate": 1.12565,
+      "fee": 1.25,
+      "note": "",
+      "source": "manual",
+      "sector": "半导体",
+      "color": "#ff9a58",
+      "schemaVersion": "11.7.4",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mqnjborg_dndtbg",
+          "buyTransactionId": "tx_mqnjborg_dndtbg",
+          "date": "2026-06-21",
+          "shares": 44,
+          "unitCostUSD": 13.377572249999998,
+          "unitCostNative": 11.685,
+          "costBasisUSD": 588.613179,
+          "costBasisNative": 514.14
+        }
+      ],
+      "feeUSD": 1.4070625,
+      "costBasisUSD": 588.613179,
+      "costBasisNative": 514.14,
+      "grossUSD": 341.252054,
+      "realizedPnlUSD": -248.76818749999995
     }
   ],
   "cashFlows": [
@@ -3842,6 +3839,14 @@
       "netAsset": 24788.07,
       "market": -5932.85,
       "cash": 30720.92
+    },
+    {
+      "scope": "active",
+      "date": "2026-10-06",
+      "capital": 22370,
+      "netAsset": 24112.88,
+      "market": -6947.88,
+      "cash": 31060.76
     }
   ],
   "dcaPlan": {
@@ -3854,12 +3859,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 704.74,
-        "priceAsOf": "2026-09-30T19:11:00.000Z",
-        "changePercent": 0.3245705,
+        "price": 711.67,
+        "priceAsOf": "2026-10-05T17:40:00.000Z",
+        "changePercent": 0.58371571,
         "priceSource": "twelve",
         "priceProvider": "twelve",
-        "priceUpdatedAt": "2026-09-30T19:11:00.000Z"
+        "priceUpdatedAt": "2026-10-05T17:40:00.000Z"
       },
       {
         "symbol": "QQQM",
@@ -3867,12 +3872,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 306.17,
-        "priceAsOf": "2026-09-30T19:11:00.000Z",
-        "changePercent": 0.77017198,
-        "priceSource": "twelve",
-        "priceProvider": "twelve",
-        "priceUpdatedAt": "2026-09-30T19:11:00.000Z"
+        "price": 310.75,
+        "priceAsOf": "2026-10-05T17:40:32.000Z",
+        "changePercent": 0.6673361624931169,
+        "priceSource": "finnhub",
+        "priceProvider": "finnhub",
+        "priceUpdatedAt": "2026-10-05T17:40:32.000Z"
       }
     ],
     "entries": [
@@ -4151,6 +4156,13 @@
         "marketValueUSD": 1539.92098,
         "pnlUSD": 37.266438,
         "returnPct": 2.48004
+      },
+      {
+        "date": "2026-10-06",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1558.23701,
+        "pnlUSD": 55.582468,
+        "returnPct": 3.698952
       }
     ]
   }
