@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-10-09T04:37:36.358Z",
+    "lastCloudSaveAt": "2026-10-10T01:19:13.127Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -235,7 +235,7 @@
       "shares": -100,
       "avgCost": 77.2145,
       "sector": "未分类",
-      "color": "#7a879b",
+      "color": "#627288",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
@@ -287,38 +287,6 @@
           "remainingCostBasisNative": 7510.56,
           "currency": "USD",
           "price": 150.22
-        }
-      ]
-    },
-    {
-      "id": "pos_mv0h4hjm_ohqqqr",
-      "symbol": "MSTU",
-      "name": "2倍做多MSTR",
-      "currency": "USD",
-      "source": "twelve",
-      "shares": 100,
-      "avgCost": 37.5137,
-      "sector": "未分类",
-      "color": "#627288",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "",
-      "costBasisUSD": 3751.37,
-      "lots": [
-        {
-          "lotId": "tx_mv0h4hj2_vi0xrh",
-          "buyTransactionId": "tx_mv0h4hj2_vi0xrh",
-          "date": "2026-10-09",
-          "order": 112,
-          "side": "long",
-          "shares": 100,
-          "remainingShares": 100,
-          "costBasisUSD": 3751.37,
-          "remainingCostBasisUSD": 3751.37,
-          "costBasisNative": 3751.37,
-          "remainingCostBasisNative": 3751.37,
-          "currency": "USD",
-          "price": 37.51
         }
       ]
     }
@@ -3292,7 +3260,7 @@
       "note": "",
       "source": "twelve",
       "sector": "未分类",
-      "color": "#7a879b",
+      "color": "#627288",
       "schemaVersion": "11.7.4",
       "feeUSD": 0.55,
       "costBasisUSD": 7721.45,
@@ -3435,6 +3403,41 @@
       "costBasisNative": 3751.37,
       "grossUSD": 3751,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mv1pho76_4fu89k",
+      "date": "2026-10-09",
+      "type": "sell",
+      "symbol": "MSTU",
+      "name": "2倍做多MSTR",
+      "shares": 100,
+      "price": 41,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.3,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "11.7.4",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mv0h4hj2_vi0xrh",
+          "buyTransactionId": "tx_mv0h4hj2_vi0xrh",
+          "date": "2026-10-09",
+          "shares": 100,
+          "unitCostUSD": 37.5137,
+          "unitCostNative": 37.5137,
+          "costBasisUSD": 3751.37,
+          "costBasisNative": 3751.37
+        }
+      ],
+      "feeUSD": 0.3,
+      "costBasisUSD": 3751.37,
+      "costBasisNative": 3751.37,
+      "grossUSD": 4100,
+      "realizedPnlUSD": 348.3299999999999
     }
   ],
   "cashFlows": [
@@ -3925,6 +3928,14 @@
       "netAsset": 25163.51,
       "market": -2145.88,
       "cash": 27309.39
+    },
+    {
+      "scope": "active",
+      "date": "2026-10-10",
+      "capital": 22370,
+      "netAsset": 25519.47,
+      "market": -5889.62,
+      "cash": 31409.09
     }
   ],
   "dcaPlan": {
@@ -3937,12 +3948,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 711.28,
-        "priceAsOf": "2026-10-08T20:00:00.000Z",
-        "changePercent": -0.4283674440742586,
+        "price": 715.59,
+        "priceAsOf": "2026-10-09T20:00:00.000Z",
+        "changePercent": 0.6059498369137414,
         "priceSource": "last-close",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-10-08T20:00:00.000Z"
+        "priceUpdatedAt": "2026-10-09T20:00:00.000Z"
       },
       {
         "symbol": "QQQM",
@@ -3950,12 +3961,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 307.85,
-        "priceAsOf": "2026-10-08T20:00:00.000Z",
-        "changePercent": -1.311149580047437,
+        "price": 309.39,
+        "priceAsOf": "2026-10-09T20:00:00.000Z",
+        "changePercent": 0.5002436251421027,
         "priceSource": "last-close",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-10-08T20:00:00.000Z"
+        "priceUpdatedAt": "2026-10-09T20:00:00.000Z"
       }
     ],
     "entries": [
@@ -4248,6 +4259,13 @@
         "marketValueUSD": 1551.80957,
         "pnlUSD": 49.155028,
         "returnPct": 3.271213
+      },
+      {
+        "date": "2026-10-10",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1560.548322,
+        "pnlUSD": 57.89378,
+        "returnPct": 3.852767
       }
     ]
   }
