@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-10-10T01:19:13.127Z",
+    "lastCloudSaveAt": "2026-10-13T03:56:27.722Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -255,38 +255,6 @@
           "remainingCostBasisNative": 7721.45,
           "currency": "USD",
           "price": 77.22
-        }
-      ]
-    },
-    {
-      "id": "pos_muohe3ew_m6flmj",
-      "symbol": "SOXL",
-      "name": "3倍做多半导体",
-      "currency": "USD",
-      "source": "twelve",
-      "shares": -50,
-      "avgCost": 150.21120000000002,
-      "sector": "半导体",
-      "color": "#fa873c",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "",
-      "costBasisUSD": -7510.56,
-      "lots": [
-        {
-          "lotId": "tx_muohe3ef_f210kx",
-          "buyTransactionId": "tx_muohe3ef_f210kx",
-          "date": "2026-09-30",
-          "order": 110,
-          "side": "short",
-          "shares": 50,
-          "remainingShares": 50,
-          "costBasisUSD": 7510.56,
-          "remainingCostBasisUSD": 7510.56,
-          "costBasisNative": 7510.56,
-          "remainingCostBasisNative": 7510.56,
-          "currency": "USD",
-          "price": 150.22
         }
       ]
     }
@@ -3438,6 +3406,41 @@
       "costBasisNative": 3751.37,
       "grossUSD": 4100,
       "realizedPnlUSD": 348.3299999999999
+    },
+    {
+      "id": "tx_mv65edgv_1a1yuh",
+      "date": "2026-10-12",
+      "type": "cover",
+      "symbol": "SOXL",
+      "name": "3倍做多半导体",
+      "shares": 50,
+      "price": 131.51,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.36,
+      "note": "",
+      "source": "twelve",
+      "sector": "半导体",
+      "color": "#fa873c",
+      "schemaVersion": "11.7.4",
+      "lotMethod": "fifo",
+      "lotAllocations": [
+        {
+          "lotId": "tx_muohe3ef_f210kx",
+          "buyTransactionId": "tx_muohe3ef_f210kx",
+          "date": "2026-09-30",
+          "shares": 50,
+          "unitCostUSD": 150.21120000000002,
+          "unitCostNative": 150.21120000000002,
+          "costBasisUSD": 7510.56,
+          "costBasisNative": 7510.56
+        }
+      ],
+      "feeUSD": 0.36,
+      "costBasisUSD": 7510.56,
+      "costBasisNative": 7510.56,
+      "grossUSD": 6575.5,
+      "realizedPnlUSD": 934.7000000000004
     }
   ],
   "cashFlows": [
@@ -3936,6 +3939,22 @@
       "netAsset": 25519.47,
       "market": -5889.62,
       "cash": 31409.09
+    },
+    {
+      "scope": "active",
+      "date": "2026-10-12",
+      "capital": 22370,
+      "netAsset": 25865.33,
+      "market": -5543.76,
+      "cash": 31409.09
+    },
+    {
+      "scope": "active",
+      "date": "2026-10-13",
+      "capital": 22370,
+      "netAsset": 25970.03,
+      "market": 1136.8,
+      "cash": 24833.23
     }
   ],
   "dcaPlan": {
@@ -3948,12 +3967,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 715.59,
-        "priceAsOf": "2026-10-09T20:00:00.000Z",
-        "changePercent": 0.6059498369137414,
+        "price": 715.13,
+        "priceAsOf": "2026-10-12T20:00:00.000Z",
+        "changePercent": -0.06428261993600194,
         "priceSource": "last-close",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-10-09T20:00:00.000Z"
+        "priceUpdatedAt": "2026-10-12T20:00:00.000Z"
       },
       {
         "symbol": "QQQM",
@@ -3961,12 +3980,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 309.39,
-        "priceAsOf": "2026-10-09T20:00:00.000Z",
-        "changePercent": 0.5002436251421027,
+        "price": 307.19,
+        "priceAsOf": "2026-10-12T20:00:00.000Z",
+        "changePercent": -0.7110766346682145,
         "priceSource": "last-close",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-10-09T20:00:00.000Z"
+        "priceUpdatedAt": "2026-10-12T20:00:00.000Z"
       }
     ],
     "entries": [
@@ -4266,6 +4285,13 @@
         "marketValueUSD": 1560.548322,
         "pnlUSD": 57.89378,
         "returnPct": 3.852767
+      },
+      {
+        "date": "2026-10-13",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1555.459282,
+        "pnlUSD": 52.80474,
+        "returnPct": 3.514097
       }
     ]
   }
