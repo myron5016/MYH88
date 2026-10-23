@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-10-23T03:25:11.978Z",
+    "lastCloudSaveAt": "2026-10-23T03:28:54.445Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -4408,6 +4408,34 @@
         "countsTowardPlan": true,
         "note": "8月手动定投",
         "source": "manual"
+      },
+      {
+        "id": "dca_mvkes5yk_g8nph8",
+        "date": "2026-10-23",
+        "type": "buy",
+        "symbol": "VOO",
+        "plannedAmountUSD": 600,
+        "shares": 0.8565,
+        "price": 700.45,
+        "feeUSD": 0.35,
+        "costBasisUSD": 600.2854250000001,
+        "countsTowardPlan": true,
+        "note": "9月~10月手动定投",
+        "source": "manual"
+      },
+      {
+        "id": "dca_mvketab6_qb8bxb",
+        "date": "2026-10-23",
+        "type": "buy",
+        "symbol": "QQQM",
+        "plannedAmountUSD": 400,
+        "shares": 1.3805,
+        "price": 289.733,
+        "feeUSD": 0.35,
+        "costBasisUSD": 400.3264065,
+        "countsTowardPlan": true,
+        "note": "9月~10月手动定投",
+        "source": "manual"
       }
     ],
     "snapshots": [
@@ -4616,10 +4644,10 @@
       },
       {
         "date": "2026-10-23",
-        "costBasisUSD": 1502.654542,
-        "marketValueUSD": 1503.972834,
-        "pnlUSD": 1.318292,
-        "returnPct": 0.087731
+        "costBasisUSD": 2503.266374,
+        "marketValueUSD": 2506.017249,
+        "pnlUSD": 2.750875,
+        "returnPct": 0.109891
       }
     ]
   }
