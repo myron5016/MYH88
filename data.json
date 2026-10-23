@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-10-17T08:26:32.991Z",
+    "lastCloudSaveAt": "2026-10-23T03:25:11.978Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -232,14 +232,14 @@
       "name": "3倍做多半导体",
       "currency": "USD",
       "source": "twelve",
-      "shares": 100,
-      "avgCost": 101.06189999999998,
+      "shares": 150,
+      "avgCost": 96.7118,
       "sector": "半导体",
       "color": "#fa873c",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 10106.19,
+      "costBasisUSD": 14506.77,
       "lots": [
         {
           "lotId": "tx_mvc4r0o1_7mgqpu",
@@ -270,6 +270,36 @@
           "remainingCostBasisNative": 4900.28,
           "currency": "USD",
           "price": 98
+        },
+        {
+          "lotId": "tx_mvken7f2_s6hwuh",
+          "buyTransactionId": "tx_mvken7f2_s6hwuh",
+          "date": "2026-10-22",
+          "order": 122,
+          "side": "long",
+          "shares": 30,
+          "remainingShares": 30,
+          "costBasisUSD": 2700.26,
+          "remainingCostBasisUSD": 2700.26,
+          "costBasisNative": 2700.26,
+          "remainingCostBasisNative": 2700.26,
+          "currency": "USD",
+          "price": 90
+        },
+        {
+          "lotId": "tx_mvkenldl_61hftz",
+          "buyTransactionId": "tx_mvkenldl_61hftz",
+          "date": "2026-10-22",
+          "order": 123,
+          "side": "long",
+          "shares": 20,
+          "remainingShares": 20,
+          "costBasisUSD": 1700.32,
+          "remainingCostBasisUSD": 1700.32,
+          "costBasisNative": 1700.32,
+          "remainingCostBasisNative": 1700.32,
+          "currency": "USD",
+          "price": 85
         }
       ]
     }
@@ -3649,6 +3679,50 @@
       "costBasisNative": 7601.92,
       "grossUSD": 7208,
       "realizedPnlUSD": -397.02999999999975
+    },
+    {
+      "id": "tx_mvken7f2_s6hwuh",
+      "date": "2026-10-22",
+      "type": "buy",
+      "symbol": "SOXL",
+      "name": "3倍做多半导体",
+      "shares": 30,
+      "price": 90,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.26,
+      "note": "",
+      "source": "twelve",
+      "sector": "半导体",
+      "color": "#fa873c",
+      "schemaVersion": "11.7.4",
+      "feeUSD": 0.26,
+      "costBasisUSD": 2700.26,
+      "costBasisNative": 2700.26,
+      "grossUSD": 2700,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mvkenldl_61hftz",
+      "date": "2026-10-22",
+      "type": "buy",
+      "symbol": "SOXL",
+      "name": "3倍做多半导体",
+      "shares": 20,
+      "price": 85,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.32,
+      "note": "",
+      "source": "twelve",
+      "sector": "半导体",
+      "color": "#fa873c",
+      "schemaVersion": "11.7.4",
+      "feeUSD": 0.32,
+      "costBasisUSD": 1700.32,
+      "costBasisNative": 1700.32,
+      "grossUSD": 1700,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -4179,6 +4253,22 @@
       "netAsset": 23748.68,
       "market": 17425.6,
       "cash": 6323.08
+    },
+    {
+      "scope": "active",
+      "date": "2026-10-19",
+      "capital": 22370,
+      "netAsset": 24657.78,
+      "market": 18334.7,
+      "cash": 6323.08
+    },
+    {
+      "scope": "active",
+      "date": "2026-10-23",
+      "capital": 22370,
+      "netAsset": 22098.62,
+      "market": 20176.12,
+      "cash": 1922.5
     }
   ],
   "dcaPlan": {
@@ -4191,12 +4281,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 701.61,
-        "priceAsOf": "2026-10-16T20:00:00.000Z",
-        "changePercent": -1.1022933904683954,
+        "price": 702.3,
+        "priceAsOf": "2026-10-22T20:00:00.000Z",
+        "changePercent": -1.1847140927510234,
         "priceSource": "last-close",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-10-16T20:00:00.000Z"
+        "priceUpdatedAt": "2026-10-22T20:00:00.000Z"
       },
       {
         "symbol": "QQQM",
@@ -4204,12 +4294,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 292.26,
-        "priceAsOf": "2026-10-16T20:00:00.000Z",
-        "changePercent": -2.5117582307615427,
+        "price": 290.13,
+        "priceAsOf": "2026-10-22T20:00:00.000Z",
+        "changePercent": -2.849584784355743,
         "priceSource": "last-close",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-10-16T20:00:00.000Z"
+        "priceUpdatedAt": "2026-10-22T20:00:00.000Z"
       }
     ],
     "entries": [
@@ -4523,6 +4613,13 @@
         "marketValueUSD": 1507.426248,
         "pnlUSD": 4.771706,
         "returnPct": 0.317552
+      },
+      {
+        "date": "2026-10-23",
+        "costBasisUSD": 1502.654542,
+        "marketValueUSD": 1503.972834,
+        "pnlUSD": 1.318292,
+        "returnPct": 0.087731
       }
     ]
   }
