@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-11-04T17:05:59.180Z",
+    "lastCloudSaveAt": "2026-11-04T17:06:58.448Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -247,14 +247,14 @@
       "name": "3倍做多半导体",
       "currency": "USD",
       "source": "twelve",
-      "shares": 200,
-      "avgCost": 78.97930000000001,
+      "shares": 250,
+      "avgCost": 76.18456,
       "sector": "半导体",
       "color": "#fa873c",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 15795.86,
+      "costBasisUSD": 19046.14,
       "lots": [
         {
           "lotId": "tx_mw1yp84d_vkkpfn",
@@ -300,6 +300,21 @@
           "remainingCostBasisNative": 3650.28,
           "currency": "USD",
           "price": 73
+        },
+        {
+          "lotId": "tx_mw2dcp74_4kl4jd",
+          "buyTransactionId": "tx_mw2dcp74_4kl4jd",
+          "date": "2026-11-04",
+          "order": 132,
+          "side": "long",
+          "shares": 50,
+          "remainingShares": 50,
+          "costBasisUSD": 3250.28,
+          "remainingCostBasisUSD": 3250.28,
+          "costBasisNative": 3250.28,
+          "remainingCostBasisNative": 3250.28,
+          "currency": "USD",
+          "price": 65
         }
       ]
     },
@@ -3992,6 +4007,28 @@
       "costBasisNative": 2937.37,
       "grossUSD": 2937,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mw2dcp74_4kl4jd",
+      "date": "2026-11-04",
+      "type": "buy",
+      "symbol": "SOXL",
+      "name": "3倍做多半导体",
+      "shares": 50,
+      "price": 65,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.28,
+      "note": "",
+      "source": "twelve",
+      "sector": "半导体",
+      "color": "#fa873c",
+      "schemaVersion": "11.7.4",
+      "feeUSD": 0.28,
+      "costBasisUSD": 3250.28,
+      "costBasisNative": 3250.28,
+      "grossUSD": 3250,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -4578,9 +4615,9 @@
       "scope": "active",
       "date": "2026-11-05",
       "capital": 22370,
-      "netAsset": 23120.09,
-      "market": 31272.17,
-      "cash": -8152.08
+      "netAsset": 23209.31,
+      "market": 34611.67,
+      "cash": -11402.36
     }
   ],
   "dcaPlan": {
