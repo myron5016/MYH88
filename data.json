@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-11-04T10:21:25.420Z",
+    "lastCloudSaveAt": "2026-11-04T10:37:58.955Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -285,6 +285,38 @@
           "remainingCostBasisNative": 3650.28,
           "currency": "USD",
           "price": 73
+        }
+      ]
+    },
+    {
+      "id": "pos_mw1zg6f2_lb3oqu",
+      "symbol": "MSTU",
+      "name": "2倍做多MSTR",
+      "currency": "USD",
+      "source": "twelve",
+      "shares": 150,
+      "avgCost": 30.002133333333333,
+      "sector": "未分类",
+      "color": "#627288",
+      "sectorLocked": false,
+      "colorLocked": false,
+      "note": "",
+      "costBasisUSD": 4500.32,
+      "lots": [
+        {
+          "lotId": "tx_mw1zg6ec_ki9lr7",
+          "buyTransactionId": "tx_mw1zg6ec_ki9lr7",
+          "date": "2026-10-30",
+          "order": 129,
+          "side": "long",
+          "shares": 150,
+          "remainingShares": 150,
+          "costBasisUSD": 4500.32,
+          "remainingCostBasisUSD": 4500.32,
+          "costBasisNative": 4500.32,
+          "remainingCostBasisNative": 4500.32,
+          "currency": "USD",
+          "price": 30
         }
       ]
     }
@@ -3864,6 +3896,28 @@
       "costBasisNative": 3650.28,
       "grossUSD": 3650,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mw1zg6ec_ki9lr7",
+      "date": "2026-10-30",
+      "type": "buy",
+      "symbol": "MSTU",
+      "name": "2倍做多MSTR",
+      "shares": 150,
+      "price": 30,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.32,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "11.7.4",
+      "feeUSD": 0.32,
+      "costBasisUSD": 4500.32,
+      "costBasisNative": 4500.32,
+      "grossUSD": 4500,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -4429,11 +4483,22 @@
     },
     {
       "scope": "active",
+      "date": "2026-11-02",
+      "capital": 22370,
+      "netAsset": 22696.033974500002,
+      "market": 17520.139892,
+      "cash": 5175.894082500003,
+      "openingBaseline": true,
+      "source": "ledger-historical-close",
+      "reconstructedAt": "2026-11-04T10:30:07.088Z"
+    },
+    {
+      "scope": "active",
       "date": "2026-11-04",
       "capital": 22370,
-      "netAsset": 23622.85,
-      "market": 22097.24,
-      "cash": 1525.61
+      "netAsset": 23477.03,
+      "market": 26451.74,
+      "cash": -2974.71
     }
   ],
   "dcaPlan": {
