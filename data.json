@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-11-04T10:37:58.955Z",
+    "lastCloudSaveAt": "2026-11-04T17:05:59.180Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -185,14 +185,14 @@
       "name": "谷歌",
       "currency": "USD",
       "source": "twelve",
-      "shares": 10,
-      "avgCost": 335.068,
+      "shares": 20,
+      "avgCost": 314.4025,
       "sector": "科技平台",
       "color": "#885af1",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 3350.68,
+      "costBasisUSD": 6288.05,
       "lots": [
         {
           "lotId": "tx_mrwsacgk_xi32ic",
@@ -223,6 +223,21 @@
           "remainingCostBasisNative": 1650.34,
           "currency": "USD",
           "price": 330
+        },
+        {
+          "lotId": "tx_mw2dam9f_5zq0qw",
+          "buyTransactionId": "tx_mw2dam9f_5zq0qw",
+          "date": "2026-10-29",
+          "order": 131,
+          "side": "long",
+          "shares": 10,
+          "remainingShares": 10,
+          "costBasisUSD": 2937.37,
+          "remainingCostBasisUSD": 2937.37,
+          "costBasisNative": 2937.37,
+          "remainingCostBasisNative": 2937.37,
+          "currency": "USD",
+          "price": 293.7
         }
       ]
     },
@@ -294,14 +309,14 @@
       "name": "2倍做多MSTR",
       "currency": "USD",
       "source": "twelve",
-      "shares": 150,
-      "avgCost": 30.002133333333333,
+      "shares": 230,
+      "avgCost": 29.30573913043478,
       "sector": "未分类",
       "color": "#627288",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 4500.32,
+      "costBasisUSD": 6740.32,
       "lots": [
         {
           "lotId": "tx_mw1zg6ec_ki9lr7",
@@ -317,6 +332,21 @@
           "remainingCostBasisNative": 4500.32,
           "currency": "USD",
           "price": 30
+        },
+        {
+          "lotId": "tx_mw28kett_lvjf9m",
+          "buyTransactionId": "tx_mw28kett_lvjf9m",
+          "date": "2026-11-02",
+          "order": 130,
+          "side": "long",
+          "shares": 80,
+          "remainingShares": 80,
+          "costBasisUSD": 2240,
+          "remainingCostBasisUSD": 2240,
+          "costBasisNative": 2240,
+          "remainingCostBasisNative": 2240,
+          "currency": "USD",
+          "price": 28
         }
       ]
     }
@@ -3918,6 +3948,50 @@
       "costBasisNative": 4500.32,
       "grossUSD": 4500,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mw28kett_lvjf9m",
+      "date": "2026-11-02",
+      "type": "buy",
+      "symbol": "MSTU",
+      "name": "2倍做多MSTR",
+      "shares": 80,
+      "price": 28,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "11.7.4",
+      "feeUSD": 0,
+      "costBasisUSD": 2240,
+      "costBasisNative": 2240,
+      "grossUSD": 2240,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mw2dam9f_5zq0qw",
+      "date": "2026-10-29",
+      "type": "buy",
+      "symbol": "GOOGL",
+      "name": "谷歌",
+      "shares": 10,
+      "price": 293.7,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.37,
+      "note": "",
+      "source": "twelve",
+      "sector": "科技平台",
+      "color": "#885af1",
+      "schemaVersion": "11.7.4",
+      "feeUSD": 0.37,
+      "costBasisUSD": 2937.37,
+      "costBasisNative": 2937.37,
+      "grossUSD": 2937,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -4496,9 +4570,17 @@
       "scope": "active",
       "date": "2026-11-04",
       "capital": 22370,
-      "netAsset": 23477.03,
-      "market": 26451.74,
-      "cash": -2974.71
+      "netAsset": 22672.77,
+      "market": 27887.48,
+      "cash": -5214.71
+    },
+    {
+      "scope": "active",
+      "date": "2026-11-05",
+      "capital": 22370,
+      "netAsset": 23120.09,
+      "market": 31272.17,
+      "cash": -8152.08
     }
   ],
   "dcaPlan": {
@@ -4511,12 +4593,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 693.54,
-        "priceAsOf": "2026-11-03T21:00:00.000Z",
-        "changePercent": 0.32112480472139004,
-        "priceSource": "last-close",
-        "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-11-03T21:00:00.000Z"
+        "price": 705.665,
+        "priceAsOf": "2026-11-04T17:04:00.000Z",
+        "changePercent": 1.74828,
+        "priceSource": "twelve",
+        "priceProvider": "twelve",
+        "priceUpdatedAt": "2026-11-04T17:04:00.000Z"
       },
       {
         "symbol": "QQQM",
@@ -4524,12 +4606,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 282.23,
-        "priceAsOf": "2026-11-03T21:00:00.000Z",
-        "changePercent": 0.620342971228924,
-        "priceSource": "last-close",
+        "price": 286.22,
+        "priceAsOf": "2026-11-04T17:04:55.000Z",
+        "changePercent": 1.4137405662048714,
+        "priceSource": "finnhub",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-11-03T21:00:00.000Z"
+        "priceUpdatedAt": "2026-11-04T17:04:55.000Z"
       }
     ],
     "entries": [
@@ -4882,9 +4964,16 @@
       {
         "date": "2026-11-04",
         "costBasisUSD": 2503.266374,
-        "marketValueUSD": 2460.107659,
-        "pnlUSD": -43.158715,
-        "returnPct": -1.724096
+        "marketValueUSD": 2492.95255,
+        "pnlUSD": -10.313824,
+        "returnPct": -0.412015
+      },
+      {
+        "date": "2026-11-05",
+        "costBasisUSD": 2503.266374,
+        "marketValueUSD": 2499.885949,
+        "pnlUSD": -3.380425,
+        "returnPct": -0.135041
       }
     ]
   }
