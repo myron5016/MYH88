@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-11-04T17:06:58.448Z",
+    "lastCloudSaveAt": "2026-11-04T17:11:40.640Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -4615,8 +4615,8 @@
       "scope": "active",
       "date": "2026-11-05",
       "capital": 22370,
-      "netAsset": 23209.31,
-      "market": 34611.67,
+      "netAsset": 23126.92,
+      "market": 34529.28,
       "cash": -11402.36
     }
   ],
@@ -4630,12 +4630,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 705.665,
-        "priceAsOf": "2026-11-04T17:04:00.000Z",
-        "changePercent": 1.74828,
+        "price": 705.99,
+        "priceAsOf": "2026-11-04T17:10:00.000Z",
+        "changePercent": 1.79514,
         "priceSource": "twelve",
         "priceProvider": "twelve",
-        "priceUpdatedAt": "2026-11-04T17:04:00.000Z"
+        "priceUpdatedAt": "2026-11-04T17:10:00.000Z"
       },
       {
         "symbol": "QQQM",
@@ -4643,12 +4643,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 286.22,
-        "priceAsOf": "2026-11-04T17:04:55.000Z",
-        "changePercent": 1.4137405662048714,
+        "price": 286.31,
+        "priceAsOf": "2026-11-04T17:09:52.000Z",
+        "changePercent": 1.4456294511568522,
         "priceSource": "finnhub",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-11-04T17:04:55.000Z"
+        "priceUpdatedAt": "2026-11-04T17:09:52.000Z"
       }
     ],
     "entries": [
@@ -5008,9 +5008,9 @@
       {
         "date": "2026-11-05",
         "costBasisUSD": 2503.266374,
-        "marketValueUSD": 2499.885949,
-        "pnlUSD": -3.380425,
-        "returnPct": -0.135041
+        "marketValueUSD": 2500.894168,
+        "pnlUSD": -2.372206,
+        "returnPct": -0.094764
       }
     ]
   }
