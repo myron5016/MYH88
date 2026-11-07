@@ -5,7 +5,7 @@
     "schemaVersion": "10.33",
     "migratedFrom": "V8.0",
     "migratedAt": "2026-06-21T08:38:50.908Z",
-    "lastCloudSaveAt": "2026-11-04T17:11:40.640Z",
+    "lastCloudSaveAt": "2026-11-07T09:02:03.343Z",
     "priceProxyUrl": "https://quote.myh88.com",
     "priceProxyUrls": [
       "https://quote.myh88.com"
@@ -27,14 +27,14 @@
       "name": "英伟达",
       "currency": "USD",
       "source": "twelve",
-      "shares": 4,
-      "avgCost": 196.17201575,
+      "shares": 14,
+      "avgCost": 195.38343307142858,
       "sector": "AI基建",
       "color": "#21cf87",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 784.688063,
+      "costBasisUSD": 2735.368063,
       "lots": [
         {
           "lotId": "tx_mqszfh6h_n9zn35",
@@ -65,6 +65,36 @@
           "remainingCostBasisNative": 382.34,
           "currency": "USD",
           "price": 191
+        },
+        {
+          "lotId": "tx_mw66b68q_p2iw5p",
+          "buyTransactionId": "tx_mw66b68q_p2iw5p",
+          "date": "2026-11-05",
+          "order": 135,
+          "side": "long",
+          "shares": 5,
+          "remainingShares": 5,
+          "costBasisUSD": 950.34,
+          "remainingCostBasisUSD": 950.34,
+          "costBasisNative": 950.34,
+          "remainingCostBasisNative": 950.34,
+          "currency": "USD",
+          "price": 190
+        },
+        {
+          "lotId": "tx_mw66bjup_ub2233",
+          "buyTransactionId": "tx_mw66bjup_ub2233",
+          "date": "2026-11-05",
+          "order": 136,
+          "side": "long",
+          "shares": 5,
+          "remainingShares": 5,
+          "costBasisUSD": 1000.34,
+          "remainingCostBasisUSD": 1000.34,
+          "costBasisNative": 1000.34,
+          "remainingCostBasisNative": 1000.34,
+          "currency": "USD",
+          "price": 200
         }
       ]
     },
@@ -153,14 +183,14 @@
       "name": "Space X",
       "currency": "USD",
       "source": "twelve",
-      "shares": 10,
-      "avgCost": 150,
+      "shares": 15,
+      "avgCost": 143.35600000000002,
       "sector": "太空",
       "color": "#f16183",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 1500,
+      "costBasisUSD": 2150.34,
       "lots": [
         {
           "lotId": "tx_mqnjborg_1jspyf",
@@ -176,6 +206,21 @@
           "remainingCostBasisNative": 1500,
           "currency": "USD",
           "price": 150
+        },
+        {
+          "lotId": "tx_mw66c4wu_b7hk35",
+          "buyTransactionId": "tx_mw66c4wu_b7hk35",
+          "date": "2026-11-05",
+          "order": 137,
+          "side": "long",
+          "shares": 5,
+          "remainingShares": 5,
+          "costBasisUSD": 650.34,
+          "remainingCostBasisUSD": 650.34,
+          "costBasisNative": 650.34,
+          "remainingCostBasisNative": 650.34,
+          "currency": "USD",
+          "price": 130
         }
       ]
     },
@@ -247,14 +292,14 @@
       "name": "3倍做多半导体",
       "currency": "USD",
       "source": "twelve",
-      "shares": 250,
-      "avgCost": 76.18456,
+      "shares": 290,
+      "avgCost": 71.88424137931034,
       "sector": "半导体",
       "color": "#fa873c",
       "sectorLocked": false,
       "colorLocked": false,
       "note": "",
-      "costBasisUSD": 19046.14,
+      "costBasisUSD": 20846.43,
       "lots": [
         {
           "lotId": "tx_mw1yp84d_vkkpfn",
@@ -315,53 +360,21 @@
           "remainingCostBasisNative": 3250.28,
           "currency": "USD",
           "price": 65
-        }
-      ]
-    },
-    {
-      "id": "pos_mw1zg6f2_lb3oqu",
-      "symbol": "MSTU",
-      "name": "2倍做多MSTR",
-      "currency": "USD",
-      "source": "twelve",
-      "shares": 230,
-      "avgCost": 29.30573913043478,
-      "sector": "未分类",
-      "color": "#627288",
-      "sectorLocked": false,
-      "colorLocked": false,
-      "note": "",
-      "costBasisUSD": 6740.32,
-      "lots": [
-        {
-          "lotId": "tx_mw1zg6ec_ki9lr7",
-          "buyTransactionId": "tx_mw1zg6ec_ki9lr7",
-          "date": "2026-10-30",
-          "order": 129,
-          "side": "long",
-          "shares": 150,
-          "remainingShares": 150,
-          "costBasisUSD": 4500.32,
-          "remainingCostBasisUSD": 4500.32,
-          "costBasisNative": 4500.32,
-          "remainingCostBasisNative": 4500.32,
-          "currency": "USD",
-          "price": 30
         },
         {
-          "lotId": "tx_mw28kett_lvjf9m",
-          "buyTransactionId": "tx_mw28kett_lvjf9m",
-          "date": "2026-11-02",
-          "order": 130,
+          "lotId": "tx_mw66aqfs_197wfd",
+          "buyTransactionId": "tx_mw66aqfs_197wfd",
+          "date": "2026-11-06",
+          "order": 134,
           "side": "long",
-          "shares": 80,
-          "remainingShares": 80,
-          "costBasisUSD": 2240,
-          "remainingCostBasisUSD": 2240,
-          "costBasisNative": 2240,
-          "remainingCostBasisNative": 2240,
+          "shares": 40,
+          "remainingShares": 40,
+          "costBasisUSD": 1800.29,
+          "remainingCostBasisUSD": 1800.29,
+          "costBasisNative": 1800.29,
+          "remainingCostBasisNative": 1800.29,
           "currency": "USD",
-          "price": 28
+          "price": 45
         }
       ]
     }
@@ -4029,6 +4042,139 @@
       "costBasisNative": 3250.28,
       "grossUSD": 3250,
       "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mw669650_8bfa7e",
+      "date": "2026-11-05",
+      "type": "sell",
+      "symbol": "MSTU",
+      "name": "2倍做多MSTR",
+      "shares": 230,
+      "price": 32.8,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.58,
+      "note": "",
+      "source": "twelve",
+      "sector": "未分类",
+      "color": "#627288",
+      "schemaVersion": "11.7.4",
+      "lotMethod": "specific",
+      "lotAllocations": [
+        {
+          "lotId": "tx_mw1zg6ec_ki9lr7",
+          "buyTransactionId": "tx_mw1zg6ec_ki9lr7",
+          "date": "2026-10-30",
+          "shares": 150,
+          "unitCostUSD": 30.002133333333333,
+          "unitCostNative": 30.002133333333333,
+          "costBasisUSD": 4500.32,
+          "costBasisNative": 4500.32
+        },
+        {
+          "lotId": "tx_mw28kett_lvjf9m",
+          "buyTransactionId": "tx_mw28kett_lvjf9m",
+          "date": "2026-11-02",
+          "shares": 80,
+          "unitCostUSD": 28,
+          "unitCostNative": 28,
+          "costBasisUSD": 2240,
+          "costBasisNative": 2240
+        }
+      ],
+      "feeUSD": 0.58,
+      "costBasisUSD": 6740.32,
+      "costBasisNative": 6740.32,
+      "grossUSD": 7543.999999999999,
+      "realizedPnlUSD": 803.0999999999995
+    },
+    {
+      "id": "tx_mw66aqfs_197wfd",
+      "date": "2026-11-06",
+      "type": "buy",
+      "symbol": "SOXL",
+      "name": "3倍做多半导体",
+      "shares": 40,
+      "price": 45,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.29,
+      "note": "",
+      "source": "twelve",
+      "sector": "半导体",
+      "color": "#fa873c",
+      "schemaVersion": "11.7.4",
+      "feeUSD": 0.29,
+      "costBasisUSD": 1800.29,
+      "costBasisNative": 1800.29,
+      "grossUSD": 1800,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mw66b68q_p2iw5p",
+      "date": "2026-11-05",
+      "type": "buy",
+      "symbol": "NVDA",
+      "name": "英伟达",
+      "shares": 5,
+      "price": 190,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.34,
+      "note": "",
+      "source": "twelve",
+      "sector": "AI基建",
+      "color": "#21cf87",
+      "schemaVersion": "11.7.4",
+      "feeUSD": 0.34,
+      "costBasisUSD": 950.34,
+      "costBasisNative": 950.34,
+      "grossUSD": 950,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mw66bjup_ub2233",
+      "date": "2026-11-05",
+      "type": "buy",
+      "symbol": "NVDA",
+      "name": "英伟达",
+      "shares": 5,
+      "price": 200,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.34,
+      "note": "",
+      "source": "twelve",
+      "sector": "AI基建",
+      "color": "#21cf87",
+      "schemaVersion": "11.7.4",
+      "feeUSD": 0.34,
+      "costBasisUSD": 1000.34,
+      "costBasisNative": 1000.34,
+      "grossUSD": 1000,
+      "realizedPnlUSD": 0
+    },
+    {
+      "id": "tx_mw66c4wu_b7hk35",
+      "date": "2026-11-05",
+      "type": "buy",
+      "symbol": "SPCX",
+      "name": "Space X",
+      "shares": 5,
+      "price": 130,
+      "currency": "USD",
+      "fxRate": 1,
+      "fee": 0.34,
+      "note": "",
+      "source": "twelve",
+      "sector": "太空",
+      "color": "#f16183",
+      "schemaVersion": "11.7.4",
+      "feeUSD": 0.34,
+      "costBasisUSD": 650.34,
+      "costBasisNative": 650.34,
+      "grossUSD": 650,
+      "realizedPnlUSD": 0
     }
   ],
   "cashFlows": [
@@ -4618,6 +4764,14 @@
       "netAsset": 23126.92,
       "market": 34529.28,
       "cash": -11402.36
+    },
+    {
+      "scope": "active",
+      "date": "2026-11-07",
+      "capital": 22370,
+      "netAsset": 17716.98,
+      "market": 25977.23,
+      "cash": -8260.25
     }
   ],
   "dcaPlan": {
@@ -4630,12 +4784,12 @@
         "issuer": "Vanguard",
         "targetWeight": 0.6,
         "source": "twelve",
-        "price": 705.99,
-        "priceAsOf": "2026-11-04T17:10:00.000Z",
-        "changePercent": 1.79514,
-        "priceSource": "twelve",
-        "priceProvider": "twelve",
-        "priceUpdatedAt": "2026-11-04T17:10:00.000Z"
+        "price": 675.99,
+        "priceAsOf": "2026-11-06T21:00:00.000Z",
+        "changePercent": 0.29971660459664107,
+        "priceSource": "last-close",
+        "priceProvider": "finnhub",
+        "priceUpdatedAt": "2026-11-06T21:00:00.000Z"
       },
       {
         "symbol": "QQQM",
@@ -4643,12 +4797,12 @@
         "issuer": "Invesco",
         "targetWeight": 0.4,
         "source": "twelve",
-        "price": 286.31,
-        "priceAsOf": "2026-11-04T17:09:52.000Z",
-        "changePercent": 1.4456294511568522,
-        "priceSource": "finnhub",
+        "price": 270.22,
+        "priceAsOf": "2026-11-06T21:00:00.000Z",
+        "changePercent": 1.2628817687839626,
+        "priceSource": "last-close",
         "priceProvider": "finnhub",
-        "priceUpdatedAt": "2026-11-04T17:09:52.000Z"
+        "priceUpdatedAt": "2026-11-06T21:00:00.000Z"
       }
     ],
     "entries": [
@@ -5011,6 +5165,13 @@
         "marketValueUSD": 2500.894168,
         "pnlUSD": -2.372206,
         "returnPct": -0.094764
+      },
+      {
+        "date": "2026-11-07",
+        "costBasisUSD": 2503.266374,
+        "marketValueUSD": 2381.194361,
+        "pnlUSD": -122.072013,
+        "returnPct": -4.876509
       }
     ]
   }
